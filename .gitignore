@@ -12,10 +12,12 @@
 
 # testing
 /coverage
+.nyc_output/
 
 # next.js
 /.next/
 /out/
+/dist/
 
 # production
 /build
@@ -39,3 +41,24 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Database
+*.db
+*.db-journal
+
+# Prisma
+prisma/migrations/dev.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
