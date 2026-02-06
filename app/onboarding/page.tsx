@@ -1,4 +1,4 @@
-// app/onboarding/page.tsx
+// app/onboarding/page.tsx - Updated to pass businessData to step3
 "use client";
 
 import { useState, useEffect } from "react";
@@ -164,6 +164,7 @@ export default function OnboardingPage() {
                             {currentStep === 3 && (
                                 <OnboardingStep3
                                     businessSlug={session.user.businessSlug || ""}
+                                    businessData={businessData}
                                 />
                             )}
                         </CardContent>

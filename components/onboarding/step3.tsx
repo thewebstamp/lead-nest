@@ -1,21 +1,42 @@
 // components/onboarding/step3.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, Copy } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import LeadForm from "@/components/forms/lead-form";
 
 interface OnboardingStep3Props {
     businessSlug: string;
+    businessData: {
+        serviceTypes: string[];
+        businessEmail: string;
+        location: string;
+        serviceArea: string;
+    };
 }
 
-export default function OnboardingStep3({ businessSlug }: OnboardingStep3Props) {
+export default function OnboardingStep3({ businessSlug, businessData }: OnboardingStep3Props) {
     const [copied, setCopied] = useState(false);
-    const formUrl = `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/form/${businessSlug}`;
+    const [businessName, setBusinessName] = useState("Your Business");
+
+    // Get business name from slug (capitalize words)
+    useEffect(() => {
+        if (businessSlug) {
+            const name = businessSlug
+                .split('-')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setBusinessName(name);
+        }
+    }, [businessSlug]);
+
+    const formUrl = `${typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL || ''}/form/${businessSlug}`;
 
     const copyToClipboard = async () => {
         try {
@@ -80,24 +101,12 @@ export default function OnboardingStep3({ businessSlug }: OnboardingStep3Props) 
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="space-y-4 rounded-lg border p-4 bg-gray-50">
-                        <div className="space-y-2">
-                            <div className="h-4 w-24 bg-gray-300 rounded"></div>
-                            <div className="h-10 bg-white border rounded"></div>
-                        </div>
-                        <div className="space-y-2">
-                            <div className="h-4 w-24 bg-gray-300 rounded"></div>
-                            <div className="h-10 bg-white border rounded"></div>
-                        </div>
-                        <div className="space-y-2">
-                            <div className="h-4 w-24 bg-gray-300 rounded"></div>
-                            <div className="h-10 bg-white border rounded"></div>
-                        </div>
-                        <div className="space-y-2">
-                            <div className="h-4 w-24 bg-gray-300 rounded"></div>
-                            <div className="h-20 bg-white border rounded"></div>
-                        </div>
-                        <div className="h-10 bg-blue-600 rounded"></div>
+                    <div className="border rounded-lg p-2 bg-gray-50">
+                        <LeadForm
+                            businessSlug={businessSlug}
+                            businessName={businessName}
+                            serviceTypes={businessData.serviceTypes.length > 0 ? businessData.serviceTypes : ["General Inquiry"]}
+                        />
                     </div>
                 </CardContent>
             </Card>
@@ -107,8 +116,8 @@ export default function OnboardingStep3({ businessSlug }: OnboardingStep3Props) 
                 <ul className="text-sm text-blue-800 space-y-1">
                     <li>• Share your form link with potential customers</li>
                     <li>• Leads will appear in your dashboard automatically</li>
-                    <li>• Set up automated follow-ups in settings</li>
-                    <li>• Add team members as your business grows</li>
+                    <li>• We&apos;ll notify you instantly when leads come in</li>
+                    <li>• Automatically follow up with stale leads</li>
                 </ul>
             </div>
         </div>
