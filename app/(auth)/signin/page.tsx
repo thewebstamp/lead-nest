@@ -1,8 +1,8 @@
-// app/(auth)/signin/page.tsx
+// app/(auth)/signin/page.tsx - SIMPLIFIED VERSION
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -14,9 +14,6 @@ import { Loader2 } from "lucide-react";
 
 export default function SigninPage() {
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
-
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string>("");
 
@@ -49,7 +46,7 @@ export default function SigninPage() {
                 return;
             }
 
-            router.push(callbackUrl);
+            router.push("/dashboard");
             router.refresh();
 
         } catch (err) {
@@ -62,7 +59,7 @@ export default function SigninPage() {
     const handleGoogleSignin = async () => {
         setIsLoading(true);
         try {
-            await signIn("google", { callbackUrl });
+            await signIn("google", { callbackUrl: "/dashboard" });
         } catch (err) {
             setError("Google sign in failed");
             setIsLoading(false);

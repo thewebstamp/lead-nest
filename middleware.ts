@@ -1,4 +1,4 @@
-// middleware.ts
+// middleware.ts (updated to fix deprecation warning)
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
@@ -21,7 +21,7 @@ const AUTH_ROUTES = ["/auth/signin", "/auth/signup"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
+  
   // Allow public routes
   if (
     PUBLIC_ROUTES.some((route) => pathname.startsWith(route)) ||
@@ -39,7 +39,6 @@ export async function middleware(request: NextRequest) {
   // Redirect to signin if not authenticated
   if (!token) {
     const signInUrl = new URL("/auth/signin", request.url);
-    signInUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(signInUrl);
   }
 
@@ -74,15 +73,9 @@ export async function middleware(request: NextRequest) {
   });
 }
 
+// Update matcher to avoid middleware running on static files
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    "/((?!_next/static|_next/image|favicon.ico|public/).*)",
+    "/((?!_next/static|_next/image|favicon.ico|public/|api/auth).*)",
   ],
 };
