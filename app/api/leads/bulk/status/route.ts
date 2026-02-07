@@ -42,7 +42,7 @@ export async function PATCH(request: NextRequest) {
       await query(
         `INSERT INTO lead_notes (lead_id, note, created_at)
          VALUES ($1, $2, NOW())`,
-        [leadId, `Status changed to ${status} (bulk update)`],
+        [leadId, `Status changed to ${status}`],
       );
     }
 

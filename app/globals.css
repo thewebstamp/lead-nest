@@ -45,3 +45,10 @@ body {
     text-wrap: balance;
   }
 }
+
+@supports not (display: grid) {
+  .dashboard-container {
+    display: flex;
+    min-height: 100vh;
+  }
+}

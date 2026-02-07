@@ -63,21 +63,21 @@ export default function DashboardLayoutClient({
             {/* Mobile sidebar backdrop */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 z-40 lg:hidden bg-black bg-opacity-50"
+                    className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
 
-            {/* Sidebar */}
+            {/* Sidebar - Fixed positioning */}
             <aside
                 className={cn(
-                    "fixed inset-y-0 left-0 z-50 w-64 transform bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto",
+                    "fixed inset-y-0 left-0 z-40 w-64 transform bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:inset-auto lg:h-screen lg:sticky lg:top-0",
                     sidebarOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
                 <div className="flex flex-col h-full">
                     {/* Logo */}
-                    <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
+                    <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 shrink-0">
                         <div className="flex items-center space-x-2">
                             <div className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center">
                                 <span className="text-white font-bold">LN</span>
@@ -95,7 +95,7 @@ export default function DashboardLayoutClient({
                     </div>
 
                     {/* Business info */}
-                    <div className="px-4 py-3 border-b border-gray-200">
+                    <div className="px-4 py-3 border-b border-gray-200 shrink-0">
                         <div className="flex items-center space-x-3">
                             <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
                                 <span className="text-blue-600 font-bold">
@@ -134,7 +134,7 @@ export default function DashboardLayoutClient({
                     </nav>
 
                     {/* User info */}
-                    <div className="border-t border-gray-200 p-4">
+                    <div className="border-t border-gray-200 p-4 shrink-0">
                         <div className="flex items-center space-x-3">
                             <Avatar>
                                 <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
@@ -148,10 +148,10 @@ export default function DashboardLayoutClient({
                 </div>
             </aside>
 
-            {/* Main content */}
-            <div className="lg:pl-64">
-                {/* Top header */}
-                <header className="fixed top-0 z-40 flex h-16 items-center gap-4 border-b border-gray-200 bg-white px-4 lg:px-6">
+            {/* Main content area */}
+            <div className="lg:pl-64 flex flex-col min-h-screen">
+                {/* Top header - Fixed with proper width */}
+                <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-gray-200 bg-white px-4 lg:px-6 w-full">
                     <Button
                         variant="ghost"
                         size="sm"
@@ -159,6 +159,7 @@ export default function DashboardLayoutClient({
                         onClick={() => setSidebarOpen(true)}
                     >
                         <Menu className="h-5 w-5" />
+                        <span className="sr-only">Toggle sidebar</span>
                     </Button>
 
                     <div className="flex-1">
@@ -168,13 +169,16 @@ export default function DashboardLayoutClient({
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm" className="hidden sm:inline-flex">
                             <HelpCircle className="h-5 w-5" />
+                            <span className="sr-only">Help</span>
                         </Button>
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm" className="relative">
                             <Bell className="h-5 w-5" />
+                            <span className="sr-only">Notifications</span>
+                            <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500"></span>
                         </Button>
-                        <Link href="/dashboard/settings">
+                        <Link href="/dashboard/settings" className="flex items-center">
                             <Avatar>
                                 <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                             </Avatar>
@@ -182,9 +186,11 @@ export default function DashboardLayoutClient({
                     </div>
                 </header>
 
-                {/* Main content */}
-                <main className="flex-1 p-4 lg:p-6">
-                    {children}
+                {/* Main content - Takes remaining space */}
+                <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
+                    <div className="max-w-7xl mx-auto">
+                        {children}
+                    </div>
                 </main>
             </div>
         </div>
