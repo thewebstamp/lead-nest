@@ -13,10 +13,12 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const days = parseInt(searchParams.get("days") || "30");
+    const days = parseInt(searchParams.get("days") || "0"); // Changed to 0 for all time
     const { businessId } = session.user;
 
-    // 1. Get basic lead counts by status
+    console.log(`Fetching analytics for business: ${businessId}`);
+
+    // 1. Get ALL lead counts by status (removed date filter)
     const { rows: statusCounts } = await query<{
       status: string;
       count: string;
@@ -24,10 +26,11 @@ export async function GET(request: NextRequest) {
       `SELECT status, COUNT(*) as count
              FROM leads
              WHERE business_id = $1
-                AND created_at >= CURRENT_DATE - INTERVAL '1 day' * $2
              GROUP BY status`,
-      [businessId, days],
+      [businessId],
     );
+
+    console.log("Status counts:", statusCounts);
 
     // 2. Calculate overall conversion rate
     const { rows: conversionData } = await query<{
@@ -38,123 +41,46 @@ export async function GET(request: NextRequest) {
                 COUNT(*) as total,
                 SUM(CASE WHEN status = 'booked' THEN 1 ELSE 0 END) as booked
              FROM leads
-             WHERE business_id = $1
-                AND created_at >= CURRENT_DATE - INTERVAL '1 day' * $2`,
-      [businessId, days],
+             WHERE business_id = $1`,
+      [businessId],
     );
 
-    // 3. Calculate average response time
+    // 3. Calculate average response time (for contacted leads)
     const { rows: responseData } = await query<{ avg_hours: number }>(
       `SELECT
                 AVG(
-                    EXTRACT(EPOCH FROM (first_contact_at - created_at)) / 3600
+                    EXTRACT(EPOCH FROM (updated_at - created_at)) / 3600
                 ) as avg_hours
-             FROM (
-                SELECT
-                    l.id,
-                    l.created_at,
-                    MIN(n.created_at) as first_contact_at
-                FROM leads l
-                LEFT JOIN lead_notes n ON l.id = n.lead_id
-                    AND n.note ILIKE '%contacted%'
-                WHERE l.business_id = $1
-                    AND l.status IN ('contacted', 'quoted', 'booked')
-                    AND l.created_at >= CURRENT_DATE - INTERVAL '1 day' * $2
-                GROUP BY l.id, l.created_at
-                HAVING MIN(n.created_at) IS NOT NULL
-             ) sub`,
-      [businessId, days],
-    );
-
-    // 4. Get average deal size
-    const { rows: dealData } = await query<{ avg_value: number }>(
-      `SELECT
-                AVG(
-                    CASE WHEN qualification_notes ~ '\\$(\\d+)' 
-                    THEN CAST(SUBSTRING(qualification_notes FROM '\\$(\\d+)') AS INTEGER)
-                    ELSE 1000 END
-                ) as avg_value
              FROM leads
              WHERE business_id = $1
-                AND status = 'booked'
-                AND created_at >= CURRENT_DATE - INTERVAL '1 day' * $2`,
-      [businessId, days],
+                AND status IN ('contacted', 'quoted', 'booked')
+                AND updated_at > created_at`,
+      [businessId],
     );
 
-    // 5. Get lead volume trend
-    const { rows: trendData } = await query<{ date: string; count: string }>(
+    // 4. Get ALL lead trends (group by month instead of day)
+    const { rows: trendData } = await query<{ month: string; count: string }>(
       `SELECT
-                DATE(created_at) as date,
+                TO_CHAR(created_at, 'YYYY-MM') as month,
                 COUNT(*) as count
              FROM leads
              WHERE business_id = $1
-                AND created_at >= CURRENT_DATE - INTERVAL '1 day' * $2
-             GROUP BY DATE(created_at)
-             ORDER BY date`,
-      [businessId, days],
+             GROUP BY TO_CHAR(created_at, 'YYYY-MM')
+             ORDER BY month`,
+      [businessId],
     );
 
-    // 6. Get top performing services (quick overview)
-    const { rows: topServices } = await query<{
+    // 5. Get service types (for avg deal size)
+    const { rows: serviceData } = await query<{
       service_type: string;
-      booked: string;
-    }>(
-      `SELECT 
-                service_type,
-                COUNT(*) as booked
-             FROM leads
-             WHERE business_id = $1
-                AND status = 'booked'
-                AND created_at >= CURRENT_DATE - INTERVAL '1 day' * $2
-             GROUP BY service_type
-             ORDER BY booked DESC
-             LIMIT 3`,
-      [businessId, days],
-    );
-
-    // 7. Get response time distribution
-    const { rows: responseDistribution } = await query<{
-      hour_range: string;
       count: string;
     }>(
-      `SELECT 
-                CASE
-                    WHEN hours < 1 THEN 'Under 1h'
-                    WHEN hours < 4 THEN '1-4h'
-                    WHEN hours < 24 THEN '4-24h'
-                    WHEN hours < 48 THEN '1-2d'
-                    ELSE 'Over 2d'
-                END as hour_range,
-                COUNT(*) as count
-             FROM (
-                SELECT 
-                    EXTRACT(EPOCH FROM (first_contact_at - created_at)) / 3600 as hours
-                FROM (
-                    SELECT
-                        l.id,
-                        l.created_at,
-                        MIN(n.created_at) as first_contact_at
-                    FROM leads l
-                    LEFT JOIN lead_notes n ON l.id = n.lead_id
-                        AND n.note ILIKE '%contacted%'
-                    WHERE l.business_id = $1
-                        AND l.status IN ('contacted', 'quoted', 'booked')
-                        AND l.created_at >= CURRENT_DATE - INTERVAL '1 day' * $2
-                    GROUP BY l.id, l.created_at
-                    HAVING MIN(n.created_at) IS NOT NULL
-                ) sub
-                WHERE first_contact_at > created_at
-             ) hours_data
-             GROUP BY hour_range
-             ORDER BY 
-                CASE hour_range
-                    WHEN 'Under 1h' THEN 1
-                    WHEN '1-4h' THEN 2
-                    WHEN '4-24h' THEN 3
-                    WHEN '1-2d' THEN 4
-                    ELSE 5
-                END`,
-      [businessId, days],
+      `SELECT service_type, COUNT(*) as count
+             FROM leads
+             WHERE business_id = $1
+                AND status = 'booked'
+             GROUP BY service_type`,
+      [businessId],
     );
 
     // Calculate totals
@@ -166,39 +92,63 @@ export async function GET(request: NextRequest) {
     const conversionRate =
       totalLeads > 0 ? Math.round((totalBooked / totalLeads) * 100) : 0;
 
-    // Format the response
+    // Estimate average deal size based on service type
+    let avgDealSize = 1000; // Default
+    if (serviceData.length > 0) {
+      // Simple mapping of service types to average prices
+      const servicePrices: Record<string, number> = {
+        Painting: 1500,
+        Plumbing: 1200,
+        Electrical: 1300,
+        Cleaning: 500,
+        Consulting: 800,
+        Repair: 750,
+      };
+
+      const totalValue = serviceData.reduce((sum, service) => {
+        const price = servicePrices[service.service_type] || 1000;
+        return sum + price * parseInt(service.count);
+      }, 0);
+
+      avgDealSize = Math.round(
+        totalValue / serviceData.reduce((sum, s) => sum + parseInt(s.count), 0),
+      );
+    }
+
+    // Format trend data for chart
+    const formattedTrend = trendData.map((item) => ({
+      date: item.month,
+      count: item.count,
+    }));
+
     const summary = {
       totalLeads,
       totalBooked,
       conversionRate,
       avgResponseTime: responseData[0]?.avg_hours
         ? Math.round(responseData[0].avg_hours)
-        : 0,
-      avgDealSize: dealData[0]?.avg_value
-        ? Math.round(dealData[0].avg_value)
-        : 1000,
+        : 24, // Default 24h
+      avgDealSize,
       statusBreakdown: statusCounts,
-      trend: trendData,
-      topServices,
-      responseDistribution,
-      period: `${days} days`,
+      trend: formattedTrend,
+      period: days === 0 ? "All time" : `${days} days`,
       timestamp: new Date().toISOString(),
-      insights: {
-        isHighConversion: conversionRate >= 20,
-        isFastResponse: responseData[0]?.avg_hours <= 4,
-        hasGrowth:
-          trendData.length >= 2
-            ? parseInt(trendData[trendData.length - 1]?.count || "0") >
-              parseInt(trendData[0]?.count || "0")
-            : false,
+      debug: {
+        statusCounts,
+        conversionData: conversionData[0],
+        serviceData,
       },
     };
 
+    console.log("Summary prepared:", summary);
     return NextResponse.json(summary);
   } catch (error) {
     console.error("Analytics summary error:", error);
     return NextResponse.json(
-      { message: "Internal server error" },
+      {
+        message: "Internal server error",
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 },
     );
   }

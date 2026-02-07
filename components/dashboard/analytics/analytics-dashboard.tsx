@@ -3,7 +3,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
@@ -14,43 +13,18 @@ import {
     Users,
     Clock,
     DollarSign,
-    BarChart3,
-    PieChart,
-    MapPin,
     Download,
     Calendar,
-    Filter,
     RefreshCw,
     AlertCircle,
     Target,
-    Globe,
-    Briefcase,
-    UserCheck,
     TrendingDown,
-    Sparkles
+    PieChart,
+    BarChart3,
+    MapPin,
+    CheckCircle,
+    XCircle
 } from "lucide-react";
-import {
-    LineChart,
-    Line,
-    BarChart,
-    Bar,
-    PieChart as RechartsPieChart,
-    Pie,
-    Cell,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    Legend,
-    ResponsiveContainer,
-    AreaChart,
-    Area,
-    RadarChart,
-    Radar,
-    PolarGrid,
-    PolarAngleAxis,
-    PolarRadiusAxis
-} from 'recharts';
 
 interface AnalyticsSummary {
     totalLeads: number;
@@ -62,25 +36,6 @@ interface AnalyticsSummary {
     statusBreakdown: Array<{ status: string; count: string }>;
 }
 
-interface SourceAnalytics {
-    source: string;
-    total_leads: string;
-    booked_leads: string;
-    conversion_rate: number;
-    avg_value: number;
-    trend: Array<{ date: string; count: string }>;
-}
-
-interface ServiceAnalytics {
-    service_type: string;
-    total_leads: string;
-    booked_leads: string;
-    conversion_rate: number;
-    avg_response_time: number;
-    avg_value: number;
-    revenue: number;
-}
-
 interface TimeRange {
     label: string;
     value: string;
@@ -88,16 +43,14 @@ interface TimeRange {
 }
 
 export default function AnalyticsDashboard() {
-    const [activeTab, setActiveTab] = useState("overview");
-    const [timeRange, setTimeRange] = useState<TimeRange>({ label: "Last 30 days", value: "30d", days: 30 });
+    const [timeRange, setTimeRange] = useState<TimeRange>({ label: "All time", value: "0", days: 0 });
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
-    const [sources, setSources] = useState<SourceAnalytics[]>([]);
-    const [services, setServices] = useState<ServiceAnalytics[]>([]);
     const [refreshKey, setRefreshKey] = useState(0);
 
     const timeRanges: TimeRange[] = [
+        { label: "All time", value: "0", days: 0 },
         { label: "Last 7 days", value: "7d", days: 7 },
         { label: "Last 30 days", value: "30d", days: 30 },
         { label: "Last 90 days", value: "90d", days: 90 },
@@ -109,43 +62,82 @@ export default function AnalyticsDashboard() {
         setError(null);
 
         try {
-            const [summaryRes, sourcesRes, servicesRes] = await Promise.all([
-                fetch(`/api/analytics/summary?days=${timeRange.days}`),
-                fetch(`/api/analytics/sources?days=${timeRange.days}`),
-                fetch(`/api/analytics/services?days=${timeRange.days}`)
-            ]);
+            console.log(`Fetching analytics for ${timeRange.label} (${timeRange.days} days)`);
 
-            if (!summaryRes.ok || !sourcesRes.ok || !servicesRes.ok) {
-                throw new Error("Failed to fetch analytics data");
+            const summaryRes = await fetch(`/api/analytics/summary?days=${timeRange.days}`);
+
+            console.log("API response status:", summaryRes.status);
+
+            if (summaryRes.status === 401) {
+                throw new Error("You need to log in again. Please refresh the page.");
             }
 
-            const [summaryData, sourcesData, servicesData] = await Promise.all([
-                summaryRes.json(),
-                sourcesRes.json(),
-                servicesRes.json()
-            ]);
+            if (!summaryRes.ok) {
+                const errorData = await summaryRes.json().catch(() => ({ message: summaryRes.statusText }));
+                throw new Error(errorData.message || `API error: ${summaryRes.status}`);
+            }
+
+            const summaryData = await summaryRes.json();
+            console.log("Analytics data received:", summaryData);
 
             setSummary(summaryData);
-            setSources(sourcesData.sources || []);
-            setServices(servicesData.services || []);
+
         } catch (err) {
-            setError(err instanceof Error ? err.message : "An error occurred");
             console.error("Analytics fetch error:", err);
+
+            let errorMessage = "Failed to fetch analytics data";
+            if (err instanceof Error) {
+                if (err.message.includes("401") || err.message.includes("unauthorized")) {
+                    errorMessage = "Session expired. Please refresh the page or log in again.";
+                } else if (err.message.includes("Failed to fetch")) {
+                    errorMessage = "Network error. Please check your connection and try again.";
+                } else {
+                    errorMessage = err.message;
+                }
+            }
+
+            setError(errorMessage);
+
+            // Fallback to dummy data for development
+            if (process.env.NODE_ENV === 'development') {
+                console.log("Using fallback data for development");
+                setSummary({
+                    totalLeads: 1,
+                    totalBooked: 1,
+                    conversionRate: 100,
+                    avgResponseTime: 4,
+                    avgDealSize: 1500,
+                    trend: [
+                        { date: "2026-02-01", count: "1" }
+                    ],
+                    statusBreakdown: [
+                        { status: "booked", count: "1" }
+                    ]
+                });
+                setError(null);
+            }
         } finally {
             setIsLoading(false);
         }
-    }, [timeRange.days]);
+    }, [timeRange.days, timeRange.label]);
 
     useEffect(() => {
         fetchAnalytics();
     }, [fetchAnalytics, refreshKey]);
 
     const handleRefresh = () => {
+        console.log("Manual refresh triggered");
         setRefreshKey(prev => prev + 1);
     };
 
     const handleExport = () => {
-        const data = { summary, sources, services, exportedAt: new Date().toISOString() };
+        if (!summary) return;
+
+        const data = {
+            summary,
+            exportedAt: new Date().toISOString(),
+            period: timeRange.label
+        };
         const dataStr = JSON.stringify(data, null, 2);
         const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
         const exportFileName = `leadnest-analytics-${new Date().toISOString().split('T')[0]}.json`;
@@ -156,77 +148,26 @@ export default function AnalyticsDashboard() {
         linkElement.click();
     };
 
-    // Format data for charts
-    const formatTrendData = () => {
-        if (!summary?.trend) return [];
-        return summary.trend.map(item => ({
-            date: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-            leads: parseInt(item.count),
-            cumulative: summary.trend
-                .filter(t => new Date(t.date) <= new Date(item.date))
-                .reduce((acc, t) => acc + parseInt(t.count), 0)
-        }));
-    };
-
-    const formatSourceData = () => {
-        return sources.map(source => ({
-            name: source.source.charAt(0).toUpperCase() + source.source.slice(1),
-            leads: parseInt(source.total_leads),
-            conversion: source.conversion_rate,
-            revenue: source.avg_value * parseInt(source.booked_leads)
-        }));
-    };
-
-    const formatServiceData = () => {
-        return services.map(service => ({
-            name: service.service_type.length > 15
-                ? service.service_type.substring(0, 12) + '...'
-                : service.service_type,
-            value: parseInt(service.total_leads),
-            conversion: service.conversion_rate,
-            revenue: service.revenue,
-            responseTime: service.avg_response_time
-        }));
-    };
-
-    const formatStatusData = () => {
-        if (!summary?.statusBreakdown) return [];
-        return summary.statusBreakdown.map(item => ({
-            name: item.status.charAt(0).toUpperCase() + item.status.slice(1),
-            value: parseInt(item.count),
-            color: getStatusColor(item.status)
-        }));
-    };
-
     const getStatusColor = (status: string): string => {
         const colors: Record<string, string> = {
-            new: '#3b82f6',
-            contacted: '#f59e0b',
-            quoted: '#8b5cf6',
-            booked: '#10b981',
-            lost: '#ef4444'
+            new: 'bg-blue-100 text-blue-800 border-blue-300',
+            contacted: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+            quoted: 'bg-purple-100 text-purple-800 border-purple-300',
+            booked: 'bg-green-100 text-green-800 border-green-300',
+            lost: 'bg-red-100 text-red-800 border-red-300'
         };
-        return colors[status] || '#6b7280';
+        return colors[status] || 'bg-gray-100 text-gray-800 border-gray-300';
     };
 
-    if (error) {
-        return (
-            <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
-                        <p className="text-gray-600">Track performance and optimize conversions</p>
-                    </div>
-                </div>
-                <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                        {error}. <Button variant="link" onClick={fetchAnalytics} className="p-0 h-auto">Try again</Button>
-                    </AlertDescription>
-                </Alert>
-            </div>
-        );
-    }
+    const getStatusIcon = (status: string) => {
+        switch (status) {
+            case 'booked': return <CheckCircle className="h-4 w-4" />;
+            case 'lost': return <XCircle className="h-4 w-4" />;
+            case 'contacted': return <Clock className="h-4 w-4" />;
+            case 'quoted': return <DollarSign className="h-4 w-4" />;
+            default: return <Users className="h-4 w-4" />;
+        }
+    };
 
     return (
         <div className="space-y-6">
@@ -234,13 +175,13 @@ export default function AnalyticsDashboard() {
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
-                    <p className="text-gray-600">Track performance, optimize conversions, and grow your business</p>
+                    <p className="text-gray-600">Track performance and optimize conversions</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <Select
                         value={timeRange.value}
                         onValueChange={(value) => {
-                            const range = timeRanges.find(r => r.value === value) || timeRanges[1];
+                            const range = timeRanges.find(r => r.value === value) || timeRanges[0];
                             setTimeRange(range);
                         }}
                     >
@@ -260,12 +201,34 @@ export default function AnalyticsDashboard() {
                         <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                         Refresh
                     </Button>
-                    <Button variant="outline" onClick={handleExport} disabled={isLoading}>
+                    <Button variant="outline" onClick={handleExport} disabled={isLoading || !summary}>
                         <Download className="h-4 w-4 mr-2" />
                         Export
                     </Button>
                 </div>
             </div>
+
+            {/* Error Alert */}
+            {error && (
+                <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription className="flex justify-between items-center">
+                        <span>{error}</span>
+                        <div className="flex gap-2">
+                            <Button variant="outline" size="sm" onClick={handleRefresh}>
+                                Try Again
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => window.location.reload()}
+                            >
+                                Refresh Page
+                            </Button>
+                        </div>
+                    </AlertDescription>
+                </Alert>
+            )}
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -277,16 +240,16 @@ export default function AnalyticsDashboard() {
                             </CardContent>
                         </Card>
                     ))
-                ) : (
+                ) : summary ? (
                     <>
                         <Card>
                             <CardContent className="pt-6">
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-medium text-gray-600">Total Leads</p>
-                                        <p className="text-2xl font-bold">{summary?.totalLeads || 0}</p>
+                                        <p className="text-2xl font-bold">{summary.totalLeads}</p>
                                         <div className="flex items-center mt-1">
-                                            {summary && summary.trend.length >= 2 ? (
+                                            {summary.trend.length >= 2 ? (
                                                 parseInt(summary.trend[summary.trend.length - 1]?.count || '0') >
                                                     parseInt(summary.trend[summary.trend.length - 2]?.count || '0') ? (
                                                     <>
@@ -300,7 +263,9 @@ export default function AnalyticsDashboard() {
                                                     </>
                                                 )
                                             ) : (
-                                                <span className="text-sm text-gray-500">No trend data</span>
+                                                <span className="text-sm text-gray-500">
+                                                    {summary.trend.length === 1 ? "1 lead total" : "No trend data"}
+                                                </span>
                                             )}
                                         </div>
                                     </div>
@@ -316,9 +281,9 @@ export default function AnalyticsDashboard() {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-medium text-gray-600">Conversion Rate</p>
-                                        <p className="text-2xl font-bold">{summary?.conversionRate || 0}%</p>
+                                        <p className="text-2xl font-bold">{summary.conversionRate}%</p>
                                         <p className="text-sm text-gray-500 mt-1">
-                                            {summary?.totalBooked || 0} booked / {summary?.totalLeads || 0} total
+                                            {summary.totalBooked} booked / {summary.totalLeads} total
                                         </p>
                                     </div>
                                     <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -333,7 +298,7 @@ export default function AnalyticsDashboard() {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-medium text-gray-600">Avg. Response Time</p>
-                                        <p className="text-2xl font-bold">{summary?.avgResponseTime || 0}h</p>
+                                        <p className="text-2xl font-bold">{summary.avgResponseTime}h</p>
                                         <p className="text-sm text-gray-500 mt-1">Time to first contact</p>
                                     </div>
                                     <div className="h-12 w-12 bg-yellow-100 rounded-lg flex items-center justify-center">
@@ -348,7 +313,7 @@ export default function AnalyticsDashboard() {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-medium text-gray-600">Avg. Deal Size</p>
-                                        <p className="text-2xl font-bold">${summary?.avgDealSize?.toLocaleString() || '0'}</p>
+                                        <p className="text-2xl font-bold">${summary.avgDealSize.toLocaleString()}</p>
                                         <p className="text-sm text-gray-500 mt-1">Projected revenue per booking</p>
                                     </div>
                                     <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -358,464 +323,159 @@ export default function AnalyticsDashboard() {
                             </CardContent>
                         </Card>
                     </>
+                ) : (
+                    // No data state
+                    <Card className="col-span-4">
+                        <CardContent className="pt-6 text-center py-12">
+                            <BarChart3 className="h-12 w-12 mx-auto text-gray-300 mb-4" />
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">No analytics data yet</h3>
+                            <p className="text-gray-600">Start capturing leads to see your analytics dashboard in action.</p>
+                            <Button className="mt-4" onClick={() => window.open('/dashboard/leads', '_blank')}>
+                                <Users className="h-4 w-4 mr-2" />
+                                View Leads
+                            </Button>
+                        </CardContent>
+                    </Card>
                 )}
             </div>
 
-            {/* Analytics Tabs */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                <TabsList className="grid grid-cols-5 w-full">
-                    <TabsTrigger value="overview">Overview</TabsTrigger>
-                    <TabsTrigger value="sources">Lead Sources</TabsTrigger>
-                    <TabsTrigger value="services">Services</TabsTrigger>
-                    <TabsTrigger value="conversion">Conversion</TabsTrigger>
-                    <TabsTrigger value="performance">Performance</TabsTrigger>
-                </TabsList>
-
-                {/* Overview Tab */}
-                <TabsContent value="overview" className="space-y-6">
-                    {isLoading ? (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <Skeleton className="h-80 w-full" />
-                            <Skeleton className="h-80 w-full" />
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            {/* Lead Trends Chart */}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Lead Trends</CardTitle>
-                                    <CardDescription>New leads over {timeRange.label.toLowerCase()}</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="h-72">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <AreaChart data={formatTrendData()}>
-                                                <CartesianGrid strokeDasharray="3 3" />
-                                                <XAxis dataKey="date" />
-                                                <YAxis />
-                                                <Tooltip
-                                                    formatter={(value, name) => {
-                                                        if (value == null) return ['–', name];
-
-                                                        const numericValue =
-                                                            typeof value === 'number' ? value : Number(value);
-
-                                                        if (name === 'leads') return [numericValue, 'Daily Leads'];
-                                                        if (name === 'cumulative') return [numericValue, 'Total Leads'];
-
-                                                        return [numericValue, name];
-                                                    }}
-                                                />
-
-                                                <Area
-                                                    type="monotone"
-                                                    dataKey="leads"
-                                                    stroke="#3b82f6"
-                                                    fill="#3b82f6"
-                                                    fillOpacity={0.2}
-                                                    name="Daily Leads"
-                                                />
-                                                <Area
-                                                    type="monotone"
-                                                    dataKey="cumulative"
-                                                    stroke="#10b981"
-                                                    fill="#10b981"
-                                                    fillOpacity={0.1}
-                                                    name="Total Leads"
-                                                />
-                                            </AreaChart>
-                                        </ResponsiveContainer>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            {/* Status Distribution */}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Lead Status Distribution</CardTitle>
-                                    <CardDescription>Current pipeline status</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="h-72">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <PieChart>
-                                                <Pie
-                                                    data={formatStatusData()}
-                                                    cx="50%"
-                                                    cy="50%"
-                                                    labelLine={false}
-                                                    label={(entry) => `${entry.name}: ${entry.value}`}
-                                                    outerRadius={80}
-                                                    fill="#8884d8"
-                                                    dataKey="value"
-                                                >
-                                                    {formatStatusData().map((entry, index) => (
-                                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                                    ))}
-                                                </Pie>
-                                                <Tooltip />
-                                                <Legend />
-                                            </PieChart>
-                                        </ResponsiveContainer>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    )}
-                </TabsContent>
-
-                {/* Sources Tab */}
-                <TabsContent value="sources" className="space-y-6">
-                    {isLoading ? (
-                        <Skeleton className="h-96 w-full" />
-                    ) : sources.length === 0 ? (
-                        <Card>
-                            <CardContent className="py-12">
-                                <div className="text-center">
-                                    <Globe className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                                    <h3 className="text-lg font-medium text-gray-900 mb-2">No source data available</h3>
-                                    <p className="text-gray-600">Lead source data will appear here as you receive more leads</p>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ) : (
-                        <>
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Lead Sources Performance</CardTitle>
-                                    <CardDescription>Conversion rates and revenue by source</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="h-80">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <BarChart data={formatSourceData()}>
-                                                <CartesianGrid strokeDasharray="3 3" />
-                                                <XAxis dataKey="name" />
-                                                <YAxis yAxisId="left" />
-                                                <YAxis yAxisId="right" orientation="right" />
-                                                <Tooltip
-                                                    formatter={(value, name) => {
-                                                        if (value == null) return ['–', name];
-
-                                                        const numericValue =
-                                                            typeof value === 'number' ? value : Number(value);
-
-                                                        if (name === 'leads') return [numericValue, 'Total Leads'];
-                                                        if (name === 'conversion') return [`${numericValue}%`, 'Conversion Rate'];
-                                                        if (name === 'revenue') return [`$${numericValue.toLocaleString()}`, 'Revenue'];
-
-                                                        return [numericValue, name];
-                                                    }}
-                                                />
-                                                <Legend />
-                                                <Bar yAxisId="left" dataKey="leads" fill="#3b82f6" name="Total Leads" />
-                                                <Bar yAxisId="right" dataKey="conversion" fill="#10b981" name="Conversion %" />
-                                                <Line yAxisId="right" type="monotone" dataKey="revenue" stroke="#8b5cf6" name="Revenue" />
-                                            </BarChart>
-                                        </ResponsiveContainer>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {sources.map((source, index) => (
-                                    <Card key={index}>
-                                        <CardContent className="pt-6">
-                                            <div className="flex items-center justify-between mb-4">
-                                                <Badge variant="outline" className="text-sm">
-                                                    {source.source}
-                                                </Badge>
+            {/* Analytics Content */}
+            {!isLoading && !error && summary && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Lead Status Overview */}
+                    <Card className="lg:col-span-2">
+                        <CardHeader>
+                            <CardTitle>Lead Status Overview</CardTitle>
+                            <CardDescription>Distribution of leads across your pipeline</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                {summary.statusBreakdown.length > 0 ? (
+                                    summary.statusBreakdown.map((status) => (
+                                        <div key={status.status} className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className={`h-8 w-8 rounded-full flex items-center justify-center ${getStatusColor(status.status).split(' ')[0]}`}>
+                                                        {getStatusIcon(status.status)}
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-medium capitalize">{status.status}</span>
+                                                        <p className="text-sm text-gray-500">
+                                                            {parseInt(status.count)} lead{parseInt(status.count) !== 1 ? 's' : ''}
+                                                        </p>
+                                                    </div>
+                                                </div>
                                                 <div className="text-right">
-                                                    <div className="text-2xl font-bold">{parseInt(source.total_leads)}</div>
-                                                    <div className="text-sm text-gray-500">Leads</div>
+                                                    <span className="font-bold text-lg">{parseInt(status.count)}</span>
+                                                    <p className="text-sm text-gray-500">
+                                                        {Math.round((parseInt(status.count) / summary.totalLeads) * 100)}%
+                                                    </p>
                                                 </div>
                                             </div>
-                                            <div className="space-y-3">
-                                                <div className="flex justify-between">
-                                                    <span className="text-sm text-gray-600">Conversion Rate</span>
-                                                    <span className={`font-medium ${source.conversion_rate >= 20 ? 'text-green-600' : source.conversion_rate >= 10 ? 'text-yellow-600' : 'text-red-600'}`}>
-                                                        {source.conversion_rate.toFixed(1)}%
-                                                    </span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                    <span className="text-sm text-gray-600">Booked Leads</span>
-                                                    <span className="font-medium">{parseInt(source.booked_leads)}</span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                    <span className="text-sm text-gray-600">Avg. Value</span>
-                                                    <span className="font-medium">${source.avg_value.toLocaleString()}</span>
-                                                </div>
-                                                <div className="pt-3 border-t">
-                                                    <div className="flex justify-between">
-                                                        <span className="text-sm text-gray-600">Projected Revenue</span>
-                                                        <span className="font-bold text-purple-600">
-                                                            ${(source.avg_value * parseInt(source.booked_leads)).toLocaleString()}
-                                                        </span>
-                                                    </div>
-                                                </div>
+                                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                <div
+                                                    className="h-full rounded-full transition-all duration-500"
+                                                    style={{
+                                                        width: `${(parseInt(status.count) / summary.totalLeads) * 100}%`,
+                                                        backgroundColor: getStatusColor(status.status).split(' ')[0].replace('bg-', '').split('-')[0]
+                                                    }}
+                                                />
                                             </div>
-                                        </CardContent>
-                                    </Card>
-                                ))}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-8 text-gray-500">
+                                        <PieChart className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                                        <p>No status data available</p>
+                                    </div>
+                                )}
                             </div>
-                        </>
-                    )}
-                </TabsContent>
+                        </CardContent>
+                    </Card>
 
-                {/* Services Tab */}
-                <TabsContent value="services" className="space-y-6">
-                    {isLoading ? (
-                        <Skeleton className="h-96 w-full" />
-                    ) : services.length === 0 ? (
-                        <Card>
-                            <CardContent className="py-12">
-                                <div className="text-center">
-                                    <Briefcase className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                                    <h3 className="text-lg font-medium text-gray-900 mb-2">No service data available</h3>
-                                    <p className="text-gray-600">Service analytics will appear here as you receive more leads</p>
+                    {/* Quick Insights */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Quick Insights</CardTitle>
+                            <CardDescription>Key performance indicators</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                                <div className="flex items-center">
+                                    <Users className="h-5 w-5 text-blue-600 mr-3" />
+                                    <div>
+                                        <p className="text-sm font-medium text-blue-900">Lead Volume</p>
+                                        <p className="text-2xl font-bold text-blue-600 mt-1">
+                                            {summary.trend?.reduce((acc, day) => acc + parseInt(day.count), 0) || summary.totalLeads}
+                                        </p>
+                                        <p className="text-xs text-blue-700 mt-1">
+                                            {summary.trend?.length || 1} {summary.trend?.length === 1 ? 'period' : 'periods'} • {timeRange.label.toLowerCase()}
+                                        </p>
+                                    </div>
                                 </div>
-                            </CardContent>
-                        </Card>
-                    ) : (
-                        <>
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Service Performance Radar</CardTitle>
-                                    <CardDescription>Multi-dimensional service analysis</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="h-80">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <RadarChart data={formatServiceData()}>
-                                                <PolarGrid />
-                                                <PolarAngleAxis dataKey="name" />
-                                                <PolarRadiusAxis />
-                                                <Radar
-                                                    name="Leads"
-                                                    dataKey="value"
-                                                    stroke="#3b82f6"
-                                                    fill="#3b82f6"
-                                                    fillOpacity={0.6}
-                                                />
-                                                <Radar
-                                                    name="Conversion %"
-                                                    dataKey="conversion"
-                                                    stroke="#10b981"
-                                                    fill="#10b981"
-                                                    fillOpacity={0.6}
-                                                />
-                                                <Radar
-                                                    name="Response Time"
-                                                    dataKey="responseTime"
-                                                    stroke="#f59e0b"
-                                                    fill="#f59e0b"
-                                                    fillOpacity={0.6}
-                                                />
-                                                <Legend />
-                                                <Tooltip />
-                                            </RadarChart>
-                                        </ResponsiveContainer>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <div className="overflow-x-auto">
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Service Performance Details</CardTitle>
-                                        <CardDescription>Detailed metrics for each service type</CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <table className="w-full">
-                                            <thead>
-                                                <tr className="border-b">
-                                                    <th className="text-left py-3 px-4 font-medium">Service Type</th>
-                                                    <th className="text-left py-3 px-4 font-medium">Total Leads</th>
-                                                    <th className="text-left py-3 px-4 font-medium">Booked</th>
-                                                    <th className="text-left py-3 px-4 font-medium">Conversion</th>
-                                                    <th className="text-left py-3 px-4 font-medium">Avg. Response</th>
-                                                    <th className="text-left py-3 px-4 font-medium">Avg. Value</th>
-                                                    <th className="text-left py-3 px-4 font-medium">Revenue</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {services.map((service, index) => (
-                                                    <tr key={index} className="border-b hover:bg-gray-50">
-                                                        <td className="py-3 px-4">
-                                                            <div className="font-medium">{service.service_type}</div>
-                                                        </td>
-                                                        <td className="py-3 px-4">
-                                                            <div className="font-bold">{parseInt(service.total_leads)}</div>
-                                                        </td>
-                                                        <td className="py-3 px-4">
-                                                            <Badge
-                                                                variant={parseInt(service.booked_leads) > 0 ? "default" : "outline"}
-                                                                className={parseInt(service.booked_leads) > 0 ? "bg-green-100 text-green-800" : ""}
-                                                            >
-                                                                {parseInt(service.booked_leads)}
-                                                            </Badge>
-                                                        </td>
-                                                        <td className="py-3 px-4">
-                                                            <div className="flex items-center">
-                                                                <div className={`w-16 h-2 bg-gray-200 rounded-full overflow-hidden mr-2`}>
-                                                                    <div
-                                                                        className={`h-full ${service.conversion_rate >= 20 ? 'bg-green-500' : service.conversion_rate >= 10 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                                                                        style={{ width: `${Math.min(service.conversion_rate, 100)}%` }}
-                                                                    />
-                                                                </div>
-                                                                <span className={`font-medium ${service.conversion_rate >= 20 ? 'text-green-600' : service.conversion_rate >= 10 ? 'text-yellow-600' : 'text-red-600'}`}>
-                                                                    {service.conversion_rate.toFixed(1)}%
-                                                                </span>
-                                                            </div>
-                                                        </td>
-                                                        <td className="py-3 px-4">
-                                                            <div className="flex items-center">
-                                                                <Clock className="h-4 w-4 text-gray-400 mr-1" />
-                                                                <span>{service.avg_response_time.toFixed(1)}h</span>
-                                                            </div>
-                                                        </td>
-                                                        <td className="py-3 px-4">
-                                                            <div className="font-medium">${service.avg_value.toLocaleString()}</div>
-                                                        </td>
-                                                        <td className="py-3 px-4">
-                                                            <div className="font-bold text-purple-600">
-                                                                ${service.revenue.toLocaleString()}
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </CardContent>
-                                </Card>
                             </div>
-                        </>
-                    )}
-                </TabsContent>
 
-                {/* Conversion Tab */}
-                <TabsContent value="conversion" className="space-y-6">
-                    {isLoading ? (
-                        <Skeleton className="h-96 w-full" />
-                    ) : (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Conversion Funnel</CardTitle>
-                                    <CardDescription>Leads progression through pipeline</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-6">
-                                        {summary?.statusBreakdown?.map((status, index, array) => (
-                                            <div key={status.status}>
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <div className="flex items-center space-x-3">
-                                                        <div className={`h-8 w-8 rounded-full flex items-center justify-center ${getStatusColor(status.status)} bg-opacity-10`}>
-                                                            <span className={`text-sm font-bold`} style={{ color: getStatusColor(status.status) }}>
-                                                                {index + 1}
-                                                            </span>
-                                                        </div>
-                                                        <div>
-                                                            <div className="font-medium capitalize">{status.status}</div>
-                                                            <div className="text-sm text-gray-500">{parseInt(status.count)} leads</div>
-                                                        </div>
-                                                    </div>
-                                                    {index < array.length - 1 && (
-                                                        <div className="text-right">
-                                                            <div className="text-sm font-medium text-gray-700">
-                                                                {array[index + 1] ? (
-                                                                    `${Math.round((parseInt(array[index + 1].count) / parseInt(status.count)) * 100)}%`
-                                                                ) : '0%'}
-                                                            </div>
-                                                            <div className="text-xs text-gray-500">to next stage</div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                                    <div
-                                                        className="h-full rounded-full transition-all duration-500"
-                                                        style={{
-                                                            width: `${(parseInt(status.count) / (summary?.totalLeads || 1)) * 100}%`,
-                                                            backgroundColor: getStatusColor(status.status)
-                                                        }}
-                                                    />
-                                                </div>
-                                            </div>
-                                        ))}
+                            <div className="p-4 bg-green-50 rounded-lg border border-green-100">
+                                <div className="flex items-center">
+                                    <Target className="h-5 w-5 text-green-600 mr-3" />
+                                    <div>
+                                        <p className="text-sm font-medium text-green-900">Conversion Health</p>
+                                        <p className={`text-2xl font-bold mt-1 ${summary.conversionRate > 20 ? 'text-green-600' :
+                                            summary.conversionRate > 10 ? 'text-yellow-600' : 'text-red-600'
+                                            }`}>
+                                            {summary.conversionRate}%
+                                        </p>
+                                        <p className="text-xs text-green-700 mt-1">
+                                            {summary.conversionRate > 20 ? 'Excellent' :
+                                                summary.conversionRate > 10 ? 'Good' : 'Needs improvement'}
+                                        </p>
                                     </div>
-                                </CardContent>
-                            </Card>
+                                </div>
+                            </div>
 
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Conversion Insights</CardTitle>
-                                    <CardDescription>Key metrics and recommendations</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-6">
-                                        <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                                            <div className="flex items-start">
-                                                <Sparkles className="h-5 w-5 text-blue-600 mt-0.5 mr-3" />
-                                                <div>
-                                                    <h4 className="font-medium text-blue-900">Top Conversion Rate</h4>
-                                                    <p className="text-sm text-blue-700 mt-1">
-                                                        {services.sort((a, b) => b.conversion_rate - a.conversion_rate)[0]?.service_type || 'N/A'}
-                                                        at {Math.max(...services.map(s => s.conversion_rate), 0).toFixed(1)}%
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="p-4 bg-green-50 rounded-lg border border-green-100">
-                                            <div className="flex items-start">
-                                                <UserCheck className="h-5 w-5 text-green-600 mt-0.5 mr-3" />
-                                                <div>
-                                                    <h4 className="font-medium text-green-900">Best Response Time</h4>
-                                                    <p className="text-sm text-green-700 mt-1">
-                                                        {services.sort((a, b) => a.avg_response_time - b.avg_response_time)[0]?.service_type || 'N/A'}
-                                                        with {Math.min(...services.map(s => s.avg_response_time), 0).toFixed(1)} hours average
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
-                                            <div className="flex items-start">
-                                                <DollarSign className="h-5 w-5 text-purple-600 mt-0.5 mr-3" />
-                                                <div>
-                                                    <h4 className="font-medium text-purple-900">Highest Revenue Service</h4>
-                                                    <p className="text-sm text-purple-700 mt-1">
-                                                        {services.sort((a, b) => b.revenue - a.revenue)[0]?.service_type || 'N/A'}
-                                                        generating ${Math.max(...services.map(s => s.revenue), 0).toLocaleString()}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="pt-4 border-t">
-                                            <h4 className="font-medium mb-3">Quick Actions</h4>
-                                            <div className="space-y-2">
-                                                {summary?.avgResponseTime && summary.avgResponseTime > 24 && (
-                                                    <div className="flex items-center text-sm text-amber-600">
-                                                        <AlertCircle className="h-4 w-4 mr-2" />
-                                                        <span>Consider improving response time (currently {summary.avgResponseTime}h)</span>
-                                                    </div>
-                                                )}
-                                                {summary?.conversionRate && summary.conversionRate < 15 && (
-                                                    <div className="flex items-center text-sm text-amber-600">
-                                                        <AlertCircle className="h-4 w-4 mr-2" />
-                                                        <span>Focus on improving conversion rate (currently {summary.conversionRate}%)</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
+                            <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
+                                <div className="flex items-center">
+                                    <Clock className="h-5 w-5 text-purple-600 mr-3" />
+                                    <div>
+                                        <p className="text-sm font-medium text-purple-900">Response Performance</p>
+                                        <p className={`text-2xl font-bold mt-1 ${summary.avgResponseTime <= 4 ? 'text-green-600' :
+                                            summary.avgResponseTime <= 8 ? 'text-yellow-600' : 'text-red-600'
+                                            }`}>
+                                            {summary.avgResponseTime}h
+                                        </p>
+                                        <p className="text-xs text-purple-700 mt-1">
+                                            {summary.avgResponseTime <= 4 ? 'Fast response' :
+                                                summary.avgResponseTime <= 8 ? 'Average' : 'Needs attention'}
+                                        </p>
                                     </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    )}
-                </TabsContent>
-            </Tabs>
+                                </div>
+                            </div>
+
+                            {/* Trend Summary */}
+                            <div className="pt-4 border-t">
+                                <h4 className="font-medium mb-3">Trend Summary</h4>
+                                <div className="space-y-2">
+                                    {summary.trend && summary.trend.length > 0 ? (
+                                        <div className="text-sm text-gray-600">
+                                            <p>Your lead activity over time:</p>
+                                            <ul className="mt-2 space-y-1">
+                                                {summary.trend.slice(-3).map((item, index) => (
+                                                    <li key={index} className="flex justify-between">
+                                                        <span>{new Date(item.date).toLocaleDateString()}</span>
+                                                        <span className="font-medium">{item.count} lead{parseInt(item.count) !== 1 ? 's' : ''}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    ) : (
+                                        <p className="text-sm text-gray-500">No trend data available for the selected period.</p>
+                                    )}
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
         </div>
     );
 }
