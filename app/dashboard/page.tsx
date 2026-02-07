@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth/config";
 import { query, queryOne } from "@/lib/db";
-import { DashboardLayout } from "./layout";
 import DashboardContent from "@/components/dashboard/dashboard-content";
 
 export default async function DashboardPage() {
@@ -72,16 +71,16 @@ export default async function DashboardPage() {
     // Calculate totals
     const stats = {
         total: statusCounts.reduce((acc, row) => acc + parseInt(row.count), 0),
-        new: statusCounts.find(row => row.status === 'new')?.count || '0',
-        contacted: statusCounts.find(row => row.status === 'contacted')?.count || '0',
-        quoted: statusCounts.find(row => row.status === 'quoted')?.count || '0',
-        booked: statusCounts.find(row => row.status === 'booked')?.count || '0',
-        lost: statusCounts.find(row => row.status === 'lost')?.count || '0',
+        new: parseInt(statusCounts.find(row => row.status === 'new')?.count || '0'),
+        contacted: parseInt(statusCounts.find(row => row.status === 'contacted')?.count || '0'),
+        quoted: parseInt(statusCounts.find(row => row.status === 'quoted')?.count || '0'),
+        booked: parseInt(statusCounts.find(row => row.status === 'booked')?.count || '0'),
+        lost: parseInt(statusCounts.find(row => row.status === 'lost')?.count || '0'),
     };
 
     // Calculate conversion rate
     const conversionRate = stats.total > 0
-        ? Math.round((parseInt(stats.booked) / stats.total) * 100)
+        ? Math.round((stats.booked / stats.total) * 100)
         : 0;
 
     // Calculate average response time (in hours) for contacted leads
@@ -100,24 +99,13 @@ export default async function DashboardPage() {
         : 0;
 
     return (
-        <DashboardLayout
-            user={{
-                name: session.user?.name,
-                email: session.user?.email,
-            }}
-            business={{
-                name: business.name,
-                slug: business.slug,
-            }}
-        >
-            <DashboardContent
-                stats={stats}
-                recentLeads={recentLeads}
-                leadTrends={leadTrends}
-                business={business}
-                conversionRate={conversionRate}
-                avgResponseTime={avgResponseTime}
-            />
-        </DashboardLayout>
+        <DashboardContent
+            stats={stats}
+            recentLeads={recentLeads}
+            leadTrends={leadTrends}
+            business={business}
+            conversionRate={conversionRate}
+            avgResponseTime={avgResponseTime}
+        />
     );
 }

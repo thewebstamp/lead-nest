@@ -1,4 +1,4 @@
-// components/dashboard/dashboard-content.tsx
+// components/dashboard/dashboard-content.tsx - UPDATED types
 "use client";
 
 import { useState } from "react";
@@ -28,11 +28,11 @@ import { toast } from "@/components/ui/use-toast";
 interface DashboardContentProps {
     stats: {
         total: number;
-        new: string;
-        contacted: string;
-        quoted: string;
-        booked: string;
-        lost: string;
+        new: number;
+        contacted: number;
+        quoted: number;
+        booked: number;
+        lost: number;
     };
     recentLeads: Array<{
         id: string;
@@ -397,7 +397,7 @@ export default function DashboardContent({
                                             <div
                                                 className={`h-full ${item.color} transition-all duration-500`}
                                                 style={{
-                                                    width: `${(parseInt(item.count) / Math.max(stats.total, 1)) * 100}%`,
+                                                    width: `${(item.count / Math.max(stats.total, 1)) * 100}%`,
                                                 }}
                                             />
                                         </div>
