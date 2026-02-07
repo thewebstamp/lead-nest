@@ -4,13 +4,14 @@ import { queryOne } from "@/lib/db";
 import LeadForm from "@/components/forms/lead-form";
 
 interface FormPageProps {
-    params: {
+    params: Promise<{
         slug: string;
-    };
+    }>;
 }
 
-export default async function FormPage({ params }: { params: { slug: string } }) {
-    const { slug } = params;
+export default async function FormPage({ params }: FormPageProps) {
+    // Await the params promise (Next.js 14+ change)
+    const { slug } = await params;
 
     // Get business by slug
     const business = await queryOne<{

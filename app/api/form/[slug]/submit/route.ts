@@ -5,10 +5,11 @@ import { v4 as uuidv4 } from "uuid";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { slug: string } },
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   try {
-    const { slug } = params;
+    // Await the params promise
+    const { slug } = await params;
 
     // Get business by slug
     const business = await queryOne<{
