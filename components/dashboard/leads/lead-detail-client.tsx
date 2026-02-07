@@ -105,12 +105,16 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
 
     const handleStatusUpdate = async (newStatus: string) => {
         try {
-            const response = await fetch(`/api/leads/${lead.id}/status`, {
+            // Use bulk API for individual update as workaround
+            const response = await fetch(`/api/leads/bulk/status`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ status: newStatus }),
+                body: JSON.stringify({
+                    leadIds: [lead.id], // Single item array
+                    status: newStatus,
+                }),
             });
 
             if (response.ok) {

@@ -113,13 +113,18 @@ export default function LeadsDashboard({ leads, stats, businessId }: LeadsDashbo
     });
 
     const handleStatusUpdate = async (leadId: string, newStatus: string) => {
+        console.log("Using bulk API for individual update");
+
         try {
-            const response = await fetch(`/api/leads/${leadId}/status`, {
+            const response = await fetch(`/api/leads/bulk/status`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ status: newStatus }),
+                body: JSON.stringify({
+                    leadIds: [leadId], // Single item array
+                    status: newStatus,
+                }),
             });
 
             if (response.ok) {
@@ -127,8 +132,7 @@ export default function LeadsDashboard({ leads, stats, businessId }: LeadsDashbo
                     title: "Status updated",
                     description: "Lead status has been updated successfully",
                 });
-                // Refresh the page to show updated data
-                setTimeout(() => window.location.reload(), 500);
+                setTimeout(() => window.location.reload(), 1000);
             } else {
                 const error = await response.json();
                 toast({
@@ -456,19 +460,21 @@ export default function LeadsDashboard({ leads, stats, businessId }: LeadsDashbo
                                                             value={lead.status}
                                                             onValueChange={(value) => handleStatusUpdate(lead.id, value)}
                                                         >
-                                                            <SelectTrigger className="w-32.5">
-                                                                <Badge
-                                                                    variant="outline"
-                                                                    className={`
-                                    ${lead.status === 'new' ? 'bg-blue-100 text-blue-800' : ''}
-                                    ${lead.status === 'contacted' ? 'bg-yellow-100 text-yellow-800' : ''}
-                                    ${lead.status === 'quoted' ? 'bg-purple-100 text-purple-800' : ''}
-                                    ${lead.status === 'booked' ? 'bg-green-100 text-green-800' : ''}
-                                    ${lead.status === 'lost' ? 'bg-red-100 text-red-800' : ''}
-                                  `}
-                                                                >
-                                                                    {lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}
-                                                                </Badge>
+                                                            <SelectTrigger className="w-32.5 h-8">
+                                                                <SelectValue>
+                                                                    <Badge
+                                                                        className={`
+                                                                        ${lead.status === 'new' ? 'bg-blue-100 text-blue-800 border-blue-300' : ''}
+                                                                        ${lead.status === 'contacted' ? 'bg-yellow-100 text-yellow-800 border-yellow-300' : ''}
+                                                                        ${lead.status === 'quoted' ? 'bg-purple-100 text-purple-800 border-purple-300' : ''}
+                                                                        ${lead.status === 'booked' ? 'bg-green-100 text-green-800 border-green-300' : ''}
+                                                                        ${lead.status === 'lost' ? 'bg-red-100 text-red-800 border-red-300' : ''}
+                                                                        border
+                                                                      `}
+                                                                    >
+                                                                        {lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}
+                                                                    </Badge>
+                                                                </SelectValue>
                                                             </SelectTrigger>
                                                             <SelectContent>
                                                                 <SelectItem value="new">New</SelectItem>
