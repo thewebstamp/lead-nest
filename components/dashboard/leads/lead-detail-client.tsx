@@ -174,10 +174,26 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
             });
 
             if (response.ok) {
-                // Show success feedback
+                toast({
+                    title: "Success",
+                    description: "Internal notes saved",
+                });
+                router.refresh();
+            } else {
+                const error = await response.json();
+                toast({
+                    title: "Error",
+                    description: error.message || "Failed to save internal notes",
+                    variant: "destructive",
+                });
             }
         } catch (error) {
             console.error("Failed to save internal notes:", error);
+            toast({
+                title: "Error",
+                description: "Failed to save internal notes",
+                variant: "destructive",
+            });
         }
     };
 
