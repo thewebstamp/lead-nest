@@ -34,6 +34,7 @@ import {
     Paperclip,
     Send,
 } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 interface LeadDetailClientProps {
     lead: {
@@ -113,10 +114,27 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
             });
 
             if (response.ok) {
+                toast({
+                    title: "Status updated",
+                    description: `Lead marked as ${newStatus}`,
+                });
+                // Refresh the page to show updated data
                 router.refresh();
+            } else {
+                const error = await response.json();
+                toast({
+                    title: "Error",
+                    description: error.message || "Failed to update status",
+                    variant: "destructive",
+                });
             }
         } catch (error) {
             console.error("Failed to update status:", error);
+            toast({
+                title: "Error",
+                description: "Failed to update status",
+                variant: "destructive",
+            });
         }
     };
 

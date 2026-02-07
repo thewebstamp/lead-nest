@@ -42,6 +42,7 @@ import {
     CheckCircle,
     XCircle,
 } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 interface Lead {
     id: string;
@@ -122,11 +123,27 @@ export default function LeadsDashboard({ leads, stats, businessId }: LeadsDashbo
             });
 
             if (response.ok) {
+                toast({
+                    title: "Status updated",
+                    description: "Lead status has been updated successfully",
+                });
                 // Refresh the page to show updated data
-                window.location.reload();
+                setTimeout(() => window.location.reload(), 500);
+            } else {
+                const error = await response.json();
+                toast({
+                    title: "Error",
+                    description: error.message || "Failed to update status",
+                    variant: "destructive",
+                });
             }
         } catch (error) {
             console.error("Failed to update status:", error);
+            toast({
+                title: "Error",
+                description: "Failed to update status",
+                variant: "destructive",
+            });
         }
     };
 

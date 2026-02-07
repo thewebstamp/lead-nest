@@ -1,25 +1,65 @@
 // app/dashboard/settings/page.tsx
-export default function SettingsPage() {
-    return (
-        <div className="max-w-4xl mx-auto">
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-                <p className="text-gray-600">Manage your business settings and preferences</p>
-            </div>
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { authOptions } from "@/lib/auth/config";
+import { query, queryOne } from "@/lib/db";
+import SettingsClient from "@/components/dashboard/settings/settings-client";
 
-            <div className="bg-white rounded-lg border p-6">
-                <h2 className="text-lg font-semibold mb-4">Coming Soon</h2>
-                <p className="text-gray-600">
-                    Settings page will be available in the next update. You&apos;ll be able to:
-                </p>
-                <ul className="list-disc pl-5 mt-2 space-y-1 text-gray-600">
-                    <li>Update business information</li>
-                    <li>Manage services offered</li>
-                    <li>Configure email notifications</li>
-                    <li>Set up team members</li>
-                    <li>Customize lead form fields</li>
-                </ul>
-            </div>
-        </div>
+export default async function SettingsPage() {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.businessId) {
+        redirect("/auth/signin");
+    }
+
+    // Fetch business details
+    const business = await queryOne<{
+        id: string;
+        name: string;
+        email: string;
+        slug: string;
+        service_types: string[];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        settings: any;
+        created_at: Date;
+    }>(
+        "SELECT id, name, email, slug, service_types, settings, created_at FROM businesses WHERE id = $1",
+        [session.user.businessId]
+    );
+
+    if (!business) {
+        redirect("/onboarding");
+    }
+
+    // Fetch team members
+    const { rows: teamMembers } = await query<{
+        user_id: string;
+        email: string;
+        name: string | null;
+        role: string;
+        is_default: boolean;
+        created_at: Date;
+    }>(
+        `SELECT 
+      ubr.user_id,
+      u.email,
+      u.name,
+      ubr.role,
+      ubr.is_default,
+      ubr.created_at
+     FROM user_business_relations ubr
+     JOIN users u ON ubr.user_id = u.id
+     WHERE ubr.business_id = $1
+     ORDER BY ubr.created_at DESC`,
+        [session.user.businessId]
+    );
+
+    return (
+        <SettingsClient
+            business={business}
+            teamMembers={teamMembers}
+            // Provide a default value for role
+            currentUserRole={session.user.role || "owner"}
+        />
     );
 }

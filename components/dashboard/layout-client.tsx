@@ -151,7 +151,7 @@ export default function DashboardLayoutClient({
             {/* Main content */}
             <div className="lg:pl-64">
                 {/* Top header */}
-                <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-gray-200 bg-white px-4 lg:px-6">
+                <header className="fixed top-0 z-40 flex h-16 items-center gap-4 border-b border-gray-200 bg-white px-4 lg:px-6">
                     <Button
                         variant="ghost"
                         size="sm"
