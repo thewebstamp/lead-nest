@@ -1,123 +1,123 @@
 // app/dashboard/page.tsx
-"use client";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { authOptions } from "@/lib/auth/config";
+import { query, queryOne } from "@/lib/db";
+import { DashboardLayout } from "./layout";
+import DashboardContent from "@/components/dashboard/dashboard-content";
 
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+export default async function DashboardPage() {
+    const session = await getServerSession(authOptions);
 
-export default function DashboardPage() {
-    const { data: session, status } = useSession();
-    const router = useRouter();
-
-    useEffect(() => {
-        if (status === "unauthenticated") {
-            router.push("/auth/signin");
-        }
-    }, [status, router]);
-
-    if (status === "loading") {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin" />
-            </div>
-        );
+    if (!session?.user?.businessId) {
+        redirect("/auth/signin");
     }
 
-    if (!session) {
-        return null;
+    // Fetch business details
+    const business = await queryOne<{
+        name: string;
+        slug: string;
+        email: string;
+        service_types: string[];
+        created_at: Date;
+    }>(
+        "SELECT name, slug, email, service_types, created_at FROM businesses WHERE id = $1",
+        [session.user.businessId]
+    );
+
+    if (!business) {
+        redirect("/onboarding");
     }
+
+    // Fetch lead statistics
+    const { rows: statusCounts } = await query<{ status: string; count: string }>(
+        `SELECT status, COUNT(*) as count 
+     FROM leads 
+     WHERE business_id = $1 
+     GROUP BY status`,
+        [session.user.businessId]
+    );
+
+    // Fetch recent leads
+    const { rows: recentLeads } = await query<{
+        id: string;
+        name: string;
+        email: string;
+        service_type: string;
+        status: string;
+        priority: string;
+        created_at: Date;
+    }>(
+        `SELECT id, name, email, service_type, status, priority, created_at
+     FROM leads 
+     WHERE business_id = $1 
+     ORDER BY created_at DESC 
+     LIMIT 5`,
+        [session.user.businessId]
+    );
+
+    // Fetch lead trends (last 7 days)
+    const { rows: leadTrends } = await query<{ date: string; count: string }>(
+        `SELECT 
+       DATE(created_at) as date,
+       COUNT(*) as count
+     FROM leads 
+     WHERE business_id = $1 
+       AND created_at >= CURRENT_DATE - INTERVAL '7 days'
+     GROUP BY DATE(created_at)
+     ORDER BY date DESC`,
+        [session.user.businessId]
+    );
+
+    // Calculate totals
+    const stats = {
+        total: statusCounts.reduce((acc, row) => acc + parseInt(row.count), 0),
+        new: statusCounts.find(row => row.status === 'new')?.count || '0',
+        contacted: statusCounts.find(row => row.status === 'contacted')?.count || '0',
+        quoted: statusCounts.find(row => row.status === 'quoted')?.count || '0',
+        booked: statusCounts.find(row => row.status === 'booked')?.count || '0',
+        lost: statusCounts.find(row => row.status === 'lost')?.count || '0',
+    };
+
+    // Calculate conversion rate
+    const conversionRate = stats.total > 0
+        ? Math.round((parseInt(stats.booked) / stats.total) * 100)
+        : 0;
+
+    // Calculate average response time (in hours) for contacted leads
+    const { rows: responseTimes } = await query<{ hours: number }>(
+        `SELECT 
+       EXTRACT(EPOCH FROM (updated_at - created_at)) / 3600 as hours
+     FROM leads 
+     WHERE business_id = $1 
+       AND status IN ('contacted', 'quoted', 'booked')
+       AND updated_at > created_at`,
+        [session.user.businessId]
+    );
+
+    const avgResponseTime = responseTimes.length > 0
+        ? Math.round(responseTimes.reduce((acc, row) => acc + row.hours, 0) / responseTimes.length)
+        : 0;
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                <div className="px-4 py-6 sm:px-0">
-                    <Card className="mb-6">
-                        <CardHeader>
-                            <CardTitle className="text-2xl">Welcome to LeadNest!</CardTitle>
-                            <CardDescription>
-                                Welcome back, {session.user?.name || "User"}!
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                <div>
-                                    <h3 className="text-lg font-medium">Your Business</h3>
-                                    <p className="text-sm text-gray-600">
-                                        Slug: {session.user?.businessSlug}
-                                    </p>
-                                    <p className="text-sm text-gray-600">
-                                        Business ID: {session.user?.businessId}
-                                    </p>
-                                </div>
-
-                                <div>
-                                    <h3 className="text-lg font-medium">What&apos;s Next?</h3>
-                                    <ul className="list-disc pl-5 text-gray-600 space-y-1">
-                                        <li>Share your form link: <code className="bg-gray-100 px-2 py-1 rounded">/form/{session.user?.businessSlug}</code></li>
-                                        <li>Check back here to see incoming leads</li>
-                                        <li>Set up email notifications in settings</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Leads Overview</CardTitle>
-                                <CardDescription>Your incoming leads</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-center py-8">
-                                    <p className="text-gray-500">No leads yet</p>
-                                    <p className="text-sm text-gray-400 mt-2">
-                                        Share your form link to start receiving leads
-                                    </p>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Quick Actions</CardTitle>
-                                <CardDescription>Common tasks</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-2">
-                                    <Button className="w-full" variant="outline" onClick={() => router.push(`/form/${session.user?.businessSlug}`)}>
-                                        View Your Form
-                                    </Button>
-                                    <Button className="w-full" variant="outline">
-                                        Settings
-                                    </Button>
-                                    <Button className="w-full" variant="outline">
-                                        Add Team Members
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Statistics</CardTitle>
-                                <CardDescription>Coming soon</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-center py-8">
-                                    <p className="text-gray-500">Dashboard features coming in Phase 2</p>
-                                    <p className="text-sm text-gray-400 mt-2">
-                                        Lead tracking, analytics, and automation
-                                    </p>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <DashboardLayout
+            user={{
+                name: session.user?.name,
+                email: session.user?.email,
+            }}
+            business={{
+                name: business.name,
+                slug: business.slug,
+            }}
+        >
+            <DashboardContent
+                stats={stats}
+                recentLeads={recentLeads}
+                leadTrends={leadTrends}
+                business={business}
+                conversionRate={conversionRate}
+                avgResponseTime={avgResponseTime}
+            />
+        </DashboardLayout>
     );
 }

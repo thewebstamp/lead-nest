@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query, queryOne } from "@/lib/db";
 import { v4 as uuidv4 } from "uuid";
+import { autoQualifyLead } from "@/lib/services/leads/qualification";
 
 export async function POST(
   request: NextRequest,
@@ -17,8 +18,10 @@ export async function POST(
       name: string;
       email: string;
       service_types: string[];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      settings: any;
     }>(
-      "SELECT id, name, email, service_types FROM businesses WHERE slug = $1",
+      "SELECT id, name, email, service_types, settings FROM businesses WHERE slug = $1",
       [slug],
     );
 
@@ -58,29 +61,19 @@ export async function POST(
       );
     }
 
+    // Auto-qualify the lead
+    const businessSettings = business.settings || {};
+    const qualification = autoQualifyLead(formData, businessSettings);
+
     // Create lead
     const leadId = uuidv4();
-
-    // Auto-qualification logic
-    let priority = "medium";
-    // eslint-disable-next-line prefer-const
-    let status = "new";
-
-    // Simple qualification rules (MVP)
-    if (formData.serviceType.toLowerCase().includes("emergency")) {
-      priority = "high";
-    }
-
-    if (formData.message && formData.message.length > 100) {
-      // Detailed messages might indicate serious interest
-      priority = "high";
-    }
 
     await query(
       `INSERT INTO leads (
         id, business_id, name, email, phone, service_type, 
-        location, message, priority, status, created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())`,
+        location, message, priority, status, source,
+        qualification_notes, tags, created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW())`,
       [
         leadId,
         business.id,
@@ -90,8 +83,11 @@ export async function POST(
         formData.serviceType,
         formData.location,
         formData.message || "",
-        priority,
-        status,
+        qualification.priority,
+        "new",
+        "form",
+        qualification.notes,
+        qualification.tags.join(","), // Store tags as comma-separated string
       ],
     );
 
@@ -102,6 +98,7 @@ export async function POST(
       success: true,
       message: "Lead submitted successfully",
       leadId,
+      qualification,
     });
   } catch (error) {
     console.error("Form submission error:", error);
