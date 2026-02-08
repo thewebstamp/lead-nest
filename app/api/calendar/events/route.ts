@@ -13,27 +13,42 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url);
-    const startDate = searchParams.get("start");
-    const endDate = searchParams.get("end");
+    const { businessId } = session.user;
 
-    const { rows: events } = await query(
+    // Fetch events with proper date formatting
+    const { rows: events } = await query<{
+      id: string;
+      title: string;
+      description: string;
+      event_type: string;
+      start_time: string;
+      end_time: string;
+      status: string;
+      location: string;
+      lead_id: string | null;
+      lead_name: string | null;
+      lead_email: string | null;
+    }>(
       `SELECT 
                 e.*,
                 l.name as lead_name,
-                l.email as lead_email,
-                l.phone as lead_phone
+                l.email as lead_email
              FROM calendar_events e
              LEFT JOIN leads l ON e.lead_id = l.id
              WHERE e.business_id = $1
-                AND ($2::timestamp IS NULL OR e.start_time >= $2)
-                AND ($3::timestamp IS NULL OR e.end_time <= $3)
                 AND e.status != 'cancelled'
              ORDER BY e.start_time`,
-      [session.user.businessId, startDate, endDate],
+      [businessId],
     );
 
-    return NextResponse.json(events);
+    // Ensure dates are properly formatted as ISO strings
+    const formattedEvents = events.map((event) => ({
+      ...event,
+      start_time: new Date(event.start_time).toISOString(),
+      end_time: new Date(event.end_time).toISOString(),
+    }));
+
+    return NextResponse.json(formattedEvents);
   } catch (error) {
     console.error("Get events error:", error);
     return NextResponse.json(

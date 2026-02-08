@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// components/dashboard/calendar/calendar-dashboard.tsx
+// components/dashboard/calendar/calendar-dashboard.tsx - Update the component
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, parseISO, addMonths, subMonths, isSameDay } from "date-fns";
+import { useState } from "react";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, parseISO, addMonths, subMonths, isSameDay, isValid } from "date-fns";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     Select,
     SelectContent,
@@ -32,26 +31,39 @@ import {
     Plus,
     Clock,
     MapPin,
-    Users,
-    Bell,
     ChevronLeft,
     ChevronRight,
-    X,
-    Check,
-    Phone,
     Mail,
-    Video,
-    User,
-    Building
+    User
 } from "lucide-react";
+
+// Safe date parsing function
+const safeParseDate = (dateString: string | Date | null | undefined): Date | null => {
+    if (!dateString) return null;
+    
+    try {
+        const date = typeof dateString === 'string' ? parseISO(dateString) : new Date(dateString);
+        return isValid(date) ? date : null;
+    } catch (error) {
+        console.error("Failed to parse date:", dateString, error);
+        return null;
+    }
+};
+
+// Safe date formatting function
+const safeFormatDate = (dateString: string | Date | null | undefined, formatString: string): string => {
+    const date = safeParseDate(dateString);
+    if (!date) return "Invalid date";
+    return format(date, formatString);
+};
 
 interface CalendarEvent {
     id: string;
     title: string;
     description: string;
     event_type: string;
-    start_time: Date;
-    end_time: Date;
+    start_time: string; // Store as string
+    end_time: string;   // Store as string
     status: string;
     location: string;
     lead_id: string | null;
@@ -107,17 +119,23 @@ export default function CalendarDashboard({
     const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
     const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-    const [view, setView] = useState<"month" | "week" | "day">("month");
     const [newEvent, setNewEvent] = useState({
         title: "",
         description: "",
         event_type: "appointment",
-        start_time: "",
-        end_time: "",
+        start_time: new Date().toISOString().slice(0, 16), // Current datetime-local format
+        end_time: new Date(Date.now() + 3600000).toISOString().slice(0, 16), // +1 hour
         location: "",
         lead_id: "",
         participants: [] as string[],
         reminders: [] as any[]
+    });
+
+    // Validate and filter events
+    const validEvents = events.filter(event => {
+        const startDate = safeParseDate(event.start_time);
+        const endDate = safeParseDate(event.end_time);
+        return startDate !== null && endDate !== null;
     });
 
     // Calculate calendar days for month view
@@ -127,9 +145,11 @@ export default function CalendarDashboard({
 
     // Get events for a specific day
     const getEventsForDay = (day: Date) => {
-        return events.filter(event =>
-            isSameDay(parseISO(event.start_time.toString()), day)
-        );
+        return validEvents.filter(event => {
+            const eventDate = safeParseDate(event.start_time);
+            if (!eventDate) return false;
+            return isSameDay(eventDate, day);
+        });
     };
 
     // Handle navigation
@@ -167,8 +187,8 @@ export default function CalendarDashboard({
                     title: "",
                     description: "",
                     event_type: "appointment",
-                    start_time: "",
-                    end_time: "",
+                    start_time: new Date().toISOString().slice(0, 16),
+                    end_time: new Date(Date.now() + 3600000).toISOString().slice(0, 16),
                     location: "",
                     lead_id: "",
                     participants: [],
@@ -178,11 +198,15 @@ export default function CalendarDashboard({
                     title: "Event created",
                     description: "Your event has been scheduled successfully",
                 });
+            } else {
+                const error = await response.json();
+                throw new Error(error.message || "Failed to create event");
             }
         } catch (error) {
+            console.error("Create event error:", error);
             toast({
                 title: "Error",
-                description: "Failed to create event",
+                description: error instanceof Error ? error.message : "Failed to create event",
                 variant: "destructive",
             });
         }
@@ -201,7 +225,7 @@ export default function CalendarDashboard({
 
             if (response.ok) {
                 const updatedEvent = await response.json();
-                setEvents(events.map(event =>
+                setEvents(events.map(event => 
                     event.id === eventId ? updatedEvent : event
                 ));
                 setSelectedEvent(updatedEvent);
@@ -211,6 +235,7 @@ export default function CalendarDashboard({
                 });
             }
         } catch (error) {
+            console.error("Update event error:", error);
             toast({
                 title: "Error",
                 description: "Failed to update event",
@@ -219,56 +244,23 @@ export default function CalendarDashboard({
         }
     };
 
-    // Handle event deletion
-    const handleDeleteEvent = async (eventId: string) => {
-        if (!confirm("Are you sure you want to delete this event?")) return;
-
-        try {
-            const response = await fetch(`/api/calendar/events/${eventId}`, {
-                method: 'DELETE',
+    // Debug function to check events
+    const debugEvents = () => {
+        console.log("=== EVENTS DEBUG ===");
+        console.log("Total events:", events.length);
+        console.log("Valid events:", validEvents.length);
+        events.forEach((event, index) => {
+            const startDate = safeParseDate(event.start_time);
+            const endDate = safeParseDate(event.end_time);
+            console.log(`Event ${index + 1}:`, {
+                id: event.id,
+                title: event.title,
+                start_time: event.start_time,
+                start_date_valid: startDate ? "Valid" : "Invalid",
+                end_time: event.end_time,
+                end_date_valid: endDate ? "Valid" : "Invalid",
             });
-
-            if (response.ok) {
-                setEvents(events.filter(event => event.id !== eventId));
-                setSelectedEvent(null);
-                toast({
-                    title: "Event deleted",
-                    description: "Your event has been deleted successfully",
-                });
-            }
-        } catch (error) {
-            toast({
-                title: "Error",
-                description: "Failed to delete event",
-                variant: "destructive",
-            });
-        }
-    };
-
-    // Send event reminder
-    const sendReminder = async (eventId: string, reminderType: string) => {
-        try {
-            const response = await fetch(`/api/calendar/events/${eventId}/reminders`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ reminder_type: reminderType }),
-            });
-
-            if (response.ok) {
-                toast({
-                    title: "Reminder sent",
-                    description: `Reminder sent via ${reminderType}`,
-                });
-            }
-        } catch (error) {
-            toast({
-                title: "Error",
-                description: "Failed to send reminder",
-                variant: "destructive",
-            });
-        }
+        });
     };
 
     return (
@@ -294,22 +286,29 @@ export default function CalendarDashboard({
                             <ChevronRight className="h-4 w-4" />
                         </Button>
                     </div>
-                    <Select value={view} onValueChange={(v: any) => setView(v)}>
-                        <SelectTrigger className="w-32">
-                            <SelectValue placeholder="View" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="month">Month</SelectItem>
-                            <SelectItem value="week">Week</SelectItem>
-                            <SelectItem value="day">Day</SelectItem>
-                        </SelectContent>
-                    </Select>
                     <Button onClick={() => setIsCreateDialogOpen(true)}>
                         <Plus className="h-4 w-4 mr-2" />
                         New Event
                     </Button>
+                    {process.env.NODE_ENV === 'development' && (
+                        <Button variant="outline" size="sm" onClick={debugEvents}>
+                            Debug
+                        </Button>
+                    )}
                 </div>
             </div>
+
+            {/* Debug info for development */}
+            {process.env.NODE_ENV === 'development' && events.length > 0 && (
+                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
+                    <p className="text-yellow-800">
+                        <strong>Debug Info:</strong> {events.length} total events, {validEvents.length} valid events
+                        {events.length !== validEvents.length && (
+                            <span className="text-red-600"> (Some events have invalid dates)</span>
+                        )}
+                    </p>
+                </div>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Calendar View */}
@@ -355,29 +354,34 @@ export default function CalendarDashboard({
                                                         <div className="h-2 w-2 rounded-full bg-blue-600" />
                                                     )}
                                                 </div>
-
+                                                
                                                 {/* Events for this day */}
                                                 <div className="space-y-1">
-                                                    {dayEvents.slice(0, 3).map(event => (
-                                                        <div
-                                                            key={event.id}
-                                                            className={`
-                                                                text-xs p-1 rounded truncate cursor-pointer
-                                                                ${eventTypeColors[event.event_type] || 'bg-gray-100'}
-                                                                border
-                                                            `}
-                                                            onClick={() => {
-                                                                setSelectedEvent(event);
-                                                                setIsEventDialogOpen(true);
-                                                            }}
-                                                        >
-                                                            <div className="font-medium truncate">{event.title}</div>
-                                                            <div className="flex items-center text-xs">
-                                                                <Clock className="h-3 w-3 mr-1" />
-                                                                {format(parseISO(event.start_time.toString()), 'h:mm a')}
+                                                    {dayEvents.slice(0, 3).map(event => {
+                                                        const eventDate = safeParseDate(event.start_time);
+                                                        return (
+                                                            <div
+                                                                key={event.id}
+                                                                className={`
+                                                                    text-xs p-1 rounded truncate cursor-pointer
+                                                                    ${eventTypeColors[event.event_type] || 'bg-gray-100'}
+                                                                    border
+                                                                `}
+                                                                onClick={() => {
+                                                                    setSelectedEvent(event);
+                                                                    setIsEventDialogOpen(true);
+                                                                }}
+                                                            >
+                                                                <div className="font-medium truncate">{event.title}</div>
+                                                                {eventDate && (
+                                                                    <div className="flex items-center text-xs">
+                                                                        <Clock className="h-3 w-3 mr-1" />
+                                                                        {format(eventDate, 'h:mm a')}
+                                                                    </div>
+                                                                )}
                                                             </div>
-                                                        </div>
-                                                    ))}
+                                                        );
+                                                    })}
                                                     {dayEvents.length > 3 && (
                                                         <div className="text-xs text-gray-500 pl-1">
                                                             +{dayEvents.length - 3} more
@@ -402,44 +406,54 @@ export default function CalendarDashboard({
                                 <CalendarIcon className="h-5 w-5" />
                                 Upcoming Events
                             </CardTitle>
-                            <CardDescription>Next 7 days</CardDescription>
+                            <CardDescription>Next 20 events</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-3">
                                 {upcomingEvents.length === 0 ? (
                                     <p className="text-gray-500 text-center py-4">No upcoming events</p>
                                 ) : (
-                                    upcomingEvents.map(event => (
-                                        <div
-                                            key={event.id}
-                                            className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
-                                            onClick={() => {
-                                                const fullEvent = events.find(e => e.id === event.id);
-                                                if (fullEvent) {
-                                                    setSelectedEvent(fullEvent);
-                                                    setIsEventDialogOpen(true);
-                                                }
-                                            }}
-                                        >
-                                            <div className="flex justify-between items-start">
-                                                <div>
-                                                    <div className="font-medium">{event.title}</div>
-                                                    <div className="text-sm text-gray-500">
-                                                        {format(parseISO(event.start_time.toString()), 'EEE, MMM d • h:mm a')}
+                                    upcomingEvents
+                                        .filter(event => {
+                                            const eventDate = safeParseDate(event.start_time);
+                                            return eventDate !== null;
+                                        })
+                                        .map(event => {
+                                            const eventDate = safeParseDate(event.start_time);
+                                            return (
+                                                <div
+                                                    key={event.id}
+                                                    className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                                                    onClick={() => {
+                                                        const fullEvent = events.find(e => e.id === event.id);
+                                                        if (fullEvent) {
+                                                            setSelectedEvent(fullEvent);
+                                                            setIsEventDialogOpen(true);
+                                                        }
+                                                    }}
+                                                >
+                                                    <div className="flex justify-between items-start">
+                                                        <div>
+                                                            <div className="font-medium">{event.title}</div>
+                                                            {eventDate && (
+                                                                <div className="text-sm text-gray-500">
+                                                                    {format(eventDate, 'EEE, MMM d • h:mm a')}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <Badge className={eventTypeColors[event.event_type]}>
+                                                            {event.event_type}
+                                                        </Badge>
                                                     </div>
+                                                    {event.lead_name && (
+                                                        <div className="text-sm text-gray-600 mt-1 flex items-center">
+                                                            <User className="h-3 w-3 mr-1" />
+                                                            With {event.lead_name}
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                <Badge className={eventTypeColors[event.event_type]}>
-                                                    {event.event_type}
-                                                </Badge>
-                                            </div>
-                                            {event.lead_name && (
-                                                <div className="text-sm text-gray-600 mt-1 flex items-center">
-                                                    <User className="h-3 w-3 mr-1" />
-                                                    With {event.lead_name}
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))
+                                            );
+                                        })
                                 )}
                             </div>
                         </CardContent>
@@ -463,13 +477,21 @@ export default function CalendarDashboard({
                                             size="sm"
                                             variant="outline"
                                             onClick={() => {
+                                                const now = new Date();
+                                                const tomorrow = new Date(now);
+                                                tomorrow.setDate(tomorrow.getDate() + 1);
+                                                tomorrow.setHours(10, 0, 0, 0);
+
+                                                const endTime = new Date(tomorrow);
+                                                endTime.setHours(11, 0, 0, 0);
+
                                                 setNewEvent({
                                                     ...newEvent,
                                                     title: `Meeting with ${lead.name}`,
                                                     lead_id: lead.id,
-                                                    participants: [lead.email],
-                                                    start_time: `${new Date().toISOString().split('T')[0]}T10:00`,
-                                                    end_time: `${new Date().toISOString().split('T')[0]}T11:00`
+                                                    participants: [lead.email, userEmail],
+                                                    start_time: tomorrow.toISOString().slice(0, 16),
+                                                    end_time: endTime.toISOString().slice(0, 16)
                                                 });
                                                 setIsCreateDialogOpen(true);
                                             }}
@@ -517,19 +539,23 @@ export default function CalendarDashboard({
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1">
                                         <Label className="text-sm font-medium">Time</Label>
-                                        <div className="flex items-center text-gray-700">
-                                            <Clock className="h-4 w-4 mr-2" />
-                                            {format(parseISO(selectedEvent.start_time.toString()), 'PPpp')}
-                                            <span className="mx-2">to</span>
-                                            {format(parseISO(selectedEvent.end_time.toString()), 'pp')}
+                                        <div className="flex flex-col text-gray-700">
+                                            <div className="flex items-center">
+                                                <Clock className="h-4 w-4 mr-2 text-gray-500" />
+                                                <span>{safeFormatDate(selectedEvent.start_time, 'PPpp')}</span>
+                                            </div>
+                                            <div className="flex items-center mt-1">
+                                                <span className="ml-6">to</span>
+                                                <span className="ml-2">{safeFormatDate(selectedEvent.end_time, 'pp')}</span>
+                                            </div>
                                         </div>
                                     </div>
-
+                                    
                                     {selectedEvent.location && (
                                         <div className="space-y-1">
                                             <Label className="text-sm font-medium">Location</Label>
                                             <div className="flex items-center text-gray-700">
-                                                <MapPin className="h-4 w-4 mr-2" />
+                                                <MapPin className="h-4 w-4 mr-2 text-gray-500" />
                                                 {selectedEvent.location}
                                             </div>
                                         </div>
@@ -540,19 +566,20 @@ export default function CalendarDashboard({
                                             <Label className="text-sm font-medium">Lead</Label>
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center">
-                                                    <User className="h-4 w-4 mr-2" />
+                                                    <User className="h-4 w-4 mr-2 text-gray-500" />
                                                     <div>
                                                         <div className="font-medium">{selectedEvent.lead_name}</div>
                                                         <div className="text-sm text-gray-500">{selectedEvent.lead_email}</div>
                                                     </div>
                                                 </div>
                                                 <div className="flex gap-1">
-                                                    <Button size="sm" variant="ghost" onClick={() => window.open(`tel:${selectedEvent.lead_email}`)}>
-                                                        <Phone className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button size="sm" variant="ghost" onClick={() => window.open(`mailto:${selectedEvent.lead_email}`)}>
-                                                        <Mail className="h-4 w-4" />
-                                                    </Button>
+                                                    {selectedEvent.lead_email && (
+                                                        <>
+                                                            <Button size="sm" variant="ghost" onClick={() => window.open(`mailto:${selectedEvent.lead_email}`)}>
+                                                                <Mail className="h-4 w-4" />
+                                                            </Button>
+                                                        </>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
@@ -573,7 +600,7 @@ export default function CalendarDashboard({
                                     <div className="flex gap-2">
                                         <Select
                                             value={selectedEvent.status}
-                                            onValueChange={(value) =>
+                                            onValueChange={(value) => 
                                                 handleUpdateEvent(selectedEvent.id, { status: value })
                                             }
                                         >
@@ -587,23 +614,12 @@ export default function CalendarDashboard({
                                                 <SelectItem value="cancelled">Cancelled</SelectItem>
                                             </SelectContent>
                                         </Select>
-                                        <Button
-                                            variant="outline"
-                                            onClick={() => sendReminder(selectedEvent.id, 'email')}
-                                        >
-                                            <Bell className="h-4 w-4 mr-2" />
-                                            Send Reminder
-                                        </Button>
                                     </div>
                                     <div className="flex gap-2">
                                         <Button
                                             variant="outline"
-                                            onClick={() => handleDeleteEvent(selectedEvent.id)}
-                                            className="text-red-600"
+                                            onClick={() => setIsEventDialogOpen(false)}
                                         >
-                                            Delete
-                                        </Button>
-                                        <Button onClick={() => setIsEventDialogOpen(false)}>
                                             Close
                                         </Button>
                                     </div>
@@ -631,7 +647,7 @@ export default function CalendarDashboard({
                                 <Input
                                     id="title"
                                     value={newEvent.title}
-                                    onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                                    onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
                                     placeholder="Meeting title"
                                 />
                             </div>
@@ -640,7 +656,7 @@ export default function CalendarDashboard({
                                 <Label htmlFor="event_type">Event Type</Label>
                                 <Select
                                     value={newEvent.event_type}
-                                    onValueChange={(value) => setNewEvent({ ...newEvent, event_type: value })}
+                                    onValueChange={(value) => setNewEvent({...newEvent, event_type: value})}
                                 >
                                     <SelectTrigger>
                                         <SelectValue />
@@ -660,7 +676,7 @@ export default function CalendarDashboard({
                                     id="start_time"
                                     type="datetime-local"
                                     value={newEvent.start_time}
-                                    onChange={(e) => setNewEvent({ ...newEvent, start_time: e.target.value })}
+                                    onChange={(e) => setNewEvent({...newEvent, start_time: e.target.value})}
                                 />
                             </div>
 
@@ -670,7 +686,7 @@ export default function CalendarDashboard({
                                     id="end_time"
                                     type="datetime-local"
                                     value={newEvent.end_time}
-                                    onChange={(e) => setNewEvent({ ...newEvent, end_time: e.target.value })}
+                                    onChange={(e) => setNewEvent({...newEvent, end_time: e.target.value})}
                                 />
                             </div>
 
@@ -705,7 +721,7 @@ export default function CalendarDashboard({
                                 <Input
                                     id="location"
                                     value={newEvent.location}
-                                    onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
+                                    onChange={(e) => setNewEvent({...newEvent, location: e.target.value})}
                                     placeholder="Virtual meeting, Office, etc."
                                 />
                             </div>
@@ -715,7 +731,7 @@ export default function CalendarDashboard({
                                 <Textarea
                                     id="description"
                                     value={newEvent.description}
-                                    onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                                    onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
                                     placeholder="Add meeting agenda, notes, or instructions..."
                                     rows={3}
                                 />
