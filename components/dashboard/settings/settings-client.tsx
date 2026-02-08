@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import QualificationRules from "./qualification-rules";
 import { QualificationSettings } from "@/lib/services/leads/qualification";
+import Link from "next/link";
 
 interface SettingsClientProps {
     business: {
@@ -385,13 +386,19 @@ export default function SettingsClient({ business, teamMembers, currentUserRole 
                                             Started {formatDate(new Date())}
                                         </p>
                                     </div>
-                                    <Button
+                                    {/* <Button
                                         variant="destructive"
                                         onClick={handleLogout}
                                     >
                                         <LogOut className="h-4 w-4 mr-2" />
                                         Logout
-                                    </Button>
+                                    </Button> */}
+                                    <Link href="/api/auth/signout">
+                                        <Button variant="outline">
+                                            <LogOut className="h-4 w-4 mr-2" />
+                                            Logout
+                                        </Button>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
