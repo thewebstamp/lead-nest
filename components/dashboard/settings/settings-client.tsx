@@ -7,17 +7,15 @@ import { signOut } from "next-auth/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "@/components/ui/use-toast";
+import EmailTemplates from "./email-templates";
 import {
     Building,
     Users,
-    Mail,
-    Bell,
     Shield,
     LogOut,
     Trash2,
@@ -26,8 +24,9 @@ import {
     Eye,
     Save,
     UserPlus,
-    Calendar,
 } from "lucide-react";
+import QualificationRules from "./qualification-rules";
+import { QualificationSettings } from "@/lib/services/leads/qualification";
 
 interface SettingsClientProps {
     business: {
@@ -54,7 +53,6 @@ interface SettingsClientProps {
 export default function SettingsClient({ business, teamMembers, currentUserRole }: SettingsClientProps) {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
-    const [inviteEmail, setInviteEmail] = useState("");
 
     // Form states
     const [businessName, setBusinessName] = useState(business.name);
@@ -62,6 +60,12 @@ export default function SettingsClient({ business, teamMembers, currentUserRole 
     const [services, setServices] = useState<string[]>(business.service_types || []);
     const [newService, setNewService] = useState("");
     const [formLink] = useState(`${typeof window !== 'undefined' ? window.location.origin : ''}/form/${business.slug}`);
+
+    // Get qualification settings from business settings
+    const qualificationSettings: QualificationSettings = business.settings?.qualification || {
+        rules: [],
+        priorityThresholds: { high: 80, medium: 60 },
+    };
 
     const handleSaveProfile = async () => {
         setIsLoading(true);
@@ -270,6 +274,15 @@ export default function SettingsClient({ business, teamMembers, currentUserRole 
                     </div>
                 </CardContent>
             </Card>
+
+            {/* Lead Qualification Rules */}
+            <QualificationRules
+                businessId={business.id}
+                initialRules={qualificationSettings.rules}
+                initialThresholds={qualificationSettings.priorityThresholds}
+            />
+
+            <EmailTemplates businessId={business.id} />
 
             {/* Team Members */}
             <Card>

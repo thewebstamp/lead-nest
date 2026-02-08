@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { query, queryOne } from "@/lib/db";
 import { v4 as uuidv4 } from "uuid";
 import { autoQualifyLead } from "@/lib/services/leads/qualification";
+import { NotificationService } from "@/lib/services/notifications/notification-service";
+import { EmailService } from "@/lib/services/email/email-service";
 
 export async function POST(
   request: NextRequest,
@@ -91,8 +93,60 @@ export async function POST(
       ],
     );
 
-    // TODO: Send confirmation email to customer
-    // TODO: Send notification email to business owner
+    // Send confirmation email to customer
+    const emailService = new EmailService(business.id);
+
+    // Create default templates if they don't exist
+    await emailService.createDefaultTemplates();
+
+    // Send confirmation email to lead
+    await emailService.sendTemplateEmail(
+      "confirmation",
+      { email: formData.email, name: formData.name },
+      {
+        business_name: business.name,
+        lead_name: formData.name,
+        service_type: formData.serviceType,
+        lead_location: formData.location,
+        lead_message: formData.message || "",
+        lead_email: formData.email,
+        lead_phone: formData.phone,
+        lead_id: leadId,
+      },
+      "lead_created",
+    );
+
+    // Send internal notification to business
+    await emailService.sendTemplateEmail(
+      "notification",
+      { email: business.email, name: business.name },
+      {
+        lead_name: formData.name,
+        lead_email: formData.email,
+        lead_phone: formData.phone,
+        service_type: formData.serviceType,
+        lead_location: formData.location,
+        lead_priority: qualification.priority,
+        lead_message: formData.message || "",
+        lead_score: qualification.score.toString(),
+        lead_tags: qualification.tags.join(", "),
+        lead_url: `${process.env.NEXT_PUBLIC_APP_URL || ""}/dashboard/leads/${leadId}`,
+      },
+      "lead_created",
+    );
+
+    // Create in-app notifications
+    const notificationService = new NotificationService(business.id);
+    await notificationService.createLeadNotification(
+      leadId,
+      {
+        name: formData.name,
+        status: "new",
+        priority: qualification.priority,
+        serviceType: formData.serviceType,
+      },
+      "new",
+    );
 
     return NextResponse.json({
       success: true,

@@ -1,4 +1,5 @@
 // lib/services/leads/qualification.ts
+
 export interface LeadData {
   name: string;
   email: string;
@@ -8,11 +9,41 @@ export interface LeadData {
   message?: string;
 }
 
+export interface QualificationRule {
+  id: string;
+  field:
+    | "serviceType"
+    | "location"
+    | "message"
+    | "contactCompleteness"
+    | "timeOfDay";
+  condition:
+    | "equals"
+    | "contains"
+    | "startsWith"
+    | "endsWith"
+    | "regex"
+    | "in"
+    | "notEmpty";
+  value: string | string[] | number;
+  score: number; // Points to add/subtract
+  tag?: string; // Optional tag to apply
+}
+
+export interface QualificationSettings {
+  rules: QualificationRule[];
+  priorityThresholds: {
+    high: number; // Default: 80
+    medium: number; // Default: 60
+  };
+}
+
 export interface BusinessSettings {
   serviceArea?: string;
   location?: string;
   preferredServices?: string[];
   blacklistedKeywords?: string[];
+  qualification?: QualificationSettings; // Add this for custom rules
 }
 
 export interface QualificationResult {
@@ -23,6 +54,72 @@ export interface QualificationResult {
   shouldAutoContact?: boolean;
 }
 
+// Helper function to evaluate a single rule
+function evaluateRule(leadData: LeadData, rule: QualificationRule): boolean {
+  let fieldValue: string | number | string[];
+
+  // Get the field value from leadData
+  switch (rule.field) {
+    case "serviceType":
+      fieldValue = leadData.serviceType.toLowerCase();
+      break;
+    case "location":
+      fieldValue = leadData.location.toLowerCase();
+      break;
+    case "message":
+      fieldValue = (leadData.message || "").toLowerCase();
+      break;
+    case "contactCompleteness":
+      const contactScore = [
+        leadData.name.length > 2,
+        leadData.email.includes("@"),
+        leadData.phone.length >= 10,
+        leadData.location.length > 2,
+      ].filter(Boolean).length;
+      fieldValue = contactScore;
+      break;
+    case "timeOfDay":
+      fieldValue = new Date().getHours();
+      break;
+    default:
+      return false;
+  }
+
+  // Check the condition
+  const ruleValue =
+    typeof rule.value === "string" ? rule.value.toLowerCase() : rule.value;
+
+  switch (rule.condition) {
+    case "equals":
+      return String(fieldValue) === String(ruleValue);
+    case "contains":
+      return String(fieldValue).includes(String(ruleValue));
+    case "startsWith":
+      return String(fieldValue).startsWith(String(ruleValue));
+    case "endsWith":
+      return String(fieldValue).endsWith(String(ruleValue));
+    case "regex":
+      try {
+        const regex = new RegExp(String(ruleValue), "i");
+        return regex.test(String(fieldValue));
+      } catch {
+        return false;
+      }
+    case "in":
+      if (Array.isArray(ruleValue)) {
+        return ruleValue.includes(String(fieldValue));
+      }
+      return String(ruleValue)
+        .split(",")
+        .map((v) => v.trim())
+        .includes(String(fieldValue));
+    case "notEmpty":
+      return String(fieldValue).trim().length > 0;
+    default:
+      return false;
+  }
+}
+
 export function autoQualifyLead(
   leadData: LeadData,
   businessSettings: BusinessSettings = {},
@@ -30,6 +127,65 @@ export function autoQualifyLead(
   let score = 50; // Start with medium priority
   const tags: string[] = [];
   const notes: string[] = [];
+
+  // Check if business has custom qualification rules
+  const customRules = businessSettings.qualification?.rules;
+  const customThresholds = businessSettings.qualification?.priorityThresholds;
+
+  // If custom rules exist, use them
+  if (customRules && customRules.length > 0) {
+    console.log("Using custom qualification rules:", customRules.length);
+
+    customRules.forEach((rule) => {
+      const matches = evaluateRule(leadData, rule);
+      if (matches) {
+        score += rule.score;
+        if (rule.tag && !tags.includes(rule.tag)) {
+          tags.push(rule.tag);
+        }
+        notes.push(
+          `Rule matched: ${rule.field} ${rule.condition} ${rule.value}`,
+        );
+      }
+    });
+
+    // Use custom thresholds if available
+    const highThreshold = customThresholds?.high || 80;
+    const mediumThreshold = customThresholds?.medium || 60;
+
+    // Determine priority based on custom thresholds
+    let priority: "low" | "medium" | "high";
+    if (score >= highThreshold) {
+      priority = "high";
+      if (!tags.includes("high-priority")) {
+        tags.push("high-priority");
+      }
+    } else if (score >= mediumThreshold) {
+      priority = "medium";
+      if (!tags.includes("medium-priority")) {
+        tags.push("medium-priority");
+      }
+    } else {
+      priority = "low";
+      if (!tags.includes("low-priority")) {
+        tags.push("low-priority");
+      }
+    }
+
+    // Should auto-contact?
+    const shouldAutoContact = priority === "high" || tags.includes("emergency");
+
+    return {
+      priority,
+      tags,
+      score,
+      notes: notes.join(" | "),
+      shouldAutoContact,
+    };
+  }
+
+  // If no custom rules, use default logic
+  console.log("Using default qualification rules");
 
   // 1. Service Type Analysis
   if (businessSettings.preferredServices?.includes(leadData.serviceType)) {

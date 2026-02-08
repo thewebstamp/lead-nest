@@ -1,3 +1,5 @@
+//types/calendar.ts
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface CalendarEventDTO {
   id: string;

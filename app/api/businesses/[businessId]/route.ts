@@ -23,7 +23,7 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { name, email, service_types } = body;
+    const { name, email, service_types, qualification } = body;
 
     // Validate input
     if (!name || name.trim().length === 0) {
@@ -33,12 +33,32 @@ export async function PATCH(
       );
     }
 
+    // Get existing settings to merge with new qualification rules
+    const existingBusiness = await query(
+      "SELECT settings FROM businesses WHERE id = $1",
+      [businessId],
+    );
+
+    const existingSettings = existingBusiness.rows[0]?.settings || {};
+
+    // Merge existing settings with new qualification rules if provided
+    const updatedSettings = {
+      ...existingSettings,
+      ...(qualification && { qualification }),
+    };
+
     // Update business
     await query(
       `UPDATE businesses 
-       SET name = $1, email = $2, service_types = $3, updated_at = NOW()
-       WHERE id = $4`,
-      [name.trim(), email?.trim() || "", service_types || [], businessId],
+       SET name = $1, email = $2, service_types = $3, settings = $4, updated_at = NOW()
+       WHERE id = $5`,
+      [
+        name.trim(),
+        email?.trim() || "",
+        service_types || [],
+        JSON.stringify(updatedSettings),
+        businessId,
+      ],
     );
 
     return NextResponse.json({ success: true, message: "Business updated" });

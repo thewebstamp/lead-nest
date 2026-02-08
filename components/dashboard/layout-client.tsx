@@ -5,6 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { NotificationsBell } from "@/components/dashboard/notifications/notifications-bell";
 import { Button } from "@/components/ui/button";
 import {
     Home,
@@ -13,9 +14,7 @@ import {
     Settings,
     Menu,
     X,
-    FileText,
     Calendar,
-    Bell,
     HelpCircle,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -173,16 +172,23 @@ export default function DashboardLayoutClient({
                             <HelpCircle className="h-5 w-5" />
                             <span className="sr-only">Help</span>
                         </Button>
-                        <Button variant="ghost" size="sm" className="relative">
-                            <Bell className="h-5 w-5" />
-                            <span className="sr-only">Notifications</span>
-                            <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500"></span>
-                        </Button>
-                        <Link href="/dashboard/settings" className="flex items-center">
+                        <div className="flex items-center gap-2">
+                            <Button variant="ghost" size="sm" className="hidden sm:inline-flex">
+                                <HelpCircle className="h-5 w-5" />
+                                <span className="sr-only">Help</span>
+                            </Button>
+                            <NotificationsBell />
+                            <Link href="/dashboard/settings" className="flex items-center">
+                                <Avatar>
+                                    <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                                </Avatar>
+                            </Link>
+                        </div>
+                        {/* <Link href="/dashboard/settings" className="flex items-center">
                             <Avatar>
                                 <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                             </Avatar>
-                        </Link>
+                        </Link> */}
                     </div>
                 </header>
 
