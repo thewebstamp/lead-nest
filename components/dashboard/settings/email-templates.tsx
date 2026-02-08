@@ -358,33 +358,44 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                     <Label htmlFor="templateType">Type</Label>
                                     <Select
                                         value={newTemplate.type}
-                                        onValueChange={(value) => setNewTemplate({ ...newTemplate, type: value })}
+                                        onValueChange={(value) =>
+                                            setNewTemplate({ ...newTemplate, type: value })
+                                        }
                                     >
                                         <SelectTrigger>
-                                            <SelectValue />
+                                            <SelectValue placeholder="Select template type" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {TEMPLATE_TYPES.map(type => (
+                                            {TEMPLATE_TYPES.map((type) => (
                                                 <SelectItem key={type.value} value={type.value}>
                                                     {type.label}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
+
                                 </div>
 
                                 <div className="space-y-2">
                                     <Label htmlFor="triggerEvent">Trigger Event (Optional)</Label>
                                     <Select
-                                        value={newTemplate.trigger_event || ''}
-                                        onValueChange={(value) => setNewTemplate({ ...newTemplate, trigger_event: value || undefined })}
+                                        value={newTemplate.trigger_event ?? "__none__"}
+                                        onValueChange={(value) =>
+                                            setNewTemplate({
+                                                ...newTemplate,
+                                                trigger_event: value === "__none__" ? undefined : value,
+                                            })
+                                        }
                                     >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select trigger event" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="">No specific trigger</SelectItem>
-                                            {TRIGGER_EVENTS.map(event => (
+                                            <SelectItem value="__none__">
+                                                No specific trigger
+                                            </SelectItem>
+
+                                            {TRIGGER_EVENTS.map((event) => (
                                                 <SelectItem key={event.value} value={event.value}>
                                                     {event.label}
                                                 </SelectItem>
@@ -392,6 +403,7 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                         </SelectContent>
                                     </Select>
                                 </div>
+
 
                                 <div className="space-y-2">
                                     <Label htmlFor="daysAfter">Days After Trigger</Label>
