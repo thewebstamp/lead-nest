@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // components/dashboard/settings/qualification-rules.tsx
 "use client";
 
@@ -6,11 +5,22 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Trash2, Plus, Save, AlertCircle } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { QualificationRule } from "@/lib/services/leads/qualification";
@@ -27,23 +37,28 @@ interface QualificationRulesProps {
 export default function QualificationRules({
     businessId,
     initialRules,
-    initialThresholds
+    initialThresholds,
 }: QualificationRulesProps) {
-    const [rules, setRules] = useState<QualificationRule[]>(initialRules);
+    // ✅ FIX: remove impossible empty-string comparison
+    const safeRules = (initialRules || []).filter(
+        (rule) => rule.field && rule.condition,
+    );
+
+    const [rules, setRules] = useState<QualificationRule[]>(safeRules);
     const [thresholds, setThresholds] = useState(initialThresholds);
     const [isLoading, setIsLoading] = useState(false);
 
     // New rule form
-    const [newRule, setNewRule] = useState<Omit<QualificationRule, 'id'>>({
-        field: 'serviceType',
-        condition: 'contains',
-        value: '',
+    const [newRule, setNewRule] = useState<Omit<QualificationRule, "id">>({
+        field: "serviceType",
+        condition: "contains",
+        value: "",
         score: 0,
-        tag: '',
+        tag: "",
     });
 
     const addRule = () => {
-        if (!newRule.value || newRule.value.toString().trim() === '') {
+        if (!newRule.value || newRule.value.toString().trim() === "") {
             toast({
                 title: "Error",
                 description: "Rule value is required",
@@ -61,11 +76,11 @@ export default function QualificationRules({
 
         // Reset form
         setNewRule({
-            field: 'serviceType',
-            condition: 'contains',
-            value: '',
+            field: "serviceType",
+            condition: "contains",
+            value: "",
             score: 0,
-            tag: '',
+            tag: "",
         });
 
         toast({
@@ -75,18 +90,15 @@ export default function QualificationRules({
     };
 
     const removeRule = (id: string) => {
-        setRules(rules.filter(rule => rule.id !== id));
+        setRules(rules.filter((rule) => rule.id !== id));
     };
 
     const saveRules = async () => {
         setIsLoading(true);
         try {
-            // Get existing settings first
             const response = await fetch(`/api/businesses/${businessId}`, {
                 method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     qualification: {
                         rules,
@@ -95,15 +107,13 @@ export default function QualificationRules({
                 }),
             });
 
-            if (response.ok) {
-                toast({
-                    title: "Success",
-                    description: "Qualification rules saved successfully",
-                });
-            } else {
-                throw new Error("Failed to save rules");
-            }
-        } catch (error) {
+            if (!response.ok) throw new Error("Failed to save rules");
+
+            toast({
+                title: "Success",
+                description: "Qualification rules saved successfully",
+            });
+        } catch {
             toast({
                 title: "Error",
                 description: "Failed to save qualification rules",
@@ -114,32 +124,45 @@ export default function QualificationRules({
         }
     };
 
-    const fieldOptions = [
-        { value: 'serviceType', label: 'Service Type' },
-        { value: 'location', label: 'Location' },
-        { value: 'message', label: 'Message' },
-        { value: 'contactCompleteness', label: 'Contact Completeness' },
-        { value: 'timeOfDay', label: 'Time of Day' },
-    ];
+    // ✅ FIX: typed options
+    const fieldOptions: {
+        value: QualificationRule["field"];
+        label: string;
+    }[] = [
+            { value: "serviceType", label: "Service Type" },
+            { value: "location", label: "Location" },
+            { value: "message", label: "Message" },
+            { value: "contactCompleteness", label: "Contact Completeness" },
+            { value: "timeOfDay", label: "Time of Day" },
+        ];
 
-    const conditionOptions = [
-        { value: 'equals', label: 'Equals' },
-        { value: 'contains', label: 'Contains' },
-        { value: 'startsWith', label: 'Starts With' },
-        { value: 'endsWith', label: 'Ends With' },
-        { value: 'regex', label: 'Matches Regex' },
-        { value: 'in', label: 'Is In List (comma-separated)' },
-        { value: 'notEmpty', label: 'Is Not Empty' },
-    ];
+    const conditionOptions: {
+        value: QualificationRule["condition"];
+        label: string;
+    }[] = [
+            { value: "equals", label: "Equals" },
+            { value: "contains", label: "Contains" },
+            { value: "startsWith", label: "Starts With" },
+            { value: "endsWith", label: "Ends With" },
+            { value: "regex", label: "Matches Regex" },
+            { value: "in", label: "Is In List (comma-separated)" },
+            { value: "notEmpty", label: "Is Not Empty" },
+        ];
 
-    const getFieldExample = (field: string) => {
+    const getFieldExample = (field: QualificationRule["field"]) => {
         switch (field) {
-            case 'serviceType': return 'e.g., "Emergency Plumbing" or "Web Design"';
-            case 'location': return 'e.g., "New York" or "London"';
-            case 'message': return 'e.g., "urgent" or "ASAP"';
-            case 'contactCompleteness': return 'Number 1-4 (1=minimal, 4=complete)';
-            case 'timeOfDay': return 'Hour 0-23 (e.g., 9 for 9 AM)';
-            default: return '';
+            case "serviceType":
+                return 'e.g., "Emergency Plumbing" or "Web Design"';
+            case "location":
+                return 'e.g., "New York" or "London"';
+            case "message":
+                return 'e.g., "urgent" or "ASAP"';
+            case "contactCompleteness":
+                return "Number 1–4 (1=minimal, 4=complete)";
+            case "timeOfDay":
+                return "Hour 0–23 (e.g., 9 for 9 AM)";
+            default:
+                return "";
         }
     };
 
@@ -151,151 +174,144 @@ export default function QualificationRules({
                     Define rules to automatically score and prioritize incoming leads
                 </CardDescription>
             </CardHeader>
+
             <CardContent className="space-y-6">
                 {/* Priority Thresholds */}
                 <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h3 className="text-lg font-medium">Priority Thresholds</h3>
-                            <p className="text-sm text-gray-500">
-                                Set the score thresholds for lead priority levels
-                            </p>
-                        </div>
-                    </div>
+                    <h3 className="text-lg font-medium">Priority Thresholds</h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="highThreshold">High Priority Score</Label>
-                            <div className="flex items-center">
-                                <span className="mr-2">≥</span>
-                                <Input
-                                    id="highThreshold"
-                                    type="number"
-                                    min="0"
-                                    max="1000"
-                                    value={thresholds.high}
-                                    onChange={(e) => setThresholds({ ...thresholds, high: parseInt(e.target.value) || 80 })}
-                                    className="flex-1"
-                                />
-                            </div>
-                            <p className="text-xs text-gray-500">
-                                Leads with score ≥ this are marked High Priority
-                            </p>
+                            <Label>High Priority Score</Label>
+                            <Input
+                                type="number"
+                                value={thresholds.high}
+                                onChange={(e) =>
+                                    setThresholds({
+                                        ...thresholds,
+                                        high: parseInt(e.target.value) || 80,
+                                    })
+                                }
+                            />
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="mediumThreshold">Medium Priority Score</Label>
-                            <div className="flex items-center">
-                                <span className="mr-2">≥</span>
-                                <Input
-                                    id="mediumThreshold"
-                                    type="number"
-                                    min="0"
-                                    max="1000"
-                                    value={thresholds.medium}
-                                    onChange={(e) => setThresholds({ ...thresholds, medium: parseInt(e.target.value) || 60 })}
-                                    className="flex-1"
-                                />
-                            </div>
-                            <p className="text-xs text-gray-500">
-                                Leads with score ≥ this are marked Medium Priority
-                            </p>
+                            <Label>Medium Priority Score</Label>
+                            <Input
+                                type="number"
+                                value={thresholds.medium}
+                                onChange={(e) =>
+                                    setThresholds({
+                                        ...thresholds,
+                                        medium: parseInt(e.target.value) || 60,
+                                    })
+                                }
+                            />
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Low Priority Score</Label>
-                            <div className="p-2 bg-gray-50 rounded border">
-                                <p className="text-sm font-medium text-center">
-                                    &lt; {thresholds.medium}
-                                </p>
+                            <Label>Low Priority</Label>
+                            <div className="p-2 border rounded text-center">
+                                &lt; {thresholds.medium}
                             </div>
-                            <p className="text-xs text-gray-500">
-                                Leads with score below medium threshold
-                            </p>
                         </div>
                     </div>
                 </div>
 
                 <Separator />
 
-                {/* Add New Rule */}
+                {/* Add Rule */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-medium">Add New Rule</h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="ruleField">Field</Label>
+                        <div>
+                            <Label>Field</Label>
                             <Select
                                 value={newRule.field}
-                                onValueChange={(value: any) => setNewRule({ ...newRule, field: value })}
+                                onValueChange={(value) =>
+                                    setNewRule({
+                                        ...newRule,
+                                        field: value as QualificationRule["field"], // ✅ FIX
+                                    })
+                                }
                             >
                                 <SelectTrigger>
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {fieldOptions.map(option => (
-                                        <SelectItem key={option.value} value={option.value}>
-                                            {option.label}
+                                    {fieldOptions.map((o) => (
+                                        <SelectItem key={o.value} value={o.value}>
+                                            {o.label}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
                         </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="ruleCondition">Condition</Label>
+                        <div>
+                            <Label>Condition</Label>
                             <Select
                                 value={newRule.condition}
-                                onValueChange={(value: any) => setNewRule({ ...newRule, condition: value })}
+                                onValueChange={(value) =>
+                                    setNewRule({
+                                        ...newRule,
+                                        condition: value as QualificationRule["condition"], // ✅ FIX
+                                    })
+                                }
                             >
                                 <SelectTrigger>
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {conditionOptions.map(option => (
-                                        <SelectItem key={option.value} value={option.value}>
-                                            {option.label}
+                                    {conditionOptions.map((o) => (
+                                        <SelectItem key={o.value} value={o.value}>
+                                            {o.label}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
                         </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="ruleValue">Value</Label>
+                        <div>
+                            <Label>Value</Label>
                             <Input
-                                id="ruleValue"
+                                value={String(newRule.value)}
                                 placeholder={getFieldExample(newRule.field)}
-                                value={newRule.value}
-                                onChange={(e) => setNewRule({ ...newRule, value: e.target.value })}
+                                onChange={(e) =>
+                                    setNewRule({ ...newRule, value: e.target.value })
+                                }
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="ruleScore">Score (+/-)</Label>
+                        <div>
+                            <Label>Score</Label>
                             <Input
-                                id="ruleScore"
                                 type="number"
-                                placeholder="e.g., 20 or -10"
                                 value={newRule.score}
-                                onChange={(e) => setNewRule({ ...newRule, score: parseInt(e.target.value) || 0 })}
+                                onChange={(e) =>
+                                    setNewRule({
+                                        ...newRule,
+                                        score: parseInt(e.target.value) || 0,
+                                    })
+                                }
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="ruleTag">Tag (Optional)</Label>
+                        <div>
+                            <Label>Tag</Label>
                             <Input
-                                id="ruleTag"
-                                placeholder="e.g., emergency, local"
-                                value={newRule.tag || ''}
-                                onChange={(e) => setNewRule({ ...newRule, tag: e.target.value })}
+                                value={newRule.tag || ""}
+                                onChange={(e) =>
+                                    setNewRule({ ...newRule, tag: e.target.value })
+                                }
                             />
                         </div>
                     </div>
 
                     <div className="flex justify-end">
                         <Button onClick={addRule}>
-                            <Plus className="h-4 w-4 mr-2" />
+                            <Plus className="mr-2 h-4 w-4" />
                             Add Rule
                         </Button>
                     </div>
@@ -305,80 +321,41 @@ export default function QualificationRules({
 
                 {/* Existing Rules */}
                 <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-medium">Current Rules ({rules.length})</h3>
-                        {rules.length > 0 && (
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setRules([])}
-                                className="text-red-600 hover:text-red-700"
-                            >
-                                Clear All Rules
-                            </Button>
-                        )}
-                    </div>
-
                     {rules.length === 0 ? (
-                        <div className="text-center py-8 border-2 border-dashed rounded-lg">
-                            <AlertCircle className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                            <p className="text-gray-500">No qualification rules defined</p>
-                            <p className="text-sm text-gray-400 mt-1">
-                                Add rules above to customize how leads are scored
-                            </p>
+                        <div className="text-center py-8 border-dashed border rounded">
+                            <AlertCircle className="mx-auto mb-2 text-gray-400" />
+                            No rules defined
                         </div>
                     ) : (
-                        <div className="space-y-3">
-                            {rules.map((rule) => (
-                                <div key={rule.id} className="flex items-start justify-between p-4 border rounded-lg">
-                                    <div className="space-y-1 flex-1">
-                                        <div className="flex items-center gap-2">
-                                            <Badge variant="outline">{rule.field}</Badge>
-                                            <Badge variant="secondary">{rule.condition}</Badge>
-                                            <span className="font-medium">{String(rule.value)}</span>
-                                        </div>
-                                        <div className="flex items-center gap-4 text-sm text-gray-600">
-                                            <span>
-                                                <Badge className={rule.score >= 0 ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
-                                                    {rule.score >= 0 ? '+' : ''}{rule.score} points
-                                                </Badge>
-                                            </span>
-                                            {rule.tag && (
-                                                <span>
-                                                    Tag: <Badge variant="outline">{rule.tag}</Badge>
-                                                </span>
-                                            )}
-                                        </div>
+                        rules.map((rule) => (
+                            <div
+                                key={rule.id}
+                                className="flex justify-between items-start p-4 border rounded"
+                            >
+                                <div>
+                                    <Badge>{rule.field}</Badge>{" "}
+                                    <Badge variant="secondary">{rule.condition}</Badge>{" "}
+                                    <span>{String(rule.value)}</span>
+                                    <div className="mt-1 text-sm">
+                                        Score: {rule.score} {rule.tag && `• Tag: ${rule.tag}`}
                                     </div>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => removeRule(rule.id)}
-                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
                                 </div>
-                            ))}
-                        </div>
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => removeRule(rule.id)}
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        ))
                     )}
                 </div>
 
-                <div className="pt-4 border-t">
-                    <div className="flex items-center justify-between">
-                        <div className="text-sm text-gray-500">
-                            <p>Rules are evaluated in order and scores are cumulative.</p>
-                            <p>Leads start with 50 points (medium priority).</p>
-                        </div>
-                        <Button onClick={saveRules} disabled={isLoading}>
-                            {isLoading ? "Saving..." : (
-                                <>
-                                    <Save className="h-4 w-4 mr-2" />
-                                    Save Rules
-                                </>
-                            )}
-                        </Button>
-                    </div>
+                <div className="flex justify-end pt-4">
+                    <Button onClick={saveRules} disabled={isLoading}>
+                        <Save className="mr-2 h-4 w-4" />
+                        Save Rules
+                    </Button>
                 </div>
             </CardContent>
         </Card>
