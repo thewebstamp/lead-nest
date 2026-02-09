@@ -127,26 +127,39 @@ export default function DashboardContent({
         return isNaN(num) ? 0 : num;
     };
 
-    const today = new Date().toISOString().split('T')[0];
-    // eslint-disable-next-line react-hooks/purity
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    const todayLeads = ensureNumber(leadTrends.find(trend => trend.date === today)?.count);
-    const yesterdayLeads = ensureNumber(leadTrends.find(trend => trend.date === yesterday)?.count);
-    const trendChange = todayLeads - yesterdayLeads;
-    const trendPercentage = yesterdayLeads > 0
-        ? Math.round((trendChange / yesterdayLeads) * 100)
-        : 0;
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
 
-    console.log("leadTrends data:", leadTrends);
-    console.log("Today's date string:", new Date().toISOString().split('T')[0]);
-    // eslint-disable-next-line react-hooks/purity
-    console.log("Yesterday's date string:", new Date(Date.now() - 86400000).toISOString().split('T')[0]);
+    // Function to compare dates without time
+    const isSameDay = (date1: Date, date2: Date): boolean => {
+        return date1.getFullYear() === date2.getFullYear() &&
+            date1.getMonth() === date2.getMonth() &&
+            date1.getDate() === date2.getDate();
+    };
 
-    // Also log the actual matches:
-    leadTrends.forEach(trend => {
-        console.log(`Trend date: ${trend.date}, Count: ${trend.count}, Is today: ${trend.date === new Date().toISOString().split('T')[0]}`);
+    // Convert leadTrends dates to Date objects for comparison
+    const todayLeads = leadTrends.find(trend => {
+        const trendDate = new Date(trend.date);
+        return isSameDay(trendDate, today);
     });
+
+    const yesterdayLeads = leadTrends.find(trend => {
+        const trendDate = new Date(trend.date);
+        return isSameDay(trendDate, yesterday);
+    });
+
+    // Get counts (default to 0 if not found)
+    const todayCount = todayLeads ? ensureNumber(todayLeads.count) : 0;
+    const yesterdayCount = yesterdayLeads ? ensureNumber(yesterdayLeads.count) : 0;
+
+    // Calculate change
+    const trendChange = todayCount - yesterdayCount;
+    const trendPercentage = yesterdayCount > 0
+        ? Math.round((trendChange / yesterdayCount) * 100)
+        : todayCount > 0 ? 100 : 0;
 
     return (
         <div className="space-y-6">
