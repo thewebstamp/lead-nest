@@ -138,6 +138,16 @@ export default function DashboardContent({
         ? Math.round((trendChange / yesterdayLeads) * 100)
         : 0;
 
+    console.log("leadTrends data:", leadTrends);
+    console.log("Today's date string:", new Date().toISOString().split('T')[0]);
+    // eslint-disable-next-line react-hooks/purity
+    console.log("Yesterday's date string:", new Date(Date.now() - 86400000).toISOString().split('T')[0]);
+
+    // Also log the actual matches:
+    leadTrends.forEach(trend => {
+        console.log(`Trend date: ${trend.date}, Count: ${trend.count}, Is today: ${trend.date === new Date().toISOString().split('T')[0]}`);
+    });
+
     return (
         <div className="space-y-6">
             {/* Welcome Header */}
