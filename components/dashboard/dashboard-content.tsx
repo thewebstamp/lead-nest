@@ -6,18 +6,15 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     Users,
     TrendingUp,
     Clock,
     CheckCircle,
-    XCircle,
     Calendar,
     ArrowUpRight,
     ArrowDownRight,
     Eye,
-    Phone,
     Mail,
     Share2,
     Copy,
@@ -66,11 +63,11 @@ const statusColors: Record<string, string> = {
     lost: "bg-red-100 text-red-800",
 };
 
-const priorityColors: Record<string, string> = {
-    high: "bg-red-100 text-red-800",
-    medium: "bg-yellow-100 text-yellow-800",
-    low: "bg-green-100 text-green-800",
-};
+// const priorityColors: Record<string, string> = {
+//     high: "bg-red-100 text-red-800",
+//     medium: "bg-yellow-100 text-yellow-800",
+//     low: "bg-green-100 text-green-800",
+// };
 
 export default function DashboardContent({
     stats,
@@ -102,14 +99,14 @@ export default function DashboardContent({
         }
     };
 
-    const formatDate = (date: Date) => {
-        return new Date(date).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-        });
-    };
+    // const formatDate = (date: Date) => {
+    //     return new Date(date).toLocaleDateString("en-US", {
+    //         month: "short",
+    //         day: "numeric",
+    //         hour: "2-digit",
+    //         minute: "2-digit",
+    //     });
+    // };
 
     const getTimeAgo = (date: Date) => {
         const now = new Date();
@@ -123,15 +120,22 @@ export default function DashboardContent({
     };
 
     // Calculate trend data
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ensureNumber = (value: any): number => {
+        if (value === null || value === undefined) return 0;
+        const num = Number(value);
+        return isNaN(num) ? 0 : num;
+    };
+
     const today = new Date().toISOString().split('T')[0];
     // eslint-disable-next-line react-hooks/purity
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
-    const todayLeads = leadTrends.find(trend => trend.date === today)?.count || '0';
-    const yesterdayLeads = leadTrends.find(trend => trend.date === yesterday)?.count || '0';
-    const trendChange = parseInt(todayLeads) - parseInt(yesterdayLeads);
-    const trendPercentage = yesterdayLeads !== '0'
-        ? Math.round((trendChange / parseInt(yesterdayLeads)) * 100)
+    const todayLeads = ensureNumber(leadTrends.find(trend => trend.date === today)?.count);
+    const yesterdayLeads = ensureNumber(leadTrends.find(trend => trend.date === yesterday)?.count);
+    const trendChange = todayLeads - yesterdayLeads;
+    const trendPercentage = yesterdayLeads > 0
+        ? Math.round((trendChange / yesterdayLeads) * 100)
         : 0;
 
     return (
