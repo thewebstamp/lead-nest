@@ -5,7 +5,6 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -21,7 +20,6 @@ import {
     TrendingDown,
     PieChart,
     BarChart3,
-    MapPin,
     CheckCircle,
     XCircle
 } from "lucide-react";
@@ -231,7 +229,7 @@ export default function AnalyticsDashboard() {
             )}
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {isLoading ? (
                     Array(4).fill(0).map((_, i) => (
                         <Card key={i}>
@@ -293,7 +291,7 @@ export default function AnalyticsDashboard() {
                             </CardContent>
                         </Card>
 
-                        <Card>
+                        {/* <Card>
                             <CardContent className="pt-6">
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -306,9 +304,9 @@ export default function AnalyticsDashboard() {
                                     </div>
                                 </div>
                             </CardContent>
-                        </Card>
+                        </Card> */}
 
-                        <Card>
+                        {/* <Card>
                             <CardContent className="pt-6">
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -321,7 +319,7 @@ export default function AnalyticsDashboard() {
                                     </div>
                                 </div>
                             </CardContent>
-                        </Card>
+                        </Card> */}
                     </>
                 ) : (
                     // No data state
@@ -433,7 +431,7 @@ export default function AnalyticsDashboard() {
                                 </div>
                             </div>
 
-                            <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
+                            {/* <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
                                 <div className="flex items-center">
                                     <Clock className="h-5 w-5 text-purple-600 mr-3" />
                                     <div>
@@ -449,7 +447,7 @@ export default function AnalyticsDashboard() {
                                         </p>
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
 
                             {/* Trend Summary */}
                             <div className="pt-4 border-t">
