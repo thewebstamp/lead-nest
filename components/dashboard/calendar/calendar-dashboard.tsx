@@ -40,7 +40,7 @@ import {
 // Safe date parsing function
 const safeParseDate = (dateString: string | Date | null | undefined): Date | null => {
     if (!dateString) return null;
-    
+
     try {
         const date = typeof dateString === 'string' ? parseISO(dateString) : new Date(dateString);
         return isValid(date) ? date : null;
@@ -62,8 +62,8 @@ interface CalendarEvent {
     title: string;
     description: string;
     event_type: string;
-    start_time: string; // Store as string
-    end_time: string;   // Store as string
+    start_time: string;
+    end_time: string;
     status: string;
     location: string;
     lead_id: string | null;
@@ -85,7 +85,21 @@ interface Lead {
 
 interface CalendarDashboardProps {
     events: CalendarEvent[];
-    leads: Lead[];
+    unscheduledLeads: Lead[];
+    scheduledLeads: Array<{
+        id: string;
+        name: string;
+        email: string;
+        phone: string;
+        service_type: string;
+        lead_status: string;
+        event_id: string;
+        event_title: string;
+        event_status: string;
+        event_start_time: string;
+        event_end_time: string;
+        event_type: string;
+    }>;
     upcomingEvents: any[];
     businessId: string;
     userEmail: string;
@@ -93,22 +107,30 @@ interface CalendarDashboardProps {
 }
 
 const eventTypeColors: Record<string, string> = {
-    appointment: "bg-blue-100 text-blue-800 border-blue-300",
-    followup: "bg-green-100 text-green-800 border-green-300",
-    meeting: "bg-purple-100 text-purple-800 border-purple-300",
-    task: "bg-yellow-100 text-yellow-800 border-yellow-300",
+    appointment: "border-blue-300",
+    followup: "border-green-300",
+    meeting: "border-purple-300",
+    task: "border-yellow-300",
 };
 
 const statusColors: Record<string, string> = {
-    scheduled: "bg-gray-100 text-gray-800",
-    confirmed: "bg-green-100 text-green-800",
-    completed: "bg-blue-100 text-blue-800",
-    cancelled: "bg-red-100 text-red-800",
+    scheduled: "bg-blue-50 text-blue-700 border-blue-200",
+    confirmed: "bg-green-50 text-green-700 border-green-200",
+    completed: "bg-purple-50 text-purple-700 border-purple-200",
+    cancelled: "bg-gray-100 text-gray-600 border-gray-300 line-through",
+};
+
+const calendarStatusColors: Record<string, string> = {
+    scheduled: "bg-blue-100 text-blue-800 border-l-4 border-blue-500",
+    confirmed: "bg-green-100 text-green-800 border-l-4 border-green-500",
+    completed: "bg-purple-100 text-purple-800 border-l-4 border-purple-500",
+    cancelled: "bg-gray-100 text-gray-500 border-l-4 border-gray-400 line-through",
 };
 
 export default function CalendarDashboard({
     events: initialEvents,
-    leads,
+    unscheduledLeads,
+    scheduledLeads,
     upcomingEvents,
     businessId,
     userEmail,
@@ -130,6 +152,13 @@ export default function CalendarDashboard({
         participants: [] as string[],
         reminders: [] as any[]
     });
+
+    // Get event status color
+    const getEventColor = (event: CalendarEvent) => {
+        return calendarStatusColors[event.status] ||
+            eventTypeColors[event.event_type] ||
+            "bg-gray-100 text-gray-800 border-l-4 border-gray-300";
+    };
 
     // Validate and filter events
     const validEvents = events.filter(event => {
@@ -164,6 +193,23 @@ export default function CalendarDashboard({
     const goToToday = () => {
         setCurrentDate(new Date());
     };
+
+    const allLeadsForDropdown = [
+        ...unscheduledLeads.map(lead => ({
+            ...lead,
+            isScheduled: false
+        })),
+        ...scheduledLeads.map(lead => ({
+            id: lead.id,
+            name: lead.name,
+            email: lead.email,
+            phone: lead.phone,
+            service_type: lead.service_type,
+            status: lead.lead_status,
+            isScheduled: true,
+            scheduledEventId: lead.event_id
+        }))
+    ];
 
     // Handle event creation
     const handleCreateEvent = async () => {
@@ -225,7 +271,7 @@ export default function CalendarDashboard({
 
             if (response.ok) {
                 const updatedEvent = await response.json();
-                setEvents(events.map(event => 
+                setEvents(events.map(event =>
                     event.id === eventId ? updatedEvent : event
                 ));
                 setSelectedEvent(updatedEvent);
@@ -298,7 +344,18 @@ export default function CalendarDashboard({
                 </div>
             </div>
 
-            {/* Debug info for development */}
+            {/* Status Legend */}
+            <div className="flex flex-wrap gap-2 items-center text-sm">
+                <span className="text-gray-600 font-medium">Status:</span>
+                {Object.entries(statusColors).map(([status, color]) => (
+                    <div key={status} className="flex items-center gap-1">
+                        <div className={`w-3 h-3 rounded-full ${color.split(' ')[0]}`} />
+                        <span className="text-gray-700 capitalize">{status}</span>
+                    </div>
+                ))}
+            </div>
+
+            {/* Debug info */}
             {process.env.NODE_ENV === 'development' && events.length > 0 && (
                 <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
                     <p className="text-yellow-800">
@@ -354,7 +411,7 @@ export default function CalendarDashboard({
                                                         <div className="h-2 w-2 rounded-full bg-blue-600" />
                                                     )}
                                                 </div>
-                                                
+
                                                 {/* Events for this day */}
                                                 <div className="space-y-1">
                                                     {dayEvents.slice(0, 3).map(event => {
@@ -363,18 +420,25 @@ export default function CalendarDashboard({
                                                             <div
                                                                 key={event.id}
                                                                 className={`
-                                                                    text-xs p-1 rounded truncate cursor-pointer
-                                                                    ${eventTypeColors[event.event_type] || 'bg-gray-100'}
-                                                                    border
+                                                                    text-xs p-2 rounded cursor-pointer
+                                                                    ${getEventColor(event)}
+                                                                    shadow-sm hover:shadow-md transition-shadow
                                                                 `}
                                                                 onClick={() => {
                                                                     setSelectedEvent(event);
                                                                     setIsEventDialogOpen(true);
                                                                 }}
                                                             >
-                                                                <div className="font-medium truncate">{event.title}</div>
+                                                                <div className="font-medium truncate flex items-center justify-between">
+                                                                    <span>{event.title}</span>
+                                                                    <Badge
+                                                                        className={`text-xs ${statusColors[event.status]} px-1 py-0`}
+                                                                    >
+                                                                        {event.status}
+                                                                    </Badge>
+                                                                </div>
                                                                 {eventDate && (
-                                                                    <div className="flex items-center text-xs">
+                                                                    <div className="flex items-center text-xs mt-1 text-gray-600">
                                                                         <Clock className="h-3 w-3 mr-1" />
                                                                         {format(eventDate, 'h:mm a')}
                                                                     </div>
@@ -462,47 +526,126 @@ export default function CalendarDashboard({
                     {/* Quick Schedule */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Quick Schedule</CardTitle>
-                            <CardDescription>Schedule with leads</CardDescription>
+                            <CardTitle className="flex items-center justify-between">
+                                <span>Quick Schedule</span>
+                                <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                                    {unscheduledLeads.length} leads
+                                </Badge>
+                            </CardTitle>
+                            <CardDescription>Leads without scheduled appointments</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-3">
-                                {leads.slice(0, 5).map(lead => (
-                                    <div key={lead.id} className="flex items-center justify-between p-3 border rounded-lg">
-                                        <div>
-                                            <div className="font-medium">{lead.name}</div>
-                                            <div className="text-sm text-gray-500">{lead.service_type}</div>
+                                {unscheduledLeads.length === 0 ? (
+                                    <div className="text-center py-6">
+                                        <div className="mx-auto w-12 h-12 flex items-center justify-center bg-green-100 rounded-full mb-3">
+                                            <CalendarIcon className="h-6 w-6 text-green-600" />
                                         </div>
-                                        <Button
-                                            size="sm"
-                                            variant="outline"
-                                            onClick={() => {
-                                                const now = new Date();
-                                                const tomorrow = new Date(now);
-                                                tomorrow.setDate(tomorrow.getDate() + 1);
-                                                tomorrow.setHours(10, 0, 0, 0);
-
-                                                const endTime = new Date(tomorrow);
-                                                endTime.setHours(11, 0, 0, 0);
-
-                                                setNewEvent({
-                                                    ...newEvent,
-                                                    title: `Meeting with ${lead.name}`,
-                                                    lead_id: lead.id,
-                                                    participants: [lead.email, userEmail],
-                                                    start_time: tomorrow.toISOString().slice(0, 16),
-                                                    end_time: endTime.toISOString().slice(0, 16)
-                                                });
-                                                setIsCreateDialogOpen(true);
-                                            }}
-                                        >
-                                            <CalendarIcon className="h-4 w-4 mr-2" />
-                                            Schedule
-                                        </Button>
+                                        <p className="text-gray-500">All leads are scheduled!</p>
                                     </div>
-                                ))}
-                                {leads.length === 0 && (
-                                    <p className="text-gray-500 text-center py-4">No leads available for scheduling</p>
+                                ) : (
+                                    unscheduledLeads.slice(0, 5).map(lead => (
+                                        <div key={lead.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                                            <div className="flex-1 min-w-0">
+                                                <div className="font-medium truncate">{lead.name}</div>
+                                                <div className="flex items-center text-sm text-gray-500">
+                                                    <span className="truncate">{lead.service_type}</span>
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="ml-2 text-xs"
+                                                    >
+                                                        {lead.status}
+                                                    </Badge>
+                                                </div>
+                                            </div>
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                className="shrink-0"
+                                                onClick={() => {
+                                                    const now = new Date();
+                                                    const tomorrow = new Date(now);
+                                                    tomorrow.setDate(tomorrow.getDate() + 1);
+                                                    tomorrow.setHours(10, 0, 0, 0);
+
+                                                    const endTime = new Date(tomorrow);
+                                                    endTime.setHours(11, 0, 0, 0);
+
+                                                    setNewEvent({
+                                                        ...newEvent,
+                                                        title: `Meeting with ${lead.name}`,
+                                                        lead_id: lead.id,
+                                                        participants: [lead.email, userEmail],
+                                                        start_time: tomorrow.toISOString().slice(0, 16),
+                                                        end_time: endTime.toISOString().slice(0, 16)
+                                                    });
+                                                    setIsCreateDialogOpen(true);
+                                                }}
+                                            >
+                                                <CalendarIcon className="h-4 w-4 mr-2" />
+                                                Schedule
+                                            </Button>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Scheduled Leads Section */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center justify-between">
+                                <span>Scheduled Leads</span>
+                                <Badge variant="outline" className="bg-gray-50 text-gray-700">
+                                    {scheduledLeads.length} scheduled
+                                </Badge>
+                            </CardTitle>
+                            <CardDescription>Leads with scheduled appointments</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-3">
+                                {scheduledLeads.length === 0 ? (
+                                    <p className="text-gray-500 text-center py-4">No scheduled leads yet</p>
+                                ) : (
+                                    scheduledLeads.slice(0, 5).map(lead => {
+                                        const eventDate = safeParseDate(lead.event_start_time);
+                                        return (
+                                            <div
+                                                key={lead.event_id}
+                                                className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                                                onClick={() => {
+                                                    const fullEvent = events.find(e => e.id === lead.event_id);
+                                                    if (fullEvent) {
+                                                        setSelectedEvent(fullEvent);
+                                                        setIsEventDialogOpen(true);
+                                                    }
+                                                }}
+                                            >
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="font-medium truncate">{lead.name}</div>
+                                                        <div className="text-sm text-gray-500 truncate">
+                                                            {lead.service_type}
+                                                        </div>
+                                                    </div>
+                                                    <Badge className={statusColors[lead.event_status]}>
+                                                        {lead.event_status}
+                                                    </Badge>
+                                                </div>
+
+                                                <div className="flex items-center justify-between text-sm">
+                                                    <div className="flex items-center text-gray-600">
+                                                        <Clock className="h-3 w-3 mr-1" />
+                                                        {eventDate ? format(eventDate, 'MMM d, h:mm a') : 'Invalid date'}
+                                                    </div>
+                                                    <Badge variant="outline" className="text-xs">
+                                                        {lead.event_type}
+                                                    </Badge>
+                                                </div>
+                                            </div>
+                                        );
+                                    })
                                 )}
                             </div>
                         </CardContent>
@@ -518,8 +661,8 @@ export default function CalendarDashboard({
                             <DialogHeader>
                                 <DialogTitle className="flex items-center justify-between">
                                     <span>{selectedEvent.title}</span>
-                                    <Badge className={statusColors[selectedEvent.status]}>
-                                        {selectedEvent.status}
+                                    <Badge className={`${statusColors[selectedEvent.status]} font-medium`}>
+                                        {selectedEvent.status.charAt(0).toUpperCase() + selectedEvent.status.slice(1)}
                                     </Badge>
                                 </DialogTitle>
                                 <DialogDescription>
@@ -550,7 +693,7 @@ export default function CalendarDashboard({
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     {selectedEvent.location && (
                                         <div className="space-y-1">
                                             <Label className="text-sm font-medium">Location</Label>
@@ -600,7 +743,7 @@ export default function CalendarDashboard({
                                     <div className="flex gap-2">
                                         <Select
                                             value={selectedEvent.status}
-                                            onValueChange={(value) => 
+                                            onValueChange={(value) =>
                                                 handleUpdateEvent(selectedEvent.id, { status: value })
                                             }
                                         >
@@ -647,7 +790,7 @@ export default function CalendarDashboard({
                                 <Input
                                     id="title"
                                     value={newEvent.title}
-                                    onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
+                                    onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                                     placeholder="Meeting title"
                                 />
                             </div>
@@ -656,7 +799,7 @@ export default function CalendarDashboard({
                                 <Label htmlFor="event_type">Event Type</Label>
                                 <Select
                                     value={newEvent.event_type}
-                                    onValueChange={(value) => setNewEvent({...newEvent, event_type: value})}
+                                    onValueChange={(value) => setNewEvent({ ...newEvent, event_type: value })}
                                 >
                                     <SelectTrigger>
                                         <SelectValue />
@@ -676,7 +819,7 @@ export default function CalendarDashboard({
                                     id="start_time"
                                     type="datetime-local"
                                     value={newEvent.start_time}
-                                    onChange={(e) => setNewEvent({...newEvent, start_time: e.target.value})}
+                                    onChange={(e) => setNewEvent({ ...newEvent, start_time: e.target.value })}
                                 />
                             </div>
 
@@ -686,7 +829,7 @@ export default function CalendarDashboard({
                                     id="end_time"
                                     type="datetime-local"
                                     value={newEvent.end_time}
-                                    onChange={(e) => setNewEvent({...newEvent, end_time: e.target.value})}
+                                    onChange={(e) => setNewEvent({ ...newEvent, end_time: e.target.value })}
                                 />
                             </div>
 
@@ -695,7 +838,7 @@ export default function CalendarDashboard({
                                 <Select
                                     value={newEvent.lead_id}
                                     onValueChange={(value) => {
-                                        const lead = leads.find(l => l.id === value);
+                                        const lead = allLeadsForDropdown.find(l => l.id === value);
                                         setNewEvent({
                                             ...newEvent,
                                             lead_id: value,
@@ -707,13 +850,90 @@ export default function CalendarDashboard({
                                         <SelectValue placeholder="Select a lead" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {leads.map(lead => (
-                                            <SelectItem key={lead.id} value={lead.id}>
-                                                {lead.name} ({lead.service_type})
-                                            </SelectItem>
-                                        ))}
+                                        <div className="max-h-60 overflow-auto">
+                                            {/* Unscheduled Leads Section */}
+                                            {unscheduledLeads.length > 0 && (
+                                                <div className="px-2 py-1.5 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Available Leads ({unscheduledLeads.length})
+                                                </div>
+                                            )}
+                                            {unscheduledLeads.map(lead => (
+                                                <SelectItem key={lead.id} value={lead.id} className="flex items-center">
+                                                    <div className="flex-1">
+                                                        <div className="font-medium">{lead.name}</div>
+                                                        <div className="text-xs text-gray-500">{lead.service_type} • {lead.status}</div>
+                                                    </div>
+                                                </SelectItem>
+                                            ))}
+
+                                            {/* Scheduled Leads Section */}
+                                            {scheduledLeads.length > 0 && (
+                                                <>
+                                                    <div className="px-2 py-1.5 text-xs font-medium text-gray-500 uppercase tracking-wider border-t mt-1">
+                                                        Already Scheduled ({scheduledLeads.length})
+                                                    </div>
+                                                    {scheduledLeads.map(lead => {
+                                                        const eventDate = safeParseDate(lead.event_start_time);
+                                                        return (
+                                                            <SelectItem
+                                                                key={lead.id}
+                                                                value={lead.id}
+                                                                className="flex items-center text-gray-500"
+                                                                disabled={lead.event_status === 'cancelled'}
+                                                            >
+                                                                <div className="flex-1">
+                                                                    <div className="font-medium flex items-center">
+                                                                        {lead.name}
+                                                                        <Badge
+                                                                            variant="outline"
+                                                                            className="ml-2 text-xs"
+                                                                            title={`Status: ${lead.event_status}`}
+                                                                        >
+                                                                            {lead.event_status}
+                                                                        </Badge>
+                                                                    </div>
+                                                                    <div className="text-xs">
+                                                                        <span className="text-gray-400">{lead.service_type}</span>
+                                                                        {eventDate && (
+                                                                            <span className="ml-2 text-gray-400">
+                                                                                • Scheduled: {format(eventDate, 'MMM d')}
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </SelectItem>
+                                                        );
+                                                    })}
+                                                </>
+                                            )}
+
+                                            {allLeadsForDropdown.length === 0 && (
+                                                <div className="px-2 py-2 text-sm text-gray-500 text-center">
+                                                    No leads available
+                                                </div>
+                                            )}
+                                        </div>
                                     </SelectContent>
                                 </Select>
+
+                                {newEvent.lead_id && (
+                                    <div className="text-xs text-gray-500 mt-1">
+                                        {(() => {
+                                            const selectedLead = allLeadsForDropdown.find(l => l.id === newEvent.lead_id);
+                                            if (selectedLead?.isScheduled) {
+                                                return (
+                                                    <div className="flex items-center text-amber-600 bg-amber-50 p-2 rounded">
+                                                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                                        </svg>
+                                                        This lead already has a scheduled appointment
+                                                    </div>
+                                                );
+                                            }
+                                            return null;
+                                        })()}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="space-y-2">
@@ -721,7 +941,7 @@ export default function CalendarDashboard({
                                 <Input
                                     id="location"
                                     value={newEvent.location}
-                                    onChange={(e) => setNewEvent({...newEvent, location: e.target.value})}
+                                    onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
                                     placeholder="Virtual meeting, Office, etc."
                                 />
                             </div>
@@ -731,7 +951,7 @@ export default function CalendarDashboard({
                                 <Textarea
                                     id="description"
                                     value={newEvent.description}
-                                    onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
+                                    onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
                                     placeholder="Add meeting agenda, notes, or instructions..."
                                     rows={3}
                                 />

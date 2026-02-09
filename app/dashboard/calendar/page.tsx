@@ -19,7 +19,7 @@ export default async function CalendarPage() {
     /**
      * Fetch all required data in parallel
      */
-    const [eventsResult, leadsForScheduling, upcomingEventsResult] =
+    const [eventsResult, unscheduledLeadsResult, upcomingEventsResult, scheduledLeadsResult] =
         await Promise.all([
             // Calendar events
             query<{
@@ -49,7 +49,7 @@ export default async function CalendarPage() {
                 [businessId]
             ),
 
-            // Leads for scheduling
+            // Unscheduled leads (leads without calendar events)
             query<{
                 id: string;
                 name: string;
@@ -61,27 +61,30 @@ export default async function CalendarPage() {
                 last_contacted_at: Date | null;
             }>(
                 `SELECT 
-                    id,
-                    name,
-                    email,
-                    phone,
-                    service_type,
-                    status,
-                    priority,
-                    last_contacted_at
-                 FROM leads
-                 WHERE business_id = $1
-                   AND status IN ('new', 'contacted', 'quoted', 'booked')
-                 ORDER BY
-                    CASE status
-                        WHEN 'new' THEN 1
-                        WHEN 'contacted' THEN 2
-                        WHEN 'quoted' THEN 3
-                        WHEN 'booked' THEN 4
-                        ELSE 5
-                    END,
-                    created_at DESC
-                 LIMIT 50`,
+            l.id,
+            l.name,
+            l.email,
+            l.phone,
+            l.service_type,
+            l.status,
+            l.priority,
+            l.last_contacted_at
+         FROM leads l
+         LEFT JOIN calendar_events ce ON l.id = ce.lead_id 
+            AND ce.status NOT IN ('cancelled', 'completed')
+         WHERE l.business_id = $1
+           AND l.status IN ('new', 'contacted', 'quoted', 'booked')
+           AND ce.id IS NULL  -- This ensures no active calendar event exists
+         ORDER BY
+            CASE l.status
+                WHEN 'new' THEN 1
+                WHEN 'contacted' THEN 2
+                WHEN 'quoted' THEN 3
+                WHEN 'booked' THEN 4
+                ELSE 5
+            END,
+            l.created_at DESC
+         LIMIT 50`,
                 [businessId]
             ),
 
@@ -114,6 +117,43 @@ export default async function CalendarPage() {
                  LIMIT 20`,
                 [businessId]
             ),
+
+            // New: Scheduled leads (leads with calendar events)
+            query<{
+                id: string;
+                name: string;
+                email: string;
+                phone: string;
+                service_type: string;
+                lead_status: string;
+                event_id: string;
+                event_title: string;
+                event_status: string;
+                event_start_time: Date;
+                event_end_time: Date;
+                event_type: string;
+            }>(
+                `SELECT 
+            l.id,
+            l.name,
+            l.email,
+            l.phone,
+            l.service_type,
+            l.status as lead_status,
+            e.id as event_id,
+            e.title as event_title,
+            e.status as event_status,
+            e.start_time as event_start_time,
+            e.end_time as event_end_time,
+            e.event_type
+         FROM leads l
+         INNER JOIN calendar_events e ON l.id = e.lead_id
+         WHERE l.business_id = $1
+           AND e.status IN ('scheduled', 'confirmed', 'completed')
+         ORDER BY e.start_time DESC
+         LIMIT 20`,
+                [businessId]
+            ),
         ]);
 
     /**
@@ -132,10 +172,18 @@ export default async function CalendarPage() {
         end_time: event.end_time.toISOString(),
     }));
 
+    // Format scheduled leads dates
+    const formattedScheduledLeads = scheduledLeadsResult.rows.map(lead => ({
+        ...lead,
+        event_start_time: lead.event_start_time.toISOString(),
+        event_end_time: lead.event_end_time.toISOString(),
+    }));
+
     return (
         <CalendarDashboard
             events={formattedEvents}
-            leads={leadsForScheduling.rows}
+            unscheduledLeads={unscheduledLeadsResult.rows}
+            scheduledLeads={formattedScheduledLeads}
             upcomingEvents={formattedUpcomingEvents}
             businessId={businessId}
             userEmail={session.user.email || ""}
