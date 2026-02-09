@@ -68,6 +68,12 @@ export default async function DashboardPage() {
         [session.user.businessId]
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const toNumber = (value: any, fallback = 0): number => {
+        const num = Number(value);
+        return isNaN(num) ? fallback : num;
+    };
+
     // Calculate totals
     const stats = {
         total: statusCounts.reduce((acc, row) => acc + parseInt(row.count), 0),
@@ -79,8 +85,10 @@ export default async function DashboardPage() {
     };
 
     // Calculate conversion rate
-    const conversionRate = stats.total > 0
-        ? Math.round((stats.booked / stats.total) * 100)
+    const total = toNumber(stats.total);
+    const booked = toNumber(stats.booked);
+    const conversionRate = total > 0
+        ? Math.round((booked / total) * 100)
         : 0;
 
     // Calculate average response time (in hours) for contacted leads
