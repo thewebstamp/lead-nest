@@ -144,7 +144,7 @@ export default function SigninPage() {
                         </Button>
                     </form>
 
-                    <div className="relative">
+                    {/* <div className="hidden relative">
                         <div className="absolute inset-0 flex items-center">
                             <span className="w-full border-t" />
                         </div>
@@ -153,9 +153,9 @@ export default function SigninPage() {
                                 Or continue with
                             </span>
                         </div>
-                    </div>
+                    </div> */}
 
-                    <Button
+                    {/* <Button
                         type="button"
                         variant="outline"
                         className="hidden w-full"
@@ -181,7 +181,7 @@ export default function SigninPage() {
                             />
                         </svg>
                         Google
-                    </Button>
+                    </Button> */}
                 </CardContent>
 
                 <CardFooter>
