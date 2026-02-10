@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import { generateSlug } from "@/lib/utils/string";
 import { transaction, query, queryOne } from "@/lib/db";
+import { sendWelcomeEmail } from "@/lib/email/resend";
 
 export async function POST(request: NextRequest) {
   try {
@@ -89,6 +90,12 @@ export async function POST(request: NextRequest) {
          VALUES ($1, $2, $3, $4, $5, NOW())`,
           [relationId, userId, businessId, "owner", true],
         );
+
+        try {
+          await sendWelcomeEmail(email, name);
+        } catch (emailError) {
+          console.error("Failed to send welcome email:", emailError);
+        }
 
         return { userId, businessId, businessName, slug };
       },

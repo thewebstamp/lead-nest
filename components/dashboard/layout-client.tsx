@@ -16,6 +16,7 @@ import {
     X,
     Calendar,
     HelpCircle,
+    LogOut,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -37,6 +38,7 @@ const navItems = [
     { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
     { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
     { name: "Settings", href: "/dashboard/settings", icon: Settings },
+    { name: "Logout", href: "/api/auth/signout", icon: LogOut }
 ];
 
 export default function DashboardLayoutClient({
