@@ -17,7 +17,7 @@ const PUBLIC_ROUTES = [
   "/api/public",
 ];
 
-const AUTH_ROUTES = ["/auth/signin", "/auth/signup"];
+const AUTH_ROUTES = ["/auth/signin", "/auth/signup", "/auth/forgot-password"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

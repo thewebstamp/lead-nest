@@ -56,12 +56,22 @@ export default function SigninPage() {
         }
     };
 
+    // In app/(auth)/signin/page.tsx - Update the Google button handler
     const handleGoogleSignin = async () => {
         setIsLoading(true);
         try {
-            await signIn("google", { callbackUrl: "/dashboard" });
+            const result = await signIn("google", {
+                callbackUrl: "/onboarding",
+                redirect: true
+            });
+
+            if (!result?.ok) {
+                setError("Google sign in failed. Please try again.");
+                setIsLoading(false);
+            }
         } catch (err) {
-            setError("Google sign in failed");
+            console.error("Google signin error:", err);
+            setError("Google sign in failed. Please try again.");
             setIsLoading(false);
         }
     };
