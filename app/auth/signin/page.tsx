@@ -57,24 +57,24 @@ export default function SigninPage() {
     };
 
     // In app/(auth)/signin/page.tsx - Update the Google button handler
-    const handleGoogleSignin = async () => {
-        setIsLoading(true);
-        try {
-            const result = await signIn("google", {
-                callbackUrl: "/onboarding",
-                redirect: true
-            });
+    // const handleGoogleSignin = async () => {
+    //     setIsLoading(true);
+    //     try {
+    //         const result = await signIn("google", {
+    //             callbackUrl: "/onboarding",
+    //             redirect: true
+    //         });
 
-            if (!result?.ok) {
-                setError("Google sign in failed. Please try again.");
-                setIsLoading(false);
-            }
-        } catch (err) {
-            console.error("Google signin error:", err);
-            setError("Google sign in failed. Please try again.");
-            setIsLoading(false);
-        }
-    };
+    //         if (!result?.ok) {
+    //             setError("Google sign in failed. Please try again.");
+    //             setIsLoading(false);
+    //         }
+    //     } catch (err) {
+    //         console.error("Google signin error:", err);
+    //         setError("Google sign in failed. Please try again.");
+    //         setIsLoading(false);
+    //     }
+    // };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-50 to-slate-100 p-4">
