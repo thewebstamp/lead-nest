@@ -158,7 +158,7 @@ export default function SigninPage() {
                     <Button
                         type="button"
                         variant="outline"
-                        className="w-full"
+                        className="hidden w-full"
                         onClick={handleGoogleSignin}
                         disabled={isLoading}
                     >
