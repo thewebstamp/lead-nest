@@ -18,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className="mobile-safe">
+    <html lang="en" suppressHydrationWarning className={inter.className}>
       <body className={`${inter.className} bg-bg-space bg-grid-pattern relative mobile-safe`}>
         {/* Responsive Background Elements */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none mobile-safe">
