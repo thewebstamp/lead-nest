@@ -22,7 +22,7 @@ export default function RootLayout({
       <body className={`${inter.className} bg-bg-space bg-grid-pattern relative mobile-safe`}>
         {/* Responsive Background Elements */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none mobile-safe">
-          {/* Floating Orbs - Responsive sizing */}
+          {/* Floating Orbs */}
           <div className="absolute top-1/4 left-1/4 bg-orb-mobile rounded-full floating opacity-10"
             style={{ background: 'radial-gradient(circle, var(--neon-blue), transparent 70%)' }} />
           <div className="absolute bottom-1/4 right-1/4 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 rounded-full floating opacity-8"
@@ -30,7 +30,7 @@ export default function RootLayout({
           <div className="absolute top-3/4 left-1/2 -translate-x-1/2 w-48 h-48 md:w-80 md:h-80 rounded-full floating opacity-6"
             style={{ animationDelay: '10s', background: 'radial-gradient(circle, var(--electric-pink), transparent 70%)' }} />
 
-          {/* Grid Lines - Responsive scaling */}
+          {/* Grid Lines */}
           <div className="absolute inset-0"
             style={{
               backgroundImage: 'linear-gradient(90deg, rgba(0, 217, 255, 0.03) 1px, transparent 1px), linear-gradient(rgba(0, 217, 255, 0.03) 1px, transparent 1px)',
@@ -38,13 +38,11 @@ export default function RootLayout({
             }} />
 
           {/* Mobile-optimized Particles */}
-          <div className="absolute inset-0"
+          <div className="absolute inset-0 particle-animation"
             style={{
               backgroundImage: `radial-gradient(0.5px 0.5px at 10% 20%, rgba(0, 217, 255, 0.3) 0px, transparent 50%),
                                   radial-gradient(0.5px 0.5px at 90% 80%, rgba(185, 103, 255, 0.3) 0px, transparent 50%)`,
-              backgroundRepeat: 'repeat',
-              backgroundSize: 'min(200px, 50vw) min(200px, 50vw)',
-              animation: 'particleMove 80s linear infinite'
+              backgroundRepeat: 'repeat'
             }} />
 
           {/* Mobile-safe decorative lines */}
@@ -58,25 +56,6 @@ export default function RootLayout({
             <Providers>{children}</Providers>
           </div>
         </div>
-
-        <style jsx global>{`
-          @keyframes particleMove {
-            from { background-position: 0 0; }
-            to { background-position: min(200px, 50vw) min(200px, 50vw); }
-          }
-          
-          /* Mobile performance optimizations */
-          @media (max-width: 640px) {
-            * {
-              -webkit-tap-highlight-color: transparent;
-            }
-            
-            .floating {
-              will-change: transform;
-              transform: translateZ(0);
-            }
-          }
-        `}</style>
       </body>
     </html>
   );

@@ -103,6 +103,29 @@
   50% { opacity: 0.8; }
 }
 
+/* Particle Animation */
+.particle-animation {
+  background-size: min(200px, 50vw) min(200px, 50vw);
+  animation: particleMove 80s linear infinite;
+}
+
+@keyframes particleMove {
+  from { background-position: 0 0; }
+  to { background-position: min(200px, 50vw) min(200px, 50vw); }
+}
+
+/* Mobile performance optimizations */
+@media (max-width: 640px) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .floating {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Josefin Sans', sans-serif;
   font-weight: 600;
@@ -125,16 +148,7 @@ body {
   .text-balance {
     text-wrap: balance;
   }
-}
-
-@supports not (display: grid) {
-  .dashboard-container {
-    display: flex;
-    min-height: 100vh;
-  }
-}
-
-@layer utilities {
+  
   .responsive-container {
     @apply container mx-auto px-4 sm:px-6 lg:px-8;
   }
@@ -163,6 +177,13 @@ body {
   
   .desktop-only {
     @apply hidden sm:block;
+  }
+}
+
+@supports not (display: grid) {
+  .dashboard-container {
+    display: flex;
+    min-height: 100vh;
   }
 }
 
