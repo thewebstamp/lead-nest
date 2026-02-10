@@ -1,32 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap');
 @import 'tailwindcss';
 
-@theme {
-  --color-background: hsl(0 0% 100%);
-  --color-foreground: hsl(222.2 84% 4.9%);
-  --color-primary: hsl(221.2 83.2% 53.3%);
-  --color-primary-foreground: hsl(210 40% 98%);
-  --color-secondary: hsl(210 40% 96.1%);
-  --color-secondary-foreground: hsl(222.2 47.4% 11.2%);
-  --color-muted: hsl(210 40% 96.1%);
-  --color-muted-foreground: hsl(215.4 16.3% 46.9%);
-  --color-border: hsl(214.3 31.8% 91.4%);
-  --color-ring: hsl(221.2 83.2% 53.3%);
-  --radius: 0.5rem;
+/* Ultra-Modern Theme Variables */
+:root {
+  /* Modern Gradient Colors */
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --dark-gradient: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  --cyber-gradient: linear-gradient(45deg, #00d9ff, #b967ff, #ff00ff);
+  
+  /* Glassmorphism Effects */
+  --glass-bg: rgba(255, 255, 255, 0.07);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --backdrop-blur: blur(12px);
+  
+  /* Neon Accents */
+  --neon-blue: #00d9ff;
+  --neon-purple: #b967ff;
+  --electric-pink: #ff00ff;
+  --cyber-green: #00ff9d;
+  
+  /* Modern Backgrounds */
+  --bg-space: #050508;
+  --bg-deep: #0a0a0f;
+  --bg-card: rgba(20, 20, 30, 0.7);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: hsl(222.2 84% 4.9%);
-    --color-foreground: hsl(210 40% 98%);
-    --color-primary: hsl(217.2 91.2% 59.8%);
-    --color-primary-foreground: hsl(222.2 47.4% 11.2%);
-    --color-secondary: hsl(217.2 32.6% 17.5%);
-    --color-secondary-foreground: hsl(210 40% 98%);
-    --color-muted: hsl(217.2 32.6% 17.5%);
-    --color-muted-foreground: hsl(215 20.2% 65.1%);
-    --color-border: hsl(217.2 32.6% 17.5%);
-    --color-ring: hsl(224.3 76.3% 48%);
-  }
+@theme {
+  /* Modern Theme Colors */
+  --color-background: var(--bg-space);
+  --color-foreground: hsl(0 0% 95%);
+  --color-primary: hsl(221.2 83.2% 53.3%);
+  --color-primary-foreground: hsl(210 40% 98%);
+  --color-secondary: hsl(217.2 32.6% 17.5%);
+  --color-secondary-foreground: hsl(210 40% 98%);
+  --color-muted: hsl(217.2 32.6% 17.5%);
+  --color-muted-foreground: hsl(215 20.2% 65.1%);
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-ring: var(--neon-blue);
+  --radius: 1rem;
+  
+  /* Custom Colors */
+  --color-neon-blue: var(--neon-blue);
+  --color-neon-purple: var(--neon-purple);
+  --color-electric-pink: var(--electric-pink);
+  --color-cyber-green: var(--cyber-green);
+}
+
+/* Custom Styles */
+.glass-effect {
+  background: var(--glass-bg);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.gradient-border {
+  position: relative;
+  border: double 2px transparent;
+  background-image: linear-gradient(var(--bg-card), var(--bg-card)), 
+                    var(--primary-gradient);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.cyber-glow {
+  text-shadow: 0 0 20px currentColor;
+}
+
+.gradient-text {
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animated Background Elements */
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.floating {
+  animation: floating 20s ease-in-out infinite;
+}
+
+@keyframes floating {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+.pulse-glow {
+  animation: pulse-glow 4s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Josefin Sans', sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 * {
@@ -38,6 +118,7 @@ body {
   background: hsl(var(--background));
   font-feature-settings: "rlig" 1, "calt" 1;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  overflow-x: hidden;
 }
 
 @layer utilities {
@@ -51,4 +132,70 @@ body {
     display: flex;
     min-height: 100vh;
   }
+}
+
+@layer utilities {
+  .responsive-container {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .responsive-text {
+    @apply text-4xl sm:text-5xl md:text-6xl lg:text-7xl;
+  }
+  
+  .responsive-padding {
+    @apply px-4 sm:px-6 md:px-8;
+  }
+  
+  .mobile-safe {
+    @apply overflow-x-hidden max-w-[100vw];
+  }
+  
+  /* Responsive background elements */
+  .bg-orb-mobile {
+    @apply w-40 h-40 sm:w-64 sm:h-64 md:w-96 md:h-96;
+  }
+  
+  /* Hide/show elements based on screen size */
+  .mobile-only {
+    @apply block sm:hidden;
+  }
+  
+  .desktop-only {
+    @apply hidden sm:block;
+  }
+}
+
+/* Mobile-first responsive adjustments */
+@media (max-width: 640px) {
+  .glass-effect {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  
+  .floating {
+    animation-duration: 25s;
+  }
+  
+  /* Scale down background elements on mobile */
+  .bg-grid-pattern {
+    background-size: 30px 30px;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .responsive-container {
+    @apply px-6;
+  }
+}
+
+/* Prevent horizontal overflow */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
 }
