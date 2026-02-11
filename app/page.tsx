@@ -4,14 +4,65 @@ import { authOptions } from "@/lib/auth/config";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { LogOut, ArrowRight, Zap, CheckCircle, Shield, Users, BarChart } from "lucide-react";
+import { motion } from "framer-motion";
+
+// Background lines component for subtle animation
+const BackgroundLines = ({ variant = "light" }: { variant?: "light" | "dark" }) => {
+  const lines = Array.from({ length: 8 }, (_, i) => i);
+  const color = variant === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)";
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {lines.map((i) => (
+        <motion.div
+          key={i}
+          className="absolute h-px w-full"
+          style={{
+            top: `${i * 15}%`,
+            left: 0,
+            background: `linear-gradient(90deg, transparent, ${color}, transparent)`,
+          }}
+          initial={{ x: "-100%", opacity: 0.3 }}
+          animate={{ x: "200%", opacity: 0.5 }}
+          transition={{
+            duration: 12 + i * 2,
+            repeat: Infinity,
+            delay: i * 0.8,
+            ease: "linear",
+          }}
+        />
+      ))}
+      {/* Vertical lines */}
+      {lines.slice(0, 4).map((i) => (
+        <motion.div
+          key={`v-${i}`}
+          className="absolute w-px h-full"
+          style={{
+            left: `${i * 25}%`,
+            top: 0,
+            background: `linear-gradient(180deg, transparent, ${color}, transparent)`,
+          }}
+          initial={{ y: "-100%", opacity: 0.3 }}
+          animate={{ y: "200%", opacity: 0.5 }}
+          transition={{
+            duration: 15 + i * 1.5,
+            repeat: Infinity,
+            delay: i * 0.6,
+            ease: "linear",
+          }}
+        />
+      ))}
+    </div>
+  );
+};
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
   const isLoggedIn = !!session;
 
   return (
-    <div className="min-h-screen bg-white font-sans antialiased overflow-x-hidden">
-      {/* Navigation */}
+    <div className="min-h-screen bg-white font-sans antialiased overflow-x-hidden relative">
+      {/* Navigation - fixed above background lines */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
@@ -32,19 +83,19 @@ export default async function HomePage() {
                   <Link href="/dashboard">
                     <Button
                       variant="ghost"
-                      className="hidden md:block text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                      className="cursor-pointer hidden md:block text-gray-700 hover:text-blue-600 hover:bg-gray-50"
                     >
                       Dashboard
                     </Button>
                     <Button
                       variant="ghost"
-                      className="md:hidden text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                      className="cursor-pointer md:hidden text-gray-700 hover:text-blue-600 hover:bg-gray-50"
                     >
                       Dash
                     </Button>
                   </Link>
                   <Link href="/api/auth/signout">
-                    <Button className="bg-gray-900 text-white hover:bg-gray-800">
+                    <Button className="cursor-pointer bg-gray-900 text-white hover:bg-gray-800">
                       <LogOut className="h-4 w-4 mr-2" />
                       Sign Out
                     </Button>
@@ -53,12 +104,12 @@ export default async function HomePage() {
               ) : (
                 <>
                   <Link href="/auth/signin">
-                    <Button variant="ghost" className="text-gray-700 hover:text-blue-600">
+                    <Button variant="ghost" className="cursor-pointer text-gray-700 hover:text-blue-600">
                       Sign In
                     </Button>
                   </Link>
                   <Link href="/auth/signup">
-                    <Button className="bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-sm">
+                    <Button className="cursor-pointer bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-sm">
                       Get Started
                     </Button>
                   </Link>
@@ -70,8 +121,9 @@ export default async function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <main className="pt-32 pb-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden pt-32 pb-20">
+        <BackgroundLines variant="light" />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 mb-8">
@@ -107,7 +159,7 @@ export default async function HomePage() {
               <Link href={isLoggedIn ? "/dashboard" : "/auth/signup"} className="w-full sm:w-auto">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto px-8 py-6 text-lg bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
+                  className="cursor-pointer w-full sm:w-auto px-8 py-6 text-lg bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
                 >
                   {isLoggedIn ? "Go to Dashboard" : "Start Free Trial"}
                   <ArrowRight className="ml-3 h-5 w-5" />
@@ -117,7 +169,7 @@ export default async function HomePage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto px-8 py-6 text-lg border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600 rounded-xl"
+                  className="cursor-pointer w-full sm:w-auto px-8 py-6 text-lg border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600 rounded-xl"
                 >
                   Watch Demo
                 </Button>
@@ -140,11 +192,12 @@ export default async function HomePage() {
             </div>
           </div>
         </div>
-      </main>
+      </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative py-20 bg-gray-50 overflow-hidden">
+        <BackgroundLines variant="light" />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Streamlined Lead Management
@@ -193,8 +246,9 @@ export default async function HomePage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative py-20 overflow-hidden">
+        <BackgroundLines variant="light" />
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Why Choose LeadNest
@@ -204,7 +258,7 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-6 grid md:grid-cols-2 gap-6">
             {[
               "Enterprise-grade security with SOC 2 compliance",
               "Seamless integration with your existing tools",
@@ -225,8 +279,9 @@ export default async function HomePage() {
       </section>
 
       {/* Testimonial */}
-      <section className="py-20 bg-gray-900 text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="relative py-20 bg-gray-900 text-white overflow-hidden">
+        <BackgroundLines variant="dark" />
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <BarChart className="h-12 w-12 text-blue-400 mx-auto mb-6" />
           <blockquote className="text-2xl md:text-3xl font-medium mb-8 leading-relaxed">
             &quot;LeadNest transformed how we handle leads. Our conversion rate increased by 3.5x in just 90 days.&quot;
@@ -239,8 +294,9 @@ export default async function HomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative py-20 overflow-hidden">
+        <BackgroundLines variant="light" />
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center bg-linear-to-br from-blue-50 to-white border border-blue-100 rounded-3xl p-8 md:p-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
               Ready to Transform Your Lead Management?
@@ -253,7 +309,7 @@ export default async function HomePage() {
               <Link href="/auth/signup" className="w-full sm:w-auto">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto px-8 py-6 text-lg bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg"
+                  className="cursor-pointer w-full sm:w-auto px-8 py-6 text-lg bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg"
                 >
                   Start Free Trial
                   <ArrowRight className="ml-3 h-5 w-5" />
@@ -263,7 +319,7 @@ export default async function HomePage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto px-8 py-6 text-lg border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600"
+                  className="cursor-pointer w-full sm:w-auto px-8 py-6 text-lg border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600"
                 >
                   Schedule a Demo
                 </Button>
@@ -278,8 +334,9 @@ export default async function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <footer className="relative border-t border-gray-200 py-12 overflow-hidden">
+        <BackgroundLines variant="light" />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
               <div className="h-8 w-8 rounded-lg bg-linear-to-br from-blue-600 to-blue-800 flex items-center justify-center">

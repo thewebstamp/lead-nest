@@ -37,7 +37,7 @@ export default function RootLayout({
               backgroundSize: 'clamp(20px, 5vw, 50px) clamp(20px, 5vw, 50px)'
             }} />
 
-          {/* Mobile-optimized Particles */}
+          {/* Particles */}
           <div className="absolute inset-0 particle-animation"
             style={{
               backgroundImage: `radial-gradient(0.5px 0.5px at 10% 20%, rgba(0, 217, 255, 0.3) 0px, transparent 50%),
@@ -45,7 +45,7 @@ export default function RootLayout({
               backgroundRepeat: 'repeat'
             }} />
 
-          {/* Mobile-safe decorative lines */}
+          {/* decorative lines */}
           <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-neon-blue/20 to-transparent pulse-glow sm:via-neon-blue/40" />
           <div className="absolute bottom-0 left-0 w-full h-px bg-linear-to-r from-transparent via-neon-purple/20 to-transparent pulse-glow sm:via-neon-purple/40" />
         </div>
