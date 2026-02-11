@@ -41,10 +41,10 @@ function ErrorContent() {
                 </Alert>
 
                 <div className="space-y-3">
-                    <Button asChild className="w-full bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800">
+                    <Button asChild className="cursor-pointer w-full bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800">
                         <Link href="/auth/signin">Back to Sign In</Link>
                     </Button>
-                    <Button variant="outline" asChild className="w-full border-gray-200 hover:bg-gray-50">
+                    <Button variant="outline" asChild className="cursor-pointer w-full border-gray-200 hover:bg-gray-50">
                         <Link href="/auth/signup">Create New Account</Link>
                     </Button>
                 </div>

@@ -5,8 +5,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Loader2, Zap, ArrowRight, ArrowLeft } from "lucide-react";
 import { BackgroundLines } from "@/components/background-lines";
 import OnboardingStep1 from "@/components/onboarding/step1";
@@ -77,15 +77,28 @@ export default function OnboardingPage() {
     }
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-white to-gray-50 font-sans antialiased overflow-x-hidden relative">
+        <div className="relative min-h-screen overflow-hidden bg-white font-sans antialiased">
+            {/* Background image with overlay - exactly like auth layout */}
+            <div className="absolute inset-0 z-0">
+                <Image
+                    src="/images/autt.jpg"
+                    alt="Onboarding background"
+                    fill
+                    className="object-cover"
+                    priority
+                />
+                <div className="absolute inset-0 bg-linear-to-br from-white/95 via-white/90 to-white/85" />
+            </div>
+
+            {/* Animated background lines */}
             <BackgroundLines variant="light" />
 
-            {/* Navigation - matches homepage exactly */}
+            {/* Navigation - fixed above everything */}
             <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between">
                         <Link href="/" className="flex items-center space-x-3">
-                            <div className="h-9 w-9 rounded-lg bg-linear-to-br from-blue-600 to-blue-800 flex items-center justify-center">
+                            <div className="cursor-pointer h-9 w-9 rounded-lg bg-linear-to-br from-blue-600 to-blue-800 flex items-center justify-center">
                                 <Zap className="h-5 w-5 text-white" />
                             </div>
                             <span className="text-xl font-bold text-gray-900 tracking-tight">LeadNest</span>
@@ -98,7 +111,7 @@ export default function OnboardingPage() {
                             <Button
                                 variant="ghost"
                                 onClick={() => router.push("/dashboard")}
-                                className="text-gray-700 hover:text-blue-600"
+                                className="cursor-pointer text-gray-700 hover:text-blue-600"
                             >
                                 Skip for now
                             </Button>
@@ -122,7 +135,7 @@ export default function OnboardingPage() {
             {/* Main Content */}
             <main className="relative pt-32 pb-20 z-10">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {/* Card */}
+                    {/* Glass card - same style as auth pages */}
                     <div className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-xl p-8 md:p-10 shadow-xl">
                         {/* Header */}
                         <div className="text-center mb-8">
@@ -166,7 +179,7 @@ export default function OnboardingPage() {
                                 variant="outline"
                                 onClick={handleBack}
                                 disabled={currentStep === 1 || isLoading}
-                                className="border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600 rounded-xl px-6 py-5 h-auto"
+                                className="cursor-pointer border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600 rounded-xl px-6 py-5 h-auto"
                             >
                                 <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back
@@ -175,7 +188,7 @@ export default function OnboardingPage() {
                             <Button
                                 onClick={handleNext}
                                 disabled={isLoading}
-                                className="bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg rounded-xl px-6 py-5 h-auto"
+                                className="cursor-pointer bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg rounded-xl px-6 py-5 h-auto"
                             >
                                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 {currentStep === TOTAL_STEPS ? (

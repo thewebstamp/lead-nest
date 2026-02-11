@@ -106,7 +106,7 @@ export default function SigninPage() {
 
                     <Button
                         type="submit"
-                        className="w-full bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg"
+                        className="cursor-pointer w-full bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg"
                         disabled={isLoading}
                     >
                         {isLoading ? (
@@ -135,7 +135,7 @@ export default function SigninPage() {
                 <Button
                     type="button"
                     variant="outline"
-                    className="hidden w-full border-gray-200 hover:bg-gray-50"
+                    className="cursor-pointer hidden w-full border-gray-200 hover:bg-gray-50"
                     onClick={() => signIn("google", { callbackUrl: "/onboarding" })}
                     disabled={isLoading}
                 >

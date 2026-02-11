@@ -50,7 +50,7 @@ export default function SignOutPage() {
                 <div className="space-y-3">
                     <Button
                         onClick={handleSignOut}
-                        className="w-full bg-linear-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-lg shadow-red-500/20"
+                        className="cursor-pointer w-full bg-linear-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-lg shadow-red-500/20"
                         size="lg"
                     >
                         <LogOut className="mr-2 h-5 w-5" />
@@ -60,7 +60,7 @@ export default function SignOutPage() {
                     <Button
                         onClick={handleCancel}
                         variant="outline"
-                        className="w-full border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600"
+                        className="cursor-pointer w-full border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600"
                         size="lg"
                     >
                         <ArrowLeft className="mr-2 h-5 w-5" />
@@ -69,7 +69,7 @@ export default function SignOutPage() {
 
                     <Button
                         variant="ghost"
-                        className="flex w-full text-gray-500 hover:text-gray-700"
+                        className="cursor-pointer flex w-full text-gray-500 hover:text-gray-700"
                         size="sm"
                         asChild
                     >

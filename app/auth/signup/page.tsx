@@ -170,7 +170,7 @@ export default function SignupPage() {
 
                     <Button
                         type="submit"
-                        className="w-full bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg"
+                        className="cursor-pointer w-full bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg"
                         disabled={isLoading}
                     >
                         {isLoading ? (

@@ -92,7 +92,7 @@ export default function OnboardingStep1({ selectedServices, onUpdate }: Onboardi
                         variant="secondary"
                         onClick={addCustomService}
                         disabled={!customService.trim()}
-                        className="bg-gray-100 text-gray-700 hover:bg-gray-200 border-0"
+                        className="cursor-pointer bg-gray-100 text-gray-700 hover:bg-gray-200 border-0"
                     >
                         Add
                     </Button>

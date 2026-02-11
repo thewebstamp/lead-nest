@@ -104,7 +104,7 @@ function ResetPasswordContent() {
                         </Alert>
                         <div className="mt-6 space-y-3">
                             <p className="text-sm text-gray-600">Please request a new reset link.</p>
-                            <Button asChild className="w-full">
+                            <Button asChild className="cursor-pointer w-full">
                                 <Link href="/auth/forgot-password">Request new link</Link>
                             </Button>
                         </div>
@@ -178,7 +178,7 @@ function ResetPasswordContent() {
                         </div>
                         <Button
                             type="submit"
-                            className="w-full bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg"
+                            className="cursor-pointer w-full bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg"
                             disabled={isLoading}
                         >
                             {isLoading ? (

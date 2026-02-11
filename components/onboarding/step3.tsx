@@ -95,14 +95,14 @@ export default function OnboardingStep3({ businessSlug, businessData }: Onboardi
                     </Button>
                 </div>
 
-                <div className="flex items-center gap-2 text-sm text-gray-500">
+                <div className="hidden items-center gap-2 text-sm text-gray-500">
                     <ExternalLink className="h-4 w-4" />
                     <span>Preview: <span className="font-mono text-blue-600">/{businessSlug}</span></span>
                 </div>
             </div>
 
             {/* Form Preview */}
-            <Card className="border border-gray-200 shadow-md overflow-hidden">
+            <Card className="hidden border border-gray-200 shadow-md overflow-hidden">
                 <CardHeader className="bg-linear-to-br from-gray-50 to-white border-b border-gray-100">
                     <CardTitle className="text-lg">Preview your form</CardTitle>
                     <CardDescription>
