@@ -94,7 +94,7 @@ export default async function DashboardPage() {
     // Calculate average response time (in hours) for contacted leads
     const { rows: responseTimes } = await query<{ hours: number }>(
         `SELECT 
-       EXTRACT(EPOCH FROM (updated_at - created_at)) / 3600 as hours
+       EXTRACT(EPOCH FROM (last_contacted_at - created_at)) / 3600 as hours
      FROM leads 
      WHERE business_id = $1 
        AND status IN ('contacted', 'quoted', 'booked')

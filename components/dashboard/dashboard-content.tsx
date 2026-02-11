@@ -105,22 +105,43 @@ export default function DashboardContent({
         return `${Math.floor(diffInHours / 168)}w ago`;
     };
 
-    // Calculate trend
+    // Calculate trend data
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ensureNumber = (value: any): number => {
+        if (value === null || value === undefined) return 0;
+        const num = Number(value);
+        return isNaN(num) ? 0 : num;
+    };
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
 
-    const isSameDay = (date1: Date, date2: Date) =>
-        date1.getFullYear() === date2.getFullYear() &&
-        date1.getMonth() === date2.getMonth() &&
-        date1.getDate() === date2.getDate();
+    // Function to compare dates without time
+    const isSameDay = (date1: Date, date2: Date): boolean => {
+        return date1.getFullYear() === date2.getFullYear() &&
+            date1.getMonth() === date2.getMonth() &&
+            date1.getDate() === date2.getDate();
+    };
 
-    const todayLeads = leadTrends.find(t => isSameDay(new Date(t.date), today));
-    const yesterdayLeads = leadTrends.find(t => isSameDay(new Date(t.date), yesterday));
+    // Convert leadTrends dates to Date objects for comparison
+    const todayLeads = leadTrends.find(trend => {
+        const trendDate = new Date(trend.date);
+        return isSameDay(trendDate, today);
+    });
 
-    const todayCount = todayLeads ? Number(todayLeads.count) : 0;
-    const yesterdayCount = yesterdayLeads ? Number(yesterdayLeads.count) : 0;
+    const yesterdayLeads = leadTrends.find(trend => {
+        const trendDate = new Date(trend.date);
+        return isSameDay(trendDate, yesterday);
+    });
+
+    // Get counts (default to 0 if not found)
+    const todayCount = todayLeads ? ensureNumber(todayLeads.count) : 0;
+    const yesterdayCount = yesterdayLeads ? ensureNumber(yesterdayLeads.count) : 0;
+
+    // Calculate change
     const trendChange = todayCount - yesterdayCount;
     const trendPercentage = yesterdayCount > 0
         ? Math.round((trendChange / yesterdayCount) * 100)

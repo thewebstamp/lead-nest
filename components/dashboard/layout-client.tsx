@@ -75,11 +75,11 @@ export default function DashboardLayoutClient({
                 />
             )}
 
-            {/* Sidebar - modern glass design */}
+            {/* Fixed Sidebar - visible on large screens, slides in on mobile */}
             <aside
                 className={cn(
-                    "fixed inset-y-0 left-0 z-40 w-72 transform bg-white/80 backdrop-blur-xl border-r border-gray-200/80 shadow-xl transition-transform duration-300 ease-in-out lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen",
-                    sidebarOpen ? "translate-x-0" : "-translate-x-full"
+                    "fixed inset-y-0 left-0 z-40 w-72 transform bg-white/80 backdrop-blur-xl border-r border-gray-200/80 shadow-xl transition-transform duration-300 ease-in-out",
+                    sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
                 )}
             >
                 <div className="flex flex-col h-full">
@@ -103,7 +103,7 @@ export default function DashboardLayoutClient({
                         </Button>
                     </div>
 
-                    {/* Navigation - now directly below logo, always visible */}
+                    {/* Navigation - directly below logo */}
                     <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
                         {navItems.map((item) => {
                             const Icon = item.icon;
@@ -175,53 +175,52 @@ export default function DashboardLayoutClient({
                 </div>
             </aside>
 
-            {/* Main content area */}
-            <div className="lg:pl-72 flex flex-col min-h-screen relative z-10">
-                {/* Top header - clean, modern */}
-                <header className="sticky top-0 z-30 flex h-20 items-center justify-between gap-4 border-b border-gray-200/80 bg-white/80 backdrop-blur-xl px-6 lg:px-8 w-full shadow-sm">
-                    <div className="flex items-center gap-4">
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            className="lg:hidden text-gray-700 hover:text-blue-600 hover:bg-blue-50"
-                            onClick={() => setSidebarOpen(true)}
-                        >
-                            <Menu className="h-5 w-5" />
-                            <span className="sr-only">Toggle sidebar</span>
-                        </Button>
+            {/* Fixed Header */}
+            <header className="fixed top-0 left-0 right-0 z-30 flex h-20 items-center justify-between gap-4 border-b border-gray-200/80 bg-white/80 backdrop-blur-xl px-6 lg:px-8 shadow-sm lg:left-72">
+                <div className="flex items-center gap-4">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="lg:hidden text-gray-700 hover:text-blue-600 hover:bg-blue-50"
+                        onClick={() => setSidebarOpen(true)}
+                    >
+                        <Menu className="h-5 w-5" />
+                        <span className="sr-only">Toggle sidebar</span>
+                    </Button>
 
-                        <h1 className="text-xl font-semibold text-gray-900 tracking-tight">
-                            {navItems.find((item) => pathname.startsWith(item.href))?.name || "Dashboard"}
-                        </h1>
-                    </div>
+                    <h1 className="text-xl font-semibold text-gray-900 tracking-tight">
+                        {navItems.find((item) => pathname.startsWith(item.href))?.name || "Dashboard"}
+                    </h1>
+                </div>
 
-                    <div className="flex items-center gap-3">
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            className="hidden sm:inline-flex text-gray-700 hover:text-blue-600 hover:bg-blue-50"
-                        >
-                            <HelpCircle className="h-5 w-5" />
-                            <span className="sr-only">Help</span>
-                        </Button>
-                        <NotificationsBell />
-                        <Link href="/dashboard/settings" className="flex items-center">
-                            <Avatar className="h-9 w-9 ring-2 ring-white shadow-sm cursor-pointer hover:ring-blue-200 transition-all">
-                                <AvatarFallback className="bg-linear-to-br from-blue-500 to-blue-700 text-white font-medium">
-                                    {getInitials(user.name)}
-                                </AvatarFallback>
-                            </Avatar>
-                        </Link>
-                    </div>
-                </header>
+                <div className="flex items-center gap-3">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="hidden sm:inline-flex text-gray-700 hover:text-blue-600 hover:bg-blue-50"
+                    >
+                        <HelpCircle className="h-5 w-5" />
+                        <span className="sr-only">Help</span>
+                    </Button>
+                    <NotificationsBell />
+                    <Link href="/dashboard/settings" className="flex items-center">
+                        <Avatar className="h-9 w-9 ring-2 ring-white shadow-sm cursor-pointer hover:ring-blue-200 transition-all">
+                            <AvatarFallback className="bg-linear-to-br from-blue-500 to-blue-700 text-white font-medium">
+                                {getInitials(user.name)}
+                            </AvatarFallback>
+                        </Avatar>
+                    </Link>
+                </div>
+            </header>
 
-                {/* Main content */}
-                <main className="flex-1 p-6 lg:p-8">
+            {/* Main Content - offset for fixed header and sidebar */}
+            <main className="relative z-10 min-h-screen pt-20 lg:pl-72">
+                <div className="p-6 lg:p-8">
                     <div className="max-w-7xl mx-auto space-y-6">
                         {children}
                     </div>
-                </main>
-            </div>
+                </div>
+            </main>
         </div>
     );
 }
