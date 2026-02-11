@@ -187,7 +187,7 @@ export default function DashboardContent({
                                 <p className="text-sm font-medium text-gray-600">Total Leads</p>
                                 <p className="text-3xl font-bold text-gray-900 mt-1">{stats.total}</p>
                                 <div className="flex items-center mt-2">
-                                    {trendChange >= 0 ? (
+                                    {trendChange <= 0 ? (
                                         <ArrowUpRight className="h-4 w-4 text-green-600 mr-1" />
                                     ) : (
                                         <ArrowDownRight className="h-4 w-4 text-red-600 mr-1" />
