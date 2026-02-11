@@ -4,57 +4,7 @@ import { authOptions } from "@/lib/auth/config";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { LogOut, ArrowRight, Zap, CheckCircle, Shield, Users, BarChart } from "lucide-react";
-import { motion } from "framer-motion";
-
-// Background lines component for subtle animation
-const BackgroundLines = ({ variant = "light" }: { variant?: "light" | "dark" }) => {
-  const lines = Array.from({ length: 8 }, (_, i) => i);
-  const color = variant === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)";
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {lines.map((i) => (
-        <motion.div
-          key={i}
-          className="absolute h-px w-full"
-          style={{
-            top: `${i * 15}%`,
-            left: 0,
-            background: `linear-gradient(90deg, transparent, ${color}, transparent)`,
-          }}
-          initial={{ x: "-100%", opacity: 0.3 }}
-          animate={{ x: "200%", opacity: 0.5 }}
-          transition={{
-            duration: 12 + i * 2,
-            repeat: Infinity,
-            delay: i * 0.8,
-            ease: "linear",
-          }}
-        />
-      ))}
-      {/* Vertical lines */}
-      {lines.slice(0, 4).map((i) => (
-        <motion.div
-          key={`v-${i}`}
-          className="absolute w-px h-full"
-          style={{
-            left: `${i * 25}%`,
-            top: 0,
-            background: `linear-gradient(180deg, transparent, ${color}, transparent)`,
-          }}
-          initial={{ y: "-100%", opacity: 0.3 }}
-          animate={{ y: "200%", opacity: 0.5 }}
-          transition={{
-            duration: 15 + i * 1.5,
-            repeat: Infinity,
-            delay: i * 0.6,
-            ease: "linear",
-          }}
-        />
-      ))}
-    </div>
-  );
-};
+import { BackgroundLines } from "@/components/background-lines";
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
@@ -62,7 +12,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-white font-sans antialiased overflow-x-hidden relative">
-      {/* Navigation - fixed above background lines */}
+      {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">

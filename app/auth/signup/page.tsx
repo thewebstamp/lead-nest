@@ -188,7 +188,7 @@ export default function SignupPage() {
                 </form>
 
                 {/* Divider */}
-                <div className="relative my-6">
+                <div className="hidden relative my-6">
                     <div className="absolute inset-0 flex items-center">
                         <span className="w-full border-t border-gray-200" />
                     </div>
@@ -201,7 +201,7 @@ export default function SignupPage() {
                 <Button
                     type="button"
                     variant="outline"
-                    className="w-full border-gray-200 hover:bg-gray-50"
+                    className="hidden w-full border-gray-200 hover:bg-gray-50"
                     onClick={() => signIn("google", { callbackUrl: "/onboarding" })}
                     disabled={isLoading}
                 >
