@@ -81,3 +81,21 @@ body {
   background-color: var(--color-primary);
   color: var(--color-primary-foreground);
 }
+
+@keyframes slide-x {
+  0% { transform: translateX(-100%); opacity: 0.3; }
+  100% { transform: translateX(200%); opacity: 0.5; }
+}
+
+@keyframes slide-y {
+  0% { transform: translateY(-100%); opacity: 0.3; }
+  100% { transform: translateY(200%); opacity: 0.5; }
+}
+
+.animate-slide-x {
+  animation: slide-x infinite linear;
+}
+
+.animate-slide-y {
+  animation: slide-y infinite linear;
+}
