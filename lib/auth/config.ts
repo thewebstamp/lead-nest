@@ -270,7 +270,7 @@ export const authOptions: NextAuthOptions = {
 
   pages: {
     signIn: "/auth/signin",
-    // signUp: "/auth/signup",
+    signOut: "/auth/signout",
     error: "/auth/error",
   },
 
