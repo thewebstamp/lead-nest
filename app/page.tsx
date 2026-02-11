@@ -134,7 +134,7 @@ export default async function HomePage() {
                 { value: "40%", label: "Faster Response" },
                 { value: "24/7", label: "Automation" },
               ].map((stat, index) => (
-                <div key={index} className="text-center p-6 rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow">
+                <div key={index} className="text-center p-6 rounded-xl border border-gray-200 bg-linear-to-br from-white to-gray-50/80 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
                   <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
                   <div className="text-sm text-gray-600">{stat.label}</div>
                 </div>
