@@ -192,7 +192,7 @@ export default function DashboardContent({
                                     ) : (
                                         <ArrowDownRight className="h-4 w-4 text-red-600 mr-1" />
                                     )}
-                                    <span className={`text-sm font-medium ${trendChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    <span className={`text-sm font-medium ${trendChange <= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                         {Math.abs(trendChange)} today
                                     </span>
                                     <span className="text-xs text-gray-500 ml-1">({Math.abs(trendPercentage)}%)</span>
