@@ -69,12 +69,12 @@ export default function SignOutPage() {
 
                     <Button
                         variant="ghost"
-                        className="w-full text-gray-500 hover:text-gray-700"
+                        className="flex w-full text-gray-500 hover:text-gray-700"
                         size="sm"
                         asChild
                     >
+                        <Home className="mr-2 h-4 w-4" />
                         <Link href="/">
-                            <Home className="mr-2 h-4 w-4" />
                             Return to home
                         </Link>
                     </Button>
