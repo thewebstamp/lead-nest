@@ -11,7 +11,7 @@ export default async function HomePage() {
   const isLoggedIn = !!session;
 
   return (
-    <div className="min-h-screen bg-white font-sans antialiased overflow-x-hidden relative">
+    <div className="min-h-screen bg-linear-to-br from-white to-gray-50 font-sans antialiased overflow-x-hidden relative">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -145,7 +145,7 @@ export default async function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="relative py-20 bg-gray-50 overflow-hidden">
+      <section className="relative py-20 bg-linear-to-br from-gray-50 to-gray-100 overflow-hidden">
         <BackgroundLines variant="light" />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -177,7 +177,7 @@ export default async function HomePage() {
             ].map((feature, index) => (
               <div
                 key={index}
-                className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300"
+                className="bg-linear-to-br from-white to-gray-50/80 p-8 rounded-2xl border border-gray-200 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
               >
                 <div className="inline-flex p-3 rounded-lg bg-blue-50 mb-6">
                   {feature.icon}
