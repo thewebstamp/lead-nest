@@ -78,7 +78,7 @@ export default function OnboardingPage() {
 
     return (
         <div className="relative min-h-screen overflow-hidden bg-white font-sans antialiased">
-            {/* Background image with overlay - exactly like auth layout */}
+            {/* Background image with overlay */}
             <div className="absolute inset-0 z-0">
                 <Image
                     src="/images/autt.jpg"
@@ -93,7 +93,7 @@ export default function OnboardingPage() {
             {/* Animated background lines */}
             <BackgroundLines variant="light" />
 
-            {/* Navigation - fixed above everything */}
+            {/* Navigation */}
             <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between">
@@ -120,7 +120,7 @@ export default function OnboardingPage() {
                 </div>
             </nav>
 
-            {/* Progress Bar - custom gradient */}
+            {/* Progress Bar */}
             <div className="fixed top-18.25 left-0 right-0 z-40 bg-white/80 backdrop-blur-sm border-b border-gray-100">
                 <div className="max-w-3xl mx-auto px-4 py-3">
                     <div className="relative h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -135,7 +135,7 @@ export default function OnboardingPage() {
             {/* Main Content */}
             <main className="relative pt-32 pb-20 z-10">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {/* Glass card - same style as auth pages */}
+                    {/* Glass card */}
                     <div className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-xl p-8 md:p-10 shadow-xl">
                         {/* Header */}
                         <div className="text-center mb-8">
@@ -200,7 +200,7 @@ export default function OnboardingPage() {
                         </div>
                     </div>
 
-                    {/* Step Dots - subtle */}
+                    {/* Step Dots */}
                     <div className="flex justify-center mt-8 space-x-3">
                         {Array.from({ length: TOTAL_STEPS }).map((_, index) => (
                             <div
