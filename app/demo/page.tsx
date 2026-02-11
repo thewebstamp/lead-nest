@@ -12,7 +12,7 @@ export default async function DemoPage() {
 
     return (
         <div className="min-h-screen bg-linear-to-br from-white to-gray-50 font-sans antialiased overflow-x-hidden relative">
-            {/* Navigation - matches homepage exactly */}
+            {/* Navigation */}
             <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between">
@@ -234,7 +234,7 @@ export default async function DemoPage() {
                 </div>
             </section>
 
-            {/* Footer - matches homepage */}
+            {/* Footer */}
             <footer className="relative border-t border-gray-200 py-12 overflow-hidden">
                 <BackgroundLines variant="light" />
                 <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

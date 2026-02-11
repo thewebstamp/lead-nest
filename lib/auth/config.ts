@@ -8,7 +8,7 @@ import { query, queryOne } from "@/lib/db";
 import { v4 as uuidv4 } from "uuid";
 import { generateSlug } from "@/lib/utils/string";
 
-// Define user type for session
+// User type for session
 declare module "next-auth" {
   interface User {
     id: string;
@@ -58,7 +58,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Email and password required");
         }
 
-        // Find user by email using direct SQL
+        // Find user by email
         const user = await queryOne<{
           id: string;
           email: string;
@@ -120,7 +120,6 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    // Add signIn callback for Google users
     async signIn({ user, account, profile }) {
       try {
         if (account?.provider === "google") {
@@ -144,7 +143,7 @@ export const authOptions: NextAuthOptions = {
                 userId,
                 user.email,
                 user.name || profile?.name || "Google User",
-                true, // Google emails are verified
+                true,
               ]
             );
 
@@ -175,9 +174,9 @@ export const authOptions: NextAuthOptions = {
                 businessName,
                 slug,
                 user.email,
-                [], // Empty services array
-                1, // First onboarding step
-                false, // Not completed
+                [],
+                1,
+                false,
               ]
             );
 
@@ -188,7 +187,6 @@ export const authOptions: NextAuthOptions = {
               [relationId, userId, businessId, "owner", true]
             );
 
-            // Update user object with new ID for JWT callback
             user.id = userId;
           }
         }
@@ -206,7 +204,6 @@ export const authOptions: NextAuthOptions = {
         token.email = user.email;
         token.name = user.name;
 
-        // For Google sign-in, we need to fetch business info
         if (account.provider === "google") {
           // Fetch user's business information
           const businessRelation = await queryOne<{
@@ -231,7 +228,6 @@ export const authOptions: NextAuthOptions = {
             token.onboardingCompleted = false;
           }
         } else {
-          // For credentials, use data from authorize callback
           token.onboardingCompleted = (user as any).onboardingCompleted;
           token.businessId = (user as any).businessId;
           token.businessSlug = (user as any).businessSlug;
@@ -260,10 +256,8 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
 
-    // Add redirect callback
+    // redirect callback
     async redirect({ url, baseUrl }) {
-      // Always redirect to onboarding for Google sign-ins (they'll be new users)
-      // For existing users, they'll be redirected to dashboard by middleware
       return `${baseUrl}/onboarding`;
     },
   },
