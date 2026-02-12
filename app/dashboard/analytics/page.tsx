@@ -60,7 +60,7 @@ export default async function AnalyticsPage() {
                 </div>
             </div>
 
-            {/* Initial Stats - Glass Cards */}
+            {/* Initial Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md rounded-xl p-6 hover:shadow-lg transition-all">
                     <div className="flex items-center justify-between">

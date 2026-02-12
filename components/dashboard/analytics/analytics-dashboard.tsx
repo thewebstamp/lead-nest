@@ -219,7 +219,7 @@ export default function AnalyticsDashboard() {
                 </div>
             </div>
 
-            {/* Error Alert - Glass style */}
+            {/* Error Alert */}
             {error && (
                 <Alert variant="destructive" className="border-red-200 bg-red-50/80 backdrop-blur-sm rounded-xl">
                     <AlertCircle className="h-4 w-4 text-red-600" />
@@ -247,7 +247,7 @@ export default function AnalyticsDashboard() {
                 </Alert>
             )}
 
-            {/* Stats Cards - Glass */}
+            {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {isLoading ? (
                     Array(4).fill(0).map((_, i) => (
@@ -311,7 +311,7 @@ export default function AnalyticsDashboard() {
                         </Card>
                     </>
                 ) : (
-                    // No data state - Full width glass card
+                    // No data state
                     <Card className="col-span-2 border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
                         <CardContent className="pt-6 text-center py-12">
                             <div className="mx-auto w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mb-4">

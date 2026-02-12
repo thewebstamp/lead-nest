@@ -34,27 +34,27 @@ class ErrorBoundary extends Component<Props, State> {
             }
 
             return (
-                <div className="min-h-100 flex flex-col items-center justify-center p-8 bg-white rounded-lg border">
-                    <div className="text-center">
-                        <div className="h-16 w-16 mx-auto text-red-500 mb-4">
-                            <svg fill="currentColor" viewBox="0 0 20 20">
+                <div className="min-h-100 flex flex-col items-center justify-center p-8 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl shadow-md">
+                    <div className="text-center max-w-md">
+                        <div className="mx-auto w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
+                            <svg className="h-8 w-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                             </svg>
                         </div>
                         <h2 className="text-xl font-bold text-gray-900 mb-2">Something went wrong</h2>
-                        <p className="text-gray-600 mb-4">
+                        <p className="text-gray-600 mb-6">
                             {this.state.error?.message || 'An unexpected error occurred'}
                         </p>
-                        <div className="flex gap-3 justify-center">
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             <button
                                 onClick={() => window.location.reload()}
-                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                className="px-6 py-2.5 bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-600/20 rounded-xl font-medium transition-all"
                             >
                                 Refresh Page
                             </button>
                             <button
                                 onClick={() => window.history.back()}
-                                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                                className="px-6 py-2.5 border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 rounded-xl font-medium transition-all"
                             >
                                 Go Back
                             </button>
