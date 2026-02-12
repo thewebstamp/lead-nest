@@ -64,7 +64,7 @@ export default function DashboardLayoutClient({
 
     return (
         <div className="relative min-h-screen bg-linear-to-br from-white to-gray-50 font-sans antialiased overflow-hidden">
-            {/* Animated background lines - subtle */}
+            {/* Animated background lines */}
             <BackgroundLines variant="light" />
 
             {/* Mobile sidebar backdrop */}
@@ -75,7 +75,7 @@ export default function DashboardLayoutClient({
                 />
             )}
 
-            {/* Fixed Sidebar - visible on large screens, slides in on mobile */}
+            {/* Sidebar - visible on large screens, slides in on mobile */}
             <aside
                 className={cn(
                     "fixed inset-y-0 left-0 z-40 w-72 transform bg-white/80 backdrop-blur-xl border-r border-gray-200/80 shadow-xl transition-transform duration-300 ease-in-out",
@@ -83,7 +83,7 @@ export default function DashboardLayoutClient({
                 )}
             >
                 <div className="flex flex-col h-full">
-                    {/* Logo - always at top */}
+                    {/* Logo */}
                     <div className="flex items-center justify-between h-20 px-6 border-b border-gray-200/80 shrink-0">
                         <Link href="/dashboard" className="flex items-center space-x-3 group">
                             <div className="h-10 w-10 rounded-xl bg-linear-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:scale-105 transition-transform">
@@ -103,7 +103,7 @@ export default function DashboardLayoutClient({
                         </Button>
                     </div>
 
-                    {/* Navigation - directly below logo */}
+                    {/* Navigation */}
                     <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
                         {navItems.map((item) => {
                             const Icon = item.icon;
@@ -137,7 +137,7 @@ export default function DashboardLayoutClient({
                         })}
                     </nav>
 
-                    {/* Business info - compact card style */}
+                    {/* Business info */}
                     <div className="px-4 py-4 mx-4 mb-2 rounded-xl bg-linear-to-br from-gray-50 to-white border border-gray-200/80">
                         <div className="flex items-center space-x-3">
                             <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
@@ -154,7 +154,7 @@ export default function DashboardLayoutClient({
                         </div>
                     </div>
 
-                    {/* User info - at bottom */}
+                    {/* User info */}
                     <div className="border-t border-gray-200/80 p-4 shrink-0">
                         <div className="flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-100/50 transition-colors">
                             <Avatar className="h-10 w-10 ring-2 ring-white shadow-sm">
@@ -175,7 +175,7 @@ export default function DashboardLayoutClient({
                 </div>
             </aside>
 
-            {/* Fixed Header */}
+            {/* Header */}
             <header className="fixed top-0 left-0 right-0 z-30 flex h-20 items-center justify-between gap-4 border-b border-gray-200/80 bg-white/80 backdrop-blur-xl px-6 lg:px-8 shadow-sm lg:left-72">
                 <div className="flex items-center gap-4">
                     <Button
@@ -213,7 +213,7 @@ export default function DashboardLayoutClient({
                 </div>
             </header>
 
-            {/* Main Content - offset for fixed header and sidebar */}
+            {/* Main Content */}
             <main className="relative z-10 min-h-screen pt-20 lg:pl-72">
                 <div className="p-6 lg:p-8">
                     <div className="max-w-7xl mx-auto space-y-6">
