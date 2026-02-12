@@ -23,6 +23,7 @@ import {
     CheckCircle,
     XCircle
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface AnalyticsSummary {
     totalLeads: number;
@@ -149,7 +150,7 @@ export default function AnalyticsDashboard() {
     const getStatusColor = (status: string): string => {
         const colors: Record<string, string> = {
             new: 'bg-blue-100 text-blue-800 border-blue-300',
-            contacted: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+            contacted: 'bg-amber-100 text-amber-800 border-amber-300',
             quoted: 'bg-purple-100 text-purple-800 border-purple-300',
             booked: 'bg-green-100 text-green-800 border-green-300',
             lost: 'bg-red-100 text-red-800 border-red-300'
@@ -169,10 +170,12 @@ export default function AnalyticsDashboard() {
 
     return (
         <div className="space-y-6">
-            {/* Header */}
+            {/* Header with Controls */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                        Analytics Dashboard
+                    </h1>
                     <p className="text-gray-600">Track performance and optimize conversions</p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -183,8 +186,8 @@ export default function AnalyticsDashboard() {
                             setTimeRange(range);
                         }}
                     >
-                        <SelectTrigger className="w-40">
-                            <Calendar className="h-4 w-4 mr-2" />
+                        <SelectTrigger className="w-40 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl">
+                            <Calendar className="h-4 w-4 mr-2 text-gray-500" />
                             <SelectValue placeholder="Select range" />
                         </SelectTrigger>
                         <SelectContent>
@@ -195,31 +198,47 @@ export default function AnalyticsDashboard() {
                             ))}
                         </SelectContent>
                     </Select>
-                    <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
-                        <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                    <Button
+                        variant="outline"
+                        onClick={handleRefresh}
+                        disabled={isLoading}
+                        className="border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600 rounded-xl"
+                    >
+                        <RefreshCw className={cn("h-4 w-4 mr-2", isLoading && "animate-spin")} />
                         Refresh
                     </Button>
-                    <Button variant="outline" onClick={handleExport} disabled={isLoading || !summary}>
+                    <Button
+                        variant="outline"
+                        onClick={handleExport}
+                        disabled={isLoading || !summary}
+                        className="border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600 rounded-xl"
+                    >
                         <Download className="h-4 w-4 mr-2" />
                         Export
                     </Button>
                 </div>
             </div>
 
-            {/* Error Alert */}
+            {/* Error Alert - Glass style */}
             {error && (
-                <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription className="flex justify-between items-center">
-                        <span>{error}</span>
+                <Alert variant="destructive" className="border-red-200 bg-red-50/80 backdrop-blur-sm rounded-xl">
+                    <AlertCircle className="h-4 w-4 text-red-600" />
+                    <AlertDescription className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <span className="text-red-800">{error}</span>
                         <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={handleRefresh}>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleRefresh}
+                                className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 rounded-lg"
+                            >
                                 Try Again
                             </Button>
                             <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => window.location.reload()}
+                                className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 rounded-lg"
                             >
                                 Refresh Page
                             </Button>
@@ -228,36 +247,36 @@ export default function AnalyticsDashboard() {
                 </Alert>
             )}
 
-            {/* Stats Cards */}
+            {/* Stats Cards - Glass */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {isLoading ? (
                     Array(4).fill(0).map((_, i) => (
-                        <Card key={i}>
+                        <Card key={i} className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
                             <CardContent className="pt-6">
-                                <Skeleton className="h-24 w-full" />
+                                <Skeleton className="h-24 w-full rounded-xl" />
                             </CardContent>
                         </Card>
                     ))
                 ) : summary ? (
                     <>
-                        <Card>
+                        <Card className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md hover:shadow-lg transition-all">
                             <CardContent className="pt-6">
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-medium text-gray-600">Total Leads</p>
-                                        <p className="text-2xl font-bold">{summary.totalLeads}</p>
-                                        <div className="flex items-center mt-1">
+                                        <p className="text-3xl font-bold text-gray-900 mt-1">{summary.totalLeads}</p>
+                                        <div className="flex items-center mt-2">
                                             {summary.trend.length >= 2 ? (
                                                 parseInt(summary.trend[summary.trend.length - 1]?.count || '0') >
                                                     parseInt(summary.trend[summary.trend.length - 2]?.count || '0') ? (
                                                     <>
-                                                        <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-                                                        <span className="text-sm text-green-600">Growing</span>
+                                                        <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
+                                                        <span className="text-sm font-medium text-green-600">Growing</span>
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <TrendingDown className="h-4 w-4 text-red-500 mr-1" />
-                                                        <span className="text-sm text-red-600">Declining</span>
+                                                        <TrendingDown className="h-4 w-4 text-red-600 mr-1" />
+                                                        <span className="text-sm font-medium text-red-600">Declining</span>
                                                     </>
                                                 )
                                             ) : (
@@ -267,68 +286,43 @@ export default function AnalyticsDashboard() {
                                             )}
                                         </div>
                                     </div>
-                                    <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                        <Users className="h-6 w-6 text-blue-600" />
+                                    <div className="h-14 w-14 rounded-xl bg-linear-to-br from-blue-500/10 to-blue-600/10 flex items-center justify-center border border-blue-200/50">
+                                        <Users className="h-7 w-7 text-blue-600" />
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card>
+                        <Card className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md hover:shadow-lg transition-all">
                             <CardContent className="pt-6">
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-medium text-gray-600">Conversion Rate</p>
-                                        <p className="text-2xl font-bold">{summary.conversionRate}%</p>
-                                        <p className="text-sm text-gray-500 mt-1">
+                                        <p className="text-3xl font-bold text-gray-900 mt-1">{summary.conversionRate}%</p>
+                                        <p className="text-xs text-gray-500 mt-2">
                                             {summary.totalBooked} booked / {summary.totalLeads} total
                                         </p>
                                     </div>
-                                    <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                        <Target className="h-6 w-6 text-green-600" />
+                                    <div className="h-14 w-14 rounded-xl bg-linear-to-br from-green-500/10 to-green-600/10 flex items-center justify-center border border-green-200/50">
+                                        <Target className="h-7 w-7 text-green-600" />
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
-
-                        {/* <Card>
-                            <CardContent className="pt-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-600">Avg. Response Time</p>
-                                        <p className="text-2xl font-bold">{summary.avgResponseTime}h</p>
-                                        <p className="text-sm text-gray-500 mt-1">Time to first contact</p>
-                                    </div>
-                                    <div className="h-12 w-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                                        <Clock className="h-6 w-6 text-yellow-600" />
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card> */}
-
-                        {/* <Card>
-                            <CardContent className="pt-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-600">Avg. Deal Size</p>
-                                        <p className="text-2xl font-bold">${summary.avgDealSize.toLocaleString()}</p>
-                                        <p className="text-sm text-gray-500 mt-1">Projected revenue per booking</p>
-                                    </div>
-                                    <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                                        <DollarSign className="h-6 w-6 text-purple-600" />
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card> */}
                     </>
                 ) : (
-                    // No data state
-                    <Card className="col-span-4">
+                    // No data state - Full width glass card
+                    <Card className="col-span-2 border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
                         <CardContent className="pt-6 text-center py-12">
-                            <BarChart3 className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">No analytics data yet</h3>
-                            <p className="text-gray-600">Start capturing leads to see your analytics dashboard in action.</p>
-                            <Button className="mt-4" onClick={() => window.open('/dashboard/leads', '_blank')}>
+                            <div className="mx-auto w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+                                <BarChart3 className="h-10 w-10 text-blue-600" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">No analytics data yet</h3>
+                            <p className="text-gray-600 mb-6">Start capturing leads to see your analytics dashboard in action.</p>
+                            <Button
+                                onClick={() => window.open('/dashboard/leads', '_blank')}
+                                className="bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-600/20 rounded-xl"
+                            >
                                 <Users className="h-4 w-4 mr-2" />
                                 View Leads
                             </Button>
@@ -341,50 +335,73 @@ export default function AnalyticsDashboard() {
             {!isLoading && !error && summary && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Lead Status Overview */}
-                    <Card className="lg:col-span-2">
+                    <Card className="lg:col-span-2 border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
                         <CardHeader>
-                            <CardTitle>Lead Status Overview</CardTitle>
-                            <CardDescription>Distribution of leads across your pipeline</CardDescription>
+                            <CardTitle className="text-xl font-semibold text-gray-900">Lead Status Overview</CardTitle>
+                            <CardDescription className="text-gray-600">
+                                Distribution of leads across your pipeline
+                            </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="space-y-4">
+                            <div className="space-y-5">
                                 {summary.statusBreakdown.length > 0 ? (
                                     summary.statusBreakdown.map((status) => (
                                         <div key={status.status} className="space-y-2">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center space-x-3">
-                                                    <div className={`h-8 w-8 rounded-full flex items-center justify-center ${getStatusColor(status.status).split(' ')[0]}`}>
+                                                    <div className={cn(
+                                                        "h-9 w-9 rounded-full flex items-center justify-center border",
+                                                        getStatusColor(status.status).split(' ')[0],
+                                                        getStatusColor(status.status).split(' ')[1],
+                                                        getStatusColor(status.status).split(' ')[2]
+                                                    )}>
                                                         {getStatusIcon(status.status)}
                                                     </div>
                                                     <div>
-                                                        <span className="font-medium capitalize">{status.status}</span>
+                                                        <span className="font-medium text-gray-900 capitalize">{status.status}</span>
                                                         <p className="text-sm text-gray-500">
                                                             {parseInt(status.count)} lead{parseInt(status.count) !== 1 ? 's' : ''}
                                                         </p>
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
-                                                    <span className="font-bold text-lg">{parseInt(status.count)}</span>
+                                                    <span className="font-bold text-lg text-gray-900">{parseInt(status.count)}</span>
                                                     <p className="text-sm text-gray-500">
                                                         {Math.round((parseInt(status.count) / summary.totalLeads) * 100)}%
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                            <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
                                                 <div
                                                     className="h-full rounded-full transition-all duration-500"
                                                     style={{
                                                         width: `${(parseInt(status.count) / summary.totalLeads) * 100}%`,
-                                                        backgroundColor: getStatusColor(status.status).split(' ')[0].replace('bg-', '').split('-')[0]
+                                                        backgroundColor: getStatusColor(status.status).split(' ')[0]
+                                                            .replace('bg-', '')
+                                                            .split('-')[0] === 'blue' ? '#3b82f6' :
+                                                            getStatusColor(status.status).split(' ')[0]
+                                                                .replace('bg-', '')
+                                                                .split('-')[0] === 'amber' ? '#f59e0b' :
+                                                                getStatusColor(status.status).split(' ')[0]
+                                                                    .replace('bg-', '')
+                                                                    .split('-')[0] === 'purple' ? '#8b5cf6' :
+                                                                    getStatusColor(status.status).split(' ')[0]
+                                                                        .replace('bg-', '')
+                                                                        .split('-')[0] === 'green' ? '#10b981' :
+                                                                        getStatusColor(status.status).split(' ')[0]
+                                                                            .replace('bg-', '')
+                                                                            .split('-')[0] === 'red' ? '#ef4444' : '#9ca3af'
                                                     }}
                                                 />
                                             </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="text-center py-8 text-gray-500">
-                                        <PieChart className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                                        <p>No status data available</p>
+                                    <div className="text-center py-8">
+                                        <div className="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                                            <PieChart className="h-8 w-8 text-gray-400" />
+                                        </div>
+                                        <p className="text-gray-600">No status data available</p>
                                     </div>
                                 )}
                             </div>
@@ -392,15 +409,20 @@ export default function AnalyticsDashboard() {
                     </Card>
 
                     {/* Quick Insights */}
-                    <Card>
+                    <Card className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
                         <CardHeader>
-                            <CardTitle>Quick Insights</CardTitle>
-                            <CardDescription>Key performance indicators</CardDescription>
+                            <CardTitle className="text-xl font-semibold text-gray-900">Quick Insights</CardTitle>
+                            <CardDescription className="text-gray-600">
+                                Key performance indicators
+                            </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                                <div className="flex items-center">
-                                    <Users className="h-5 w-5 text-blue-600 mr-3" />
+                        <CardContent className="space-y-5">
+                            {/* Lead Volume */}
+                            <div className="p-5 bg-linear-to-br from-blue-50 to-white border border-blue-100 rounded-xl">
+                                <div className="flex items-start">
+                                    <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center mr-3 shrink-0">
+                                        <Users className="h-5 w-5 text-blue-600" />
+                                    </div>
                                     <div>
                                         <p className="text-sm font-medium text-blue-900">Lead Volume</p>
                                         <p className="text-2xl font-bold text-blue-600 mt-1">
@@ -413,17 +435,26 @@ export default function AnalyticsDashboard() {
                                 </div>
                             </div>
 
-                            <div className="p-4 bg-green-50 rounded-lg border border-green-100">
-                                <div className="flex items-center">
-                                    <Target className="h-5 w-5 text-green-600 mr-3" />
+                            {/* Conversion Health */}
+                            <div className="p-5 bg-linear-to-br from-green-50 to-white border border-green-100 rounded-xl">
+                                <div className="flex items-start">
+                                    <div className="h-10 w-10 rounded-lg bg-green-100 flex items-center justify-center mr-3 shrink-0">
+                                        <Target className="h-5 w-5 text-green-600" />
+                                    </div>
                                     <div>
                                         <p className="text-sm font-medium text-green-900">Conversion Health</p>
-                                        <p className={`text-2xl font-bold mt-1 ${summary.conversionRate > 20 ? 'text-green-600' :
-                                            summary.conversionRate > 10 ? 'text-yellow-600' : 'text-red-600'
-                                            }`}>
+                                        <p className={cn(
+                                            "text-2xl font-bold mt-1",
+                                            summary.conversionRate > 20 ? 'text-green-600' :
+                                                summary.conversionRate > 10 ? 'text-amber-600' : 'text-red-600'
+                                        )}>
                                             {summary.conversionRate}%
                                         </p>
-                                        <p className="text-xs text-green-700 mt-1">
+                                        <p className="text-xs mt-1"
+                                            style={{
+                                                color: summary.conversionRate > 20 ? '#059669' :
+                                                    summary.conversionRate > 10 ? '#d97706' : '#dc2626'
+                                            }}>
                                             {summary.conversionRate > 20 ? 'Excellent' :
                                                 summary.conversionRate > 10 ? 'Good' : 'Needs improvement'}
                                         </p>
@@ -431,36 +462,19 @@ export default function AnalyticsDashboard() {
                                 </div>
                             </div>
 
-                            {/* <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
-                                <div className="flex items-center">
-                                    <Clock className="h-5 w-5 text-purple-600 mr-3" />
-                                    <div>
-                                        <p className="text-sm font-medium text-purple-900">Response Performance</p>
-                                        <p className={`text-2xl font-bold mt-1 ${summary.avgResponseTime <= 4 ? 'text-green-600' :
-                                            summary.avgResponseTime <= 8 ? 'text-yellow-600' : 'text-red-600'
-                                            }`}>
-                                            {summary.avgResponseTime}h
-                                        </p>
-                                        <p className="text-xs text-purple-700 mt-1">
-                                            {summary.avgResponseTime <= 4 ? 'Fast response' :
-                                                summary.avgResponseTime <= 8 ? 'Average' : 'Needs attention'}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div> */}
-
                             {/* Trend Summary */}
-                            <div className="pt-4 border-t">
-                                <h4 className="font-medium mb-3">Trend Summary</h4>
+                            <div className="pt-3 border-t border-gray-200">
+                                <h4 className="font-semibold text-gray-900 mb-3">Recent Activity</h4>
                                 <div className="space-y-2">
                                     {summary.trend && summary.trend.length > 0 ? (
-                                        <div className="text-sm text-gray-600">
-                                            <p>Your lead activity over time:</p>
-                                            <ul className="mt-2 space-y-1">
+                                        <div className="text-sm">
+                                            <ul className="space-y-2">
                                                 {summary.trend.slice(-3).map((item, index) => (
-                                                    <li key={index} className="flex justify-between">
-                                                        <span>{new Date(item.date).toLocaleDateString()}</span>
-                                                        <span className="font-medium">{item.count} lead{parseInt(item.count) !== 1 ? 's' : ''}</span>
+                                                    <li key={index} className="flex justify-between items-center p-2 bg-gray-50/50 rounded-lg">
+                                                        <span className="text-gray-700">
+                                                            {new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                                        </span>
+                                                        <span className="font-medium text-gray-900">{item.count} lead{parseInt(item.count) !== 1 ? 's' : ''}</span>
                                                     </li>
                                                 ))}
                                             </ul>

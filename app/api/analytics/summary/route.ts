@@ -49,12 +49,12 @@ export async function GET(request: NextRequest) {
     const { rows: responseData } = await query<{ avg_hours: number }>(
       `SELECT
                 AVG(
-                    EXTRACT(EPOCH FROM (updated_at - created_at)) / 3600
+                    EXTRACT(EPOCH FROM (last_contacted_at - created_at)) / 3600
                 ) as avg_hours
              FROM leads
              WHERE business_id = $1
                 AND status IN ('contacted', 'quoted', 'booked')
-                AND updated_at > created_at`,
+                AND last_contacted_at > created_at`,
       [businessId],
     );
 
