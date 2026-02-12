@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Save, Mail, Clock, Eye } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { cn } from "@/lib/utils";
 
 interface EmailTemplate {
     id: string;
@@ -318,21 +319,32 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
     };
 
     return (
-        <Card>
+        <Card className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
             <CardHeader>
-                <CardTitle>Email & Automation Settings</CardTitle>
-                <CardDescription>
+                <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-900">
+                    <div className="h-8 w-8 rounded-lg bg-linear-to-br from-blue-500/10 to-blue-600/10 flex items-center justify-center border border-blue-200/50">
+                        <Mail className="h-4 w-4 text-blue-600" />
+                    </div>
+                    Email & Automation Settings
+                </CardTitle>
+                <CardDescription className="text-gray-600">
                     Configure email templates and automated follow-ups
                 </CardDescription>
             </CardHeader>
             <CardContent>
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
-                    <TabsList className="grid grid-cols-2 mb-6">
-                        <TabsTrigger value="templates">
+                    <TabsList className="grid grid-cols-2 mb-6 p-1 bg-gray-100/80 rounded-xl">
+                        <TabsTrigger
+                            value="templates"
+                            className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg"
+                        >
                             <Mail className="h-4 w-4 mr-2" />
                             Email Templates
                         </TabsTrigger>
-                        <TabsTrigger value="schedules">
+                        <TabsTrigger
+                            value="schedules"
+                            className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg"
+                        >
                             <Clock className="h-4 w-4 mr-2" />
                             Follow-up Schedules
                         </TabsTrigger>
@@ -341,28 +353,29 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                     {/* Email Templates Tab */}
                     <TabsContent value="templates" className="space-y-6">
                         <div className="space-y-4">
-                            <h3 className="text-lg font-medium">Create New Template</h3>
+                            <h3 className="text-lg font-semibold text-gray-900">Create New Template</h3>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="templateName">Template Name</Label>
+                                    <Label htmlFor="templateName" className="text-gray-700">Template Name</Label>
                                     <Input
                                         id="templateName"
                                         placeholder="e.g., Lead Confirmation"
                                         value={newTemplate.name}
                                         onChange={(e) => setNewTemplate({ ...newTemplate, name: e.target.value })}
+                                        className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="templateType">Type</Label>
+                                    <Label htmlFor="templateType" className="text-gray-700">Type</Label>
                                     <Select
                                         value={newTemplate.type}
                                         onValueChange={(value) =>
                                             setNewTemplate({ ...newTemplate, type: value })
                                         }
                                     >
-                                        <SelectTrigger>
+                                        <SelectTrigger className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl">
                                             <SelectValue placeholder="Select template type" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -373,11 +386,10 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                             ))}
                                         </SelectContent>
                                     </Select>
-
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="triggerEvent">Trigger Event (Optional)</Label>
+                                    <Label htmlFor="triggerEvent" className="text-gray-700">Trigger Event (Optional)</Label>
                                     <Select
                                         value={newTemplate.trigger_event ?? "__none__"}
                                         onValueChange={(value) =>
@@ -387,14 +399,13 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                             })
                                         }
                                     >
-                                        <SelectTrigger>
+                                        <SelectTrigger className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl">
                                             <SelectValue placeholder="Select trigger event" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="__none__">
                                                 No specific trigger
                                             </SelectItem>
-
                                             {TRIGGER_EVENTS.map((event) => (
                                                 <SelectItem key={event.value} value={event.value}>
                                                     {event.label}
@@ -404,49 +415,55 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                     </Select>
                                 </div>
 
-
                                 <div className="space-y-2">
-                                    <Label htmlFor="daysAfter">Days After Trigger</Label>
+                                    <Label htmlFor="daysAfter" className="text-gray-700">Days After Trigger</Label>
                                     <Input
                                         id="daysAfter"
                                         type="number"
                                         min="0"
                                         value={newTemplate.days_after_trigger}
                                         onChange={(e) => setNewTemplate({ ...newTemplate, days_after_trigger: parseInt(e.target.value) || 0 })}
+                                        className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                     />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="templateSubject">Email Subject</Label>
+                                <Label htmlFor="templateSubject" className="text-gray-700">Email Subject</Label>
                                 <Input
                                     id="templateSubject"
                                     placeholder="Use {{variables}} for dynamic content"
                                     value={newTemplate.subject}
                                     onChange={(e) => setNewTemplate({ ...newTemplate, subject: e.target.value })}
+                                    className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="templateBody">Email Body</Label>
+                                <Label htmlFor="templateBody" className="text-gray-700">Email Body</Label>
                                 <Textarea
                                     id="templateBody"
                                     placeholder="Write your email content here. Use {{variables}} for dynamic content."
                                     rows={8}
                                     value={newTemplate.body}
                                     onChange={(e) => setNewTemplate({ ...newTemplate, body: e.target.value })}
-                                    className="font-mono text-sm"
+                                    className="font-mono text-sm border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <Label>Available Variables</Label>
-                                <div className="flex flex-wrap gap-2">
+                                <Label className="text-gray-700">Available Variables</Label>
+                                <div className="flex flex-wrap gap-2 p-3 bg-gray-50/50 border border-gray-200 rounded-xl">
                                     {VARIABLES.map(variable => (
                                         <Badge
                                             key={variable.key}
                                             variant={newTemplate.variables?.includes(variable.key) ? "default" : "outline"}
-                                            className="cursor-pointer"
+                                            className={cn(
+                                                "cursor-pointer px-3 py-1.5 rounded-full text-xs font-medium transition-all",
+                                                newTemplate.variables?.includes(variable.key)
+                                                    ? "bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200"
+                                                    : "bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:text-blue-600"
+                                            )}
                                             onClick={() =>
                                                 newTemplate.variables?.includes(variable.key)
                                                     ? removeVariable(variable.key)
@@ -455,71 +472,91 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                         >
                                             {variable.key}
                                             {newTemplate.variables?.includes(variable.key) && (
-                                                <span className="ml-1"> ✓</span>
+                                                <span className="ml-1">✓</span>
                                             )}
                                         </Badge>
                                     ))}
                                 </div>
-                                <p className="text-sm text-gray-500">
+                                <p className="text-xs text-gray-500">
                                     Click on variables to add them to your template. They will be replaced with actual data when sent.
                                 </p>
                             </div>
 
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between pt-2">
                                 <div className="flex items-center space-x-2">
                                     <Switch
                                         checked={newTemplate.is_active}
                                         onCheckedChange={(checked) => setNewTemplate({ ...newTemplate, is_active: checked })}
+                                        className="data-[state=checked]:bg-blue-600"
                                     />
-                                    <Label>Active</Label>
+                                    <Label className="text-gray-700">Active</Label>
                                 </div>
-                                <Button onClick={saveTemplate} disabled={isLoading}>
+                                <Button
+                                    onClick={saveTemplate}
+                                    disabled={isLoading}
+                                    className="bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-600/20 rounded-xl"
+                                >
                                     <Save className="h-4 w-4 mr-2" />
                                     Save Template
                                 </Button>
                             </div>
                         </div>
 
-                        <Separator />
+                        <Separator className="bg-gray-200" />
 
                         <div className="space-y-4">
-                            <h3 className="text-lg font-medium">Existing Templates ({templates.length})</h3>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                Existing Templates ({templates.length})
+                            </h3>
 
                             {templates.length === 0 ? (
-                                <div className="text-center py-8 border-2 border-dashed rounded-lg">
+                                <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/30">
                                     <Mail className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                                    <p className="text-gray-500">No email templates created yet</p>
+                                    <p className="text-gray-600">No email templates created yet</p>
                                 </div>
                             ) : (
                                 <div className="space-y-3">
                                     {templates.map(template => (
-                                        <div key={template.id} className="p-4 border rounded-lg">
-                                            <div className="flex items-start justify-between">
+                                        <div key={template.id} className="p-5 border border-gray-200 rounded-xl hover:shadow-md transition-all">
+                                            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                                                 <div className="flex-1">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <Badge>{template.type}</Badge>
+                                                    <div className="flex flex-wrap items-center gap-2 mb-3">
+                                                        <Badge className="bg-blue-100 text-blue-800 border-blue-200 rounded-full">
+                                                            {template.type}
+                                                        </Badge>
                                                         {template.trigger_event && (
-                                                            <Badge variant="outline">{template.trigger_event}</Badge>
+                                                            <Badge variant="outline" className="border-gray-300 text-gray-700 rounded-full">
+                                                                {template.trigger_event}
+                                                            </Badge>
                                                         )}
-                                                        <Badge variant={template.is_active ? "default" : "secondary"}>
+                                                        <Badge
+                                                            variant={template.is_active ? "default" : "secondary"}
+                                                            className={cn(
+                                                                "rounded-full",
+                                                                template.is_active
+                                                                    ? "bg-green-100 text-green-800 border-green-200"
+                                                                    : "bg-gray-100 text-gray-800 border-gray-200"
+                                                            )}
+                                                        >
                                                             {template.is_active ? 'Active' : 'Inactive'}
                                                         </Badge>
                                                     </div>
-                                                    <h4 className="font-medium">{template.name}</h4>
+                                                    <h4 className="font-semibold text-gray-900">{template.name}</h4>
                                                     <p className="text-sm text-gray-600 mt-1">{template.subject}</p>
                                                     <div className="flex flex-wrap gap-1 mt-2">
                                                         {template.variables.map(variable => (
-                                                            <span key={variable} className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
+                                                            <span key={variable} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
                                                                 {variable}
                                                             </span>
                                                         ))}
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-2 ml-4">
+                                                <div className="flex items-center gap-2">
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => testTemplate(template.id)}
+                                                        className="text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
                                                     >
                                                         <Eye className="h-4 w-4" />
                                                     </Button>
@@ -527,6 +564,12 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => toggleTemplateStatus(template.id, template.is_active)}
+                                                        className={cn(
+                                                            "rounded-lg",
+                                                            template.is_active
+                                                                ? "text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                                                                : "text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                        )}
                                                     >
                                                         {template.is_active ? 'Deactivate' : 'Activate'}
                                                     </Button>
@@ -542,32 +585,34 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                     {/* Follow-up Schedules Tab */}
                     <TabsContent value="schedules" className="space-y-6">
                         <div className="space-y-4">
-                            <h3 className="text-lg font-medium">Create New Follow-up Schedule</h3>
+                            <h3 className="text-lg font-semibold text-gray-900">Create New Follow-up Schedule</h3>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="scheduleName">Schedule Name</Label>
+                                    <Label htmlFor="scheduleName" className="text-gray-700">Schedule Name</Label>
                                     <Input
                                         id="scheduleName"
                                         placeholder="e.g., 7-Day Follow-up"
                                         value={newSchedule.name}
                                         onChange={(e) => setNewSchedule({ ...newSchedule, name: e.target.value })}
+                                        className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="delayDays">Delay (Days)</Label>
+                                    <Label htmlFor="delayDays" className="text-gray-700">Delay (Days)</Label>
                                     <Input
                                         id="delayDays"
                                         type="number"
                                         min="0"
                                         value={newSchedule.delay_days}
                                         onChange={(e) => setNewSchedule({ ...newSchedule, delay_days: parseInt(e.target.value) || 0 })}
+                                        className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="delayHours">Delay (Hours)</Label>
+                                    <Label htmlFor="delayHours" className="text-gray-700">Delay (Hours)</Label>
                                     <Input
                                         id="delayHours"
                                         type="number"
@@ -575,72 +620,90 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                         max="23"
                                         value={newSchedule.delay_hours}
                                         onChange={(e) => setNewSchedule({ ...newSchedule, delay_hours: parseInt(e.target.value) || 0 })}
+                                        className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label>Trigger Conditions</Label>
-                                    <div className="text-sm text-gray-500">
+                                    <Label className="text-gray-700">Trigger Conditions</Label>
+                                    <div className="text-sm text-gray-600 p-2 bg-gray-50/50 border border-gray-200 rounded-xl">
                                         Will trigger when lead matches status, priority, and days without contact
                                     </div>
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="scheduleDescription">Description</Label>
+                                <Label htmlFor="scheduleDescription" className="text-gray-700">Description</Label>
                                 <Textarea
                                     id="scheduleDescription"
                                     placeholder="Describe when this follow-up should trigger"
                                     rows={3}
                                     value={newSchedule.description}
                                     onChange={(e) => setNewSchedule({ ...newSchedule, description: e.target.value })}
+                                    className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                 />
                             </div>
 
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between pt-2">
                                 <div className="flex items-center space-x-2">
                                     <Switch
                                         checked={newSchedule.is_active}
                                         onCheckedChange={(checked) => setNewSchedule({ ...newSchedule, is_active: checked })}
+                                        className="data-[state=checked]:bg-blue-600"
                                     />
-                                    <Label>Active</Label>
+                                    <Label className="text-gray-700">Active</Label>
                                 </div>
-                                <Button onClick={saveSchedule} disabled={isLoading}>
+                                <Button
+                                    onClick={saveSchedule}
+                                    disabled={isLoading}
+                                    className="bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-600/20 rounded-xl"
+                                >
                                     <Save className="h-4 w-4 mr-2" />
                                     Save Schedule
                                 </Button>
                             </div>
                         </div>
 
-                        <Separator />
+                        <Separator className="bg-gray-200" />
 
                         <div className="space-y-4">
-                            <h3 className="text-lg font-medium">Active Schedules ({schedules.filter(s => s.is_active).length})</h3>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                Active Schedules ({schedules.filter(s => s.is_active).length})
+                            </h3>
 
                             {schedules.length === 0 ? (
-                                <div className="text-center py-8 border-2 border-dashed rounded-lg">
+                                <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/30">
                                     <Clock className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                                    <p className="text-gray-500">No follow-up schedules created yet</p>
+                                    <p className="text-gray-600">No follow-up schedules created yet</p>
                                 </div>
                             ) : (
                                 <div className="space-y-3">
                                     {schedules.map(schedule => (
-                                        <div key={schedule.id} className="p-4 border rounded-lg">
-                                            <div className="flex items-start justify-between">
+                                        <div key={schedule.id} className="p-5 border border-gray-200 rounded-xl hover:shadow-md transition-all">
+                                            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                                                 <div className="flex-1">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <Badge variant={schedule.is_active ? "default" : "secondary"}>
+                                                    <div className="flex flex-wrap items-center gap-2 mb-3">
+                                                        <Badge
+                                                            variant={schedule.is_active ? "default" : "secondary"}
+                                                            className={cn(
+                                                                "rounded-full",
+                                                                schedule.is_active
+                                                                    ? "bg-green-100 text-green-800 border-green-200"
+                                                                    : "bg-gray-100 text-gray-800 border-gray-200"
+                                                            )}
+                                                        >
                                                             {schedule.is_active ? 'Active' : 'Inactive'}
                                                         </Badge>
-                                                        <Badge variant="outline">
-                                                            After {schedule.delay_days} days
+                                                        <Badge variant="outline" className="border-gray-300 text-gray-700 rounded-full">
+                                                            After {schedule.delay_days} day{schedule.delay_days !== 1 ? 's' : ''}
+                                                            {schedule.delay_hours > 0 && `, ${schedule.delay_hours} hour${schedule.delay_hours !== 1 ? 's' : ''}`}
                                                         </Badge>
                                                     </div>
-                                                    <h4 className="font-medium">{schedule.name}</h4>
+                                                    <h4 className="font-semibold text-gray-900">{schedule.name}</h4>
                                                     <p className="text-sm text-gray-600 mt-1">{schedule.description}</p>
-                                                    <div className="mt-2 text-sm">
-                                                        <div className="font-medium">Triggers:</div>
-                                                        <div className="text-gray-600">
+                                                    <div className="mt-3 text-sm bg-gray-50/50 p-3 border border-gray-200 rounded-xl">
+                                                        <span className="font-medium text-gray-900">Triggers:</span>{' '}
+                                                        <span className="text-gray-700">
                                                             Status: {Array.isArray(schedule.trigger_condition?.status)
                                                                 ? schedule.trigger_condition.status.join(', ')
                                                                 : 'Any'},
@@ -648,14 +711,20 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                                                 ? schedule.trigger_condition.priority.join(', ')
                                                                 : 'Any'},
                                                             After {schedule.trigger_condition?.days_without_contact || 0} days without contact
-                                                        </div>
+                                                        </span>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-2 ml-4">
+                                                <div className="flex items-center gap-2">
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => toggleScheduleStatus(schedule.id, schedule.is_active)}
+                                                        className={cn(
+                                                            "rounded-lg",
+                                                            schedule.is_active
+                                                                ? "text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                                                                : "text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                        )}
                                                     >
                                                         {schedule.is_active ? 'Deactivate' : 'Activate'}
                                                     </Button>

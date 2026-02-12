@@ -413,7 +413,7 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
                                                         </AvatarFallback>
                                                     </Avatar>
                                                     <div className="flex-1">
-                                                        <div className="flex items-center justify-between">
+                                                        <div className="flex gap-1.25 items-center justify-between">
                                                             <span className="font-medium text-gray-900">
                                                                 {note.user_id ? "You" : "System"}
                                                             </span>

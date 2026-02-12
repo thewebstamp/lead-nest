@@ -39,7 +39,6 @@ export default function QualificationRules({
     initialRules,
     initialThresholds,
 }: QualificationRulesProps) {
-    // ✅ FIX: remove impossible empty-string comparison
     const safeRules = (initialRules || []).filter(
         (rule) => rule.field && rule.condition,
     );
@@ -48,7 +47,6 @@ export default function QualificationRules({
     const [thresholds, setThresholds] = useState(initialThresholds);
     const [isLoading, setIsLoading] = useState(false);
 
-    // New rule form
     const [newRule, setNewRule] = useState<Omit<QualificationRule, "id">>({
         field: "serviceType",
         condition: "contains",
@@ -74,7 +72,6 @@ export default function QualificationRules({
 
         setRules([...rules, rule]);
 
-        // Reset form
         setNewRule({
             field: "serviceType",
             condition: "contains",
@@ -124,7 +121,6 @@ export default function QualificationRules({
         }
     };
 
-    // ✅ FIX: typed options
     const fieldOptions: {
         value: QualificationRule["field"];
         label: string;
@@ -167,10 +163,12 @@ export default function QualificationRules({
     };
 
     return (
-        <Card>
+        <Card className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
             <CardHeader>
-                <CardTitle>Lead Qualification Rules</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-xl font-semibold text-gray-900">
+                    Lead Qualification Rules
+                </CardTitle>
+                <CardDescription className="text-gray-600">
                     Define rules to automatically score and prioritize incoming leads
                 </CardDescription>
             </CardHeader>
@@ -178,11 +176,11 @@ export default function QualificationRules({
             <CardContent className="space-y-6">
                 {/* Priority Thresholds */}
                 <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Priority Thresholds</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Priority Thresholds</h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
-                            <Label>High Priority Score</Label>
+                            <Label className="text-gray-700">High Priority Score</Label>
                             <Input
                                 type="number"
                                 value={thresholds.high}
@@ -192,11 +190,12 @@ export default function QualificationRules({
                                         high: parseInt(e.target.value) || 80,
                                     })
                                 }
+                                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Medium Priority Score</Label>
+                            <Label className="text-gray-700">Medium Priority Score</Label>
                             <Input
                                 type="number"
                                 value={thresholds.medium}
@@ -206,37 +205,38 @@ export default function QualificationRules({
                                         medium: parseInt(e.target.value) || 60,
                                     })
                                 }
+                                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Low Priority</Label>
-                            <div className="p-2 border rounded text-center">
+                            <Label className="text-gray-700">Low Priority</Label>
+                            <div className="h-10 px-3 py-2 border border-gray-200 rounded-xl bg-gray-50/50 text-gray-700 text-sm flex items-center">
                                 &lt; {thresholds.medium}
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <Separator />
+                <Separator className="bg-gray-200" />
 
                 {/* Add Rule */}
                 <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Add New Rule</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Add New Rule</h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                         <div>
-                            <Label>Field</Label>
+                            <Label className="text-gray-700">Field</Label>
                             <Select
                                 value={newRule.field}
                                 onValueChange={(value) =>
                                     setNewRule({
                                         ...newRule,
-                                        field: value as QualificationRule["field"], // ✅ FIX
+                                        field: value as QualificationRule["field"],
                                     })
                                 }
                             >
-                                <SelectTrigger>
+                                <SelectTrigger className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -250,17 +250,17 @@ export default function QualificationRules({
                         </div>
 
                         <div>
-                            <Label>Condition</Label>
+                            <Label className="text-gray-700">Condition</Label>
                             <Select
                                 value={newRule.condition}
                                 onValueChange={(value) =>
                                     setNewRule({
                                         ...newRule,
-                                        condition: value as QualificationRule["condition"], // ✅ FIX
+                                        condition: value as QualificationRule["condition"],
                                     })
                                 }
                             >
-                                <SelectTrigger>
+                                <SelectTrigger className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -274,18 +274,19 @@ export default function QualificationRules({
                         </div>
 
                         <div>
-                            <Label>Value</Label>
+                            <Label className="text-gray-700">Value</Label>
                             <Input
                                 value={String(newRule.value)}
                                 placeholder={getFieldExample(newRule.field)}
                                 onChange={(e) =>
                                     setNewRule({ ...newRule, value: e.target.value })
                                 }
+                                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                             />
                         </div>
 
                         <div>
-                            <Label>Score</Label>
+                            <Label className="text-gray-700">Score</Label>
                             <Input
                                 type="number"
                                 value={newRule.score}
@@ -295,64 +296,88 @@ export default function QualificationRules({
                                         score: parseInt(e.target.value) || 0,
                                     })
                                 }
+                                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                             />
                         </div>
 
                         <div>
-                            <Label>Tag</Label>
+                            <Label className="text-gray-700">Tag (Optional)</Label>
                             <Input
                                 value={newRule.tag || ""}
                                 onChange={(e) =>
                                     setNewRule({ ...newRule, tag: e.target.value })
                                 }
+                                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                             />
                         </div>
                     </div>
 
                     <div className="flex justify-end">
-                        <Button onClick={addRule}>
+                        <Button
+                            onClick={addRule}
+                            className="bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-600/20 rounded-xl"
+                        >
                             <Plus className="mr-2 h-4 w-4" />
                             Add Rule
                         </Button>
                     </div>
                 </div>
 
-                <Separator />
+                <Separator className="bg-gray-200" />
 
                 {/* Existing Rules */}
                 <div className="space-y-4">
                     {rules.length === 0 ? (
-                        <div className="text-center py-8 border-dashed border rounded">
-                            <AlertCircle className="mx-auto mb-2 text-gray-400" />
-                            No rules defined
+                        <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/30">
+                            <AlertCircle className="mx-auto h-8 w-8 text-gray-400" />
+                            <p className="mt-2 text-sm text-gray-600">No rules defined</p>
                         </div>
                     ) : (
-                        rules.map((rule) => (
-                            <div
-                                key={rule.id}
-                                className="flex justify-between items-start p-4 border rounded"
-                            >
-                                <div>
-                                    <Badge>{rule.field}</Badge>{" "}
-                                    <Badge variant="secondary">{rule.condition}</Badge>{" "}
-                                    <span>{String(rule.value)}</span>
-                                    <div className="mt-1 text-sm">
-                                        Score: {rule.score} {rule.tag && `• Tag: ${rule.tag}`}
+                        <>
+                            <h3 className="text-lg font-semibold text-gray-900">Existing Rules ({rules.length})</h3>
+                            <div className="space-y-3">
+                                {rules.map((rule) => (
+                                    <div
+                                        key={rule.id}
+                                        className="flex items-start justify-between p-4 border border-gray-200 rounded-xl hover:shadow-md transition-all"
+                                    >
+                                        <div className="flex-1">
+                                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                                                <Badge className="bg-blue-100 text-blue-800 border-blue-200 rounded-full">
+                                                    {rule.field}
+                                                </Badge>
+                                                <Badge variant="secondary" className="bg-gray-100 text-gray-800 border-gray-200 rounded-full">
+                                                    {rule.condition}
+                                                </Badge>
+                                                <span className="text-sm font-medium text-gray-900">{String(rule.value)}</span>
+                                            </div>
+                                            <div className="text-sm text-gray-700">
+                                                Score: <span className="font-semibold text-blue-600">{rule.score}</span>
+                                                {rule.tag && (
+                                                    <span className="ml-2">• Tag: <span className="font-semibold">{rule.tag}</span></span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <Button
+                                            variant="ghost"
+                                            onClick={() => removeRule(rule.id)}
+                                            className="text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg ml-2"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
                                     </div>
-                                </div>
-                                <Button
-                                    variant="ghost"
-                                    onClick={() => removeRule(rule.id)}
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
+                                ))}
                             </div>
-                        ))
+                        </>
                     )}
                 </div>
 
                 <div className="flex justify-end pt-4">
-                    <Button onClick={saveRules} disabled={isLoading}>
+                    <Button
+                        onClick={saveRules}
+                        disabled={isLoading}
+                        className="bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-600/20 rounded-xl"
+                    >
                         <Save className="mr-2 h-4 w-4" />
                         Save Rules
                     </Button>

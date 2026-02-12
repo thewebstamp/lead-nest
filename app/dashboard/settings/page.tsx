@@ -58,7 +58,6 @@ export default async function SettingsPage() {
         <SettingsClient
             business={business}
             teamMembers={teamMembers}
-            // Provide a default value for role
             currentUserRole={session.user.role || "owner"}
         />
     );
