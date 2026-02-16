@@ -83,10 +83,10 @@ function ResetPasswordContent() {
     if (isValidating) {
         return (
             <div className="w-full max-w-md">
-                <div className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-xl p-8 shadow-xl">
+                <div className="rounded-2xl border border-white/10 bg-gray-900/30 backdrop-blur-xl p-8 shadow-2xl">
                     <div className="flex flex-col items-center justify-center py-8">
-                        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-                        <p className="mt-4 text-sm text-gray-600">Validating reset link...</p>
+                        <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
+                        <p className="mt-4 text-sm text-gray-300">Validating reset link...</p>
                     </div>
                 </div>
             </div>
@@ -96,15 +96,20 @@ function ResetPasswordContent() {
     if (!tokenValid) {
         return (
             <div className="w-full max-w-md">
-                <div className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-xl p-8 shadow-xl">
+                <div className="rounded-2xl border border-white/10 bg-gray-900/30 backdrop-blur-xl p-8 shadow-2xl">
                     <div className="text-center">
-                        <h1 className="text-2xl font-bold text-red-600">Invalid Reset Link</h1>
-                        <Alert variant="destructive" className="mt-4">
-                            <AlertDescription>{error || "This password reset link is invalid or has expired."}</AlertDescription>
+                        <h1 className="text-2xl font-bold text-red-400">Invalid Reset Link</h1>
+                        <Alert
+                            variant="destructive"
+                            className="mt-4 border-red-500/30 bg-red-500/10 text-red-200"
+                        >
+                            <AlertDescription>
+                                {error || "This password reset link is invalid or has expired."}
+                            </AlertDescription>
                         </Alert>
                         <div className="mt-6 space-y-3">
-                            <p className="text-sm text-gray-600">Please request a new reset link.</p>
-                            <Button asChild className="cursor-pointer w-full">
+                            <p className="text-sm text-gray-300">Please request a new reset link.</p>
+                            <Button asChild className="w-full">
                                 <Link href="/auth/forgot-password">Request new link</Link>
                             </Button>
                         </div>
@@ -116,39 +121,44 @@ function ResetPasswordContent() {
 
     return (
         <div className="w-full max-w-md">
-            <div className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-xl p-8 shadow-xl">
+            <div className="rounded-2xl border border-white/10 bg-gray-900/30 backdrop-blur-xl p-8 shadow-2xl">
                 <div className="mb-8 text-center">
-                    <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+                    <h1 className="text-3xl font-bold tracking-tight text-white">
                         Reset your password
                     </h1>
-                    <p className="mt-2 text-sm text-gray-600">
-                        Enter your new password for <span className="font-medium">{email}</span>
+                    <p className="mt-2 text-sm text-gray-300">
+                        Enter your new password for <span className="font-medium text-gray-200">{email}</span>
                     </p>
                 </div>
 
                 {error && (
-                    <Alert variant="destructive" className="mb-6">
+                    <Alert
+                        variant="destructive"
+                        className="mb-6 border-red-500/30 bg-red-500/10 text-red-200"
+                    >
                         <AlertDescription>{error}</AlertDescription>
                     </Alert>
                 )}
 
                 {success ? (
                     <div className="space-y-6 text-center">
-                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-                            <CheckCircle className="h-8 w-8 text-green-600" />
+                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10">
+                            <CheckCircle className="h-8 w-8 text-green-400" />
                         </div>
                         <div>
-                            <h3 className="text-lg font-medium text-gray-900">Password updated!</h3>
-                            <p className="mt-2 text-sm text-gray-600">
+                            <h3 className="text-lg font-medium text-white">Password updated!</h3>
+                            <p className="mt-2 text-sm text-gray-300">
                                 Your password has been successfully reset.
                             </p>
-                            <p className="mt-1 text-xs text-gray-500">Redirecting to sign in...</p>
+                            <p className="mt-1 text-xs text-gray-400">Redirecting to sign in...</p>
                         </div>
                     </div>
                 ) : (
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-2">
-                            <Label htmlFor="password">New password</Label>
+                            <Label htmlFor="password" className="text-sm font-semibold text-gray-200">
+                                New password
+                            </Label>
                             <Input
                                 id="password"
                                 name="password"
@@ -158,12 +168,14 @@ function ResetPasswordContent() {
                                 onChange={handleChange}
                                 required
                                 disabled={isLoading}
-                                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                                className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 transition-all hover:border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50"
                             />
-                            <p className="text-xs text-gray-500">At least 8 characters</p>
+                            <p className="text-xs text-gray-400">At least 8 characters</p>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="confirmPassword">Confirm new password</Label>
+                            <Label htmlFor="confirmPassword" className="text-sm font-semibold text-gray-200">
+                                Confirm new password
+                            </Label>
                             <Input
                                 id="confirmPassword"
                                 name="confirmPassword"
@@ -173,12 +185,12 @@ function ResetPasswordContent() {
                                 onChange={handleChange}
                                 required
                                 disabled={isLoading}
-                                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                                className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 transition-all hover:border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50"
                             />
                         </div>
                         <Button
                             type="submit"
-                            className="cursor-pointer w-full bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg"
+                            className="w-full bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-blue-600 hover:to-blue-700 hover:shadow-blue-500/25"
                             disabled={isLoading}
                         >
                             {isLoading ? (
@@ -205,10 +217,10 @@ export default function ResetPasswordPage() {
         <Suspense
             fallback={
                 <div className="w-full max-w-md">
-                    <div className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-xl p-8 shadow-xl">
+                    <div className="rounded-2xl border border-white/10 bg-gray-900/30 backdrop-blur-xl p-8 shadow-2xl">
                         <div className="flex flex-col items-center justify-center py-8">
-                            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-                            <p className="mt-4 text-sm text-gray-600">Loading...</p>
+                            <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
+                            <p className="mt-4 text-sm text-gray-300">Loading...</p>
                         </div>
                     </div>
                 </div>

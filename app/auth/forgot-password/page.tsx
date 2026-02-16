@@ -39,38 +39,41 @@ export default function ForgotPasswordPage() {
 
     return (
         <div className="w-full max-w-md">
-            <div className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-xl p-8 shadow-xl">
+            <div className="rounded-2xl border border-white/10 bg-gray-900/30 backdrop-blur-xl p-8 shadow-2xl">
                 <div className="mb-8 text-center">
-                    <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+                    <h1 className="text-3xl font-bold tracking-tight text-white">
                         Forgot password?
                     </h1>
-                    <p className="mt-2 text-sm text-gray-600">
+                    <p className="mt-2 text-sm text-gray-300">
                         Enter your email and we&apos;ll send you a reset link
                     </p>
                 </div>
 
                 {error && (
-                    <Alert variant="destructive" className="mb-6">
+                    <Alert
+                        variant="destructive"
+                        className="mb-6 border-red-500/30 bg-red-500/10 text-red-200"
+                    >
                         <AlertDescription>{error}</AlertDescription>
                     </Alert>
                 )}
 
                 {success ? (
                     <div className="space-y-6 text-center">
-                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-                            <CheckCircle className="h-8 w-8 text-green-600" />
+                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10">
+                            <CheckCircle className="h-8 w-8 text-green-400" />
                         </div>
                         <div>
-                            <h3 className="text-lg font-medium text-gray-900">Check your email</h3>
-                            <p className="mt-2 text-sm text-gray-600">
+                            <h3 className="text-lg font-medium text-white">Check your email</h3>
+                            <p className="mt-2 text-sm text-gray-300">
                                 We&apos;ve sent a reset link to{" "}
-                                <span className="font-medium text-gray-900">{email}</span>
+                                <span className="font-medium text-gray-200">{email}</span>
                             </p>
-                            <p className="mt-1 text-xs text-gray-500">The link will expire in 1 hour.</p>
+                            <p className="mt-1 text-xs text-gray-400">The link will expire in 1 hour.</p>
                         </div>
                         <Button
                             variant="outline"
-                            className="cursor-pointer w-full"
+                            className="w-full border-white/10 bg-gray-800/30 text-gray-200 backdrop-blur-sm transition-all hover:bg-gray-700/50 hover:text-white"
                             onClick={() => {
                                 setSuccess(false);
                                 setEmail("");
@@ -80,9 +83,11 @@ export default function ForgotPasswordPage() {
                         </Button>
                     </div>
                 ) : (
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-2">
-                            <Label htmlFor="email">Email address</Label>
+                            <Label htmlFor="email" className="text-sm font-semibold text-gray-200">
+                                Email address
+                            </Label>
                             <Input
                                 id="email"
                                 type="email"
@@ -91,12 +96,12 @@ export default function ForgotPasswordPage() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 disabled={isLoading}
-                                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                                className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 transition-all hover:border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50"
                             />
                         </div>
                         <Button
                             type="submit"
-                            className="cursor-pointer w-full bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg"
+                            className="w-full bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-blue-600 hover:to-blue-700 hover:shadow-blue-500/25"
                             disabled={isLoading}
                         >
                             {isLoading ? (
@@ -111,9 +116,12 @@ export default function ForgotPasswordPage() {
                                 </>
                             )}
                         </Button>
-                        <p className="text-center text-sm text-gray-600">
+                        <p className="text-center text-sm text-gray-300">
                             Remember your password?{" "}
-                            <Link href="/auth/signin" className="font-medium text-blue-600 hover:text-blue-700">
+                            <Link
+                                href="/auth/signin"
+                                className="font-medium text-blue-400 transition-colors hover:text-blue-300"
+                            >
                                 Sign in
                             </Link>
                         </p>

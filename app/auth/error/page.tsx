@@ -26,25 +26,35 @@ function ErrorContent() {
 
     return (
         <div className="w-full max-w-md">
-            <div className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-xl p-8 shadow-xl">
+            <div className="rounded-2xl border border-white/10 bg-gray-900/30 backdrop-blur-xl p-8 shadow-2xl">
                 <div className="mb-8 text-center">
-                    <h1 className="text-3xl font-bold tracking-tight text-red-600">
+                    <h1 className="text-3xl font-bold tracking-tight text-red-400">
                         Sign In Error
                     </h1>
-                    <p className="mt-2 text-sm text-gray-600">
+                    <p className="mt-2 text-sm text-gray-300">
                         There was a problem signing in
                     </p>
                 </div>
 
-                <Alert variant="destructive" className="mb-6">
+                <Alert
+                    variant="destructive"
+                    className="mb-6 border-red-500/30 bg-red-500/10 text-red-200"
+                >
                     <AlertDescription>{getErrorMessage(error)}</AlertDescription>
                 </Alert>
 
                 <div className="space-y-3">
-                    <Button asChild className="cursor-pointer w-full bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800">
+                    <Button
+                        asChild
+                        className="w-full bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-blue-600 hover:to-blue-700 hover:shadow-blue-500/25"
+                    >
                         <Link href="/auth/signin">Back to Sign In</Link>
                     </Button>
-                    <Button variant="outline" asChild className="cursor-pointer w-full border-gray-200 hover:bg-gray-50">
+                    <Button
+                        variant="outline"
+                        asChild
+                        className="w-full border-white/10 bg-gray-800/30 text-gray-200 backdrop-blur-sm transition-all hover:bg-gray-700/50 hover:text-white"
+                    >
                         <Link href="/auth/signup">Create New Account</Link>
                     </Button>
                 </div>
@@ -58,10 +68,10 @@ export default function AuthErrorPage() {
         <Suspense
             fallback={
                 <div className="w-full max-w-md">
-                    <div className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-xl p-8 shadow-xl">
+                    <div className="rounded-2xl border border-white/10 bg-gray-900/30 backdrop-blur-xl p-8 shadow-2xl">
                         <div className="flex flex-col items-center justify-center py-8">
-                            <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
-                            <p className="mt-4 text-sm text-gray-600">Loading...</p>
+                            <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+                            <p className="mt-4 text-sm text-gray-300">Loading...</p>
                         </div>
                     </div>
                 </div>

@@ -59,7 +59,9 @@ export default function SettingsClient({ business, teamMembers, currentUserRole 
     const [businessEmail, setBusinessEmail] = useState(business.email);
     const [services, setServices] = useState<string[]>(business.service_types || []);
     const [newService, setNewService] = useState("");
-    const [formLink] = useState(`${typeof window !== 'undefined' ? window.location.origin : ''}/form/${business.slug}`);
+    const [formLink] = useState(
+        `${typeof window !== "undefined" ? window.location.origin : ""}/form/${business.slug}`
+    );
 
     // Get qualification settings from business settings
     const qualificationSettings: QualificationSettings = business.settings?.qualification || {
@@ -110,7 +112,7 @@ export default function SettingsClient({ business, teamMembers, currentUserRole 
     };
 
     const handleRemoveService = (service: string) => {
-        setServices(services.filter(s => s !== service));
+        setServices(services.filter((s) => s !== service));
     };
 
     const handleRemoveMember = async (userId: string) => {
@@ -170,67 +172,71 @@ export default function SettingsClient({ business, teamMembers, currentUserRole 
         <div className="space-y-6">
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Settings</h1>
-                <p className="text-gray-600">Manage your business settings and preferences</p>
+                <h1 className="text-2xl font-bold text-white tracking-tight">Settings</h1>
+                <p className="text-gray-300">Manage your business settings and preferences</p>
             </div>
 
             {/* Business Profile - Glass card */}
-            <Card className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
+            <Card className="border border-white/10 bg-gray-800/30 backdrop-blur-xl shadow-lg">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-900">
-                        <div className="h-8 w-8 rounded-lg bg-linear-to-br from-blue-500/10 to-blue-600/10 flex items-center justify-center border border-blue-200/50">
-                            <Building className="h-4 w-4 text-blue-600" />
+                    <CardTitle className="flex items-center gap-2 text-xl font-semibold text-white">
+                        <div className="h-8 w-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                            <Building className="h-4 w-4 text-blue-400" />
                         </div>
                         Business Profile
                     </CardTitle>
-                    <CardDescription className="text-gray-600">
+                    <CardDescription className="text-gray-300">
                         Update your business information and services offered
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <Label htmlFor="name" className="text-gray-700">Business Name</Label>
+                            <Label htmlFor="name" className="text-gray-200">
+                                Business Name
+                            </Label>
                             <Input
                                 id="name"
                                 value={businessName}
                                 onChange={(e) => setBusinessName(e.target.value)}
                                 placeholder="Your business name"
-                                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                                className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="email" className="text-gray-700">Business Email</Label>
+                            <Label htmlFor="email" className="text-gray-200">
+                                Business Email
+                            </Label>
                             <Input
                                 id="email"
                                 type="email"
                                 value={businessEmail}
                                 onChange={(e) => setBusinessEmail(e.target.value)}
                                 placeholder="contact@business.com"
-                                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                                className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                             />
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <Label className="text-gray-700">Form Link</Label>
+                        <Label className="text-gray-200">Form Link</Label>
                         <div className="flex flex-col sm:flex-row gap-2">
-                            <div className="flex-1 p-3 bg-gray-50/80 backdrop-blur-sm border border-gray-200 rounded-xl text-sm font-mono break-all">
+                            <div className="flex-1 p-3 bg-gray-800/50 border border-white/10 rounded-xl text-sm font-mono text-gray-200 break-all">
                                 {formLink}
                             </div>
                             <div className="flex gap-2">
                                 <Button
                                     variant="outline"
                                     onClick={copyToClipboard}
-                                    className="border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600 rounded-xl"
+                                    className="border-white/10 bg-gray-800/30 text-gray-200 hover:bg-gray-700/50 hover:text-white rounded-xl"
                                 >
                                     <Copy className="h-4 w-4 mr-2" />
                                     Copy
                                 </Button>
                                 <Button
                                     variant="outline"
-                                    onClick={() => window.open(formLink, '_blank')}
-                                    className="border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600 rounded-xl"
+                                    onClick={() => window.open(formLink, "_blank")}
+                                    className="border-white/10 bg-gray-800/30 text-gray-200 hover:bg-gray-700/50 hover:text-white rounded-xl"
                                 >
                                     <Eye className="h-4 w-4 mr-2" />
                                     Preview
@@ -240,18 +246,18 @@ export default function SettingsClient({ business, teamMembers, currentUserRole 
                     </div>
 
                     <div className="space-y-2">
-                        <Label className="text-gray-700">Services Offered</Label>
+                        <Label className="text-gray-200">Services Offered</Label>
                         <div className="flex gap-2 mb-4">
                             <Input
                                 placeholder="Add a service (e.g., Web Design, Consulting)"
                                 value={newService}
                                 onChange={(e) => setNewService(e.target.value)}
-                                onKeyPress={(e) => e.key === 'Enter' && handleAddService()}
-                                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                                onKeyPress={(e) => e.key === "Enter" && handleAddService()}
+                                className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                             />
                             <Button
                                 onClick={handleAddService}
-                                className="bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-600/20 rounded-xl"
+                                className="bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:from-blue-600 hover:to-blue-700 hover:shadow-blue-500/25 rounded-xl"
                             >
                                 <Plus className="h-4 w-4 mr-2" />
                                 Add
@@ -262,12 +268,12 @@ export default function SettingsClient({ business, teamMembers, currentUserRole 
                                 <Badge
                                     key={index}
                                     variant="secondary"
-                                    className="px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-sm font-medium"
+                                    className="px-3 py-1.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full text-sm font-medium"
                                 >
                                     {service}
                                     <button
                                         onClick={() => handleRemoveService(service)}
-                                        className="ml-2 text-blue-400 hover:text-blue-600 rounded-full p-0.5"
+                                        className="ml-2 text-blue-400 hover:text-blue-300 rounded-full p-0.5"
                                     >
                                         <span className="sr-only">Remove</span>
                                         ×
@@ -275,7 +281,7 @@ export default function SettingsClient({ business, teamMembers, currentUserRole 
                                 </Badge>
                             ))}
                             {services.length === 0 && (
-                                <p className="text-sm text-gray-500">No services added yet</p>
+                                <p className="text-sm text-gray-400">No services added yet</p>
                             )}
                         </div>
                     </div>
@@ -284,7 +290,7 @@ export default function SettingsClient({ business, teamMembers, currentUserRole 
                         <Button
                             onClick={handleSaveProfile}
                             disabled={isLoading}
-                            className="bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-600/20 rounded-xl"
+                            className="bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:from-blue-600 hover:to-blue-700 hover:shadow-blue-500/25 rounded-xl"
                         >
                             {isLoading ? "Saving..." : (
                                 <>
@@ -307,15 +313,15 @@ export default function SettingsClient({ business, teamMembers, currentUserRole 
             <EmailTemplates businessId={business.id} />
 
             {/* Team Members */}
-            <Card className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
+            <Card className="border border-white/10 bg-gray-800/30 backdrop-blur-xl shadow-lg">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-900">
-                        <div className="h-8 w-8 rounded-lg bg-linear-to-br from-blue-500/10 to-blue-600/10 flex items-center justify-center border border-blue-200/50">
-                            <Users className="h-4 w-4 text-blue-600" />
+                    <CardTitle className="flex items-center gap-2 text-xl font-semibold text-white">
+                        <div className="h-8 w-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                            <Users className="h-4 w-4 text-blue-400" />
                         </div>
                         Team Members
                     </CardTitle>
-                    <CardDescription className="text-gray-600">
+                    <CardDescription className="text-gray-300">
                         People who have access to this business
                     </CardDescription>
                 </CardHeader>
@@ -324,23 +330,23 @@ export default function SettingsClient({ business, teamMembers, currentUserRole 
                         {teamMembers.map((member) => (
                             <div
                                 key={member.user_id}
-                                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-gray-200 rounded-xl hover:bg-gray-50/50 transition-colors"
+                                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-white/10 rounded-xl hover:bg-gray-700/30 transition-colors"
                             >
                                 <div className="flex items-center gap-3">
-                                    <Avatar className="h-10 w-10 ring-2 ring-white shadow-sm">
+                                    <Avatar className="h-10 w-10 ring-2 ring-white/20 shadow-sm">
                                         <AvatarFallback className="bg-linear-to-br from-blue-500 to-blue-700 text-white">
                                             {member.name?.charAt(0).toUpperCase() || member.email.charAt(0).toUpperCase()}
                                         </AvatarFallback>
                                     </Avatar>
                                     <div>
-                                        <div className="font-medium text-gray-900">{member.name || "No name"}</div>
-                                        <div className="text-sm text-gray-500">{member.email}</div>
+                                        <div className="font-medium text-white">{member.name || "No name"}</div>
+                                        <div className="text-sm text-gray-400">{member.email}</div>
                                         <div className="flex items-center gap-2 mt-1">
-                                            <Badge variant="outline" className="border-gray-300 text-gray-700 rounded-full">
+                                            <Badge variant="outline" className="border-gray-600 text-gray-300 rounded-full">
                                                 {member.role}
                                             </Badge>
                                             {member.is_default && (
-                                                <Badge className="bg-blue-100 text-blue-800 border-blue-200 rounded-full">
+                                                <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 rounded-full">
                                                     Owner
                                                 </Badge>
                                             )}
@@ -348,15 +354,13 @@ export default function SettingsClient({ business, teamMembers, currentUserRole 
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-4 mt-3 sm:mt-0">
-                                    <span className="text-sm text-gray-500">
-                                        Joined {formatDate(member.created_at)}
-                                    </span>
+                                    <span className="text-sm text-gray-400">Joined {formatDate(member.created_at)}</span>
                                     {currentUserRole === "owner" && !member.is_default && (
                                         <Button
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => handleRemoveMember(member.user_id)}
-                                            className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg"
+                                            className="text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg"
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
@@ -367,21 +371,23 @@ export default function SettingsClient({ business, teamMembers, currentUserRole 
                     </div>
 
                     {currentUserRole === "owner" && (
-                        <div className="mt-6 p-6 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/30">
+                        <div className="mt-6 p-6 border-2 border-dashed border-white/10 rounded-xl bg-gray-800/20">
                             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                                 <div>
-                                    <h3 className="font-semibold text-gray-900">Invite Team Members</h3>
-                                    <p className="text-sm text-gray-600 mt-1">
+                                    <h3 className="font-semibold text-white">Invite Team Members</h3>
+                                    <p className="text-sm text-gray-400 mt-1">
                                         Invite team members to collaborate on this business
                                     </p>
                                 </div>
                                 <Button
                                     variant="outline"
-                                    onClick={() => toast({
-                                        title: "Coming Soon",
-                                        description: "Team invitations will be available in the next update",
-                                    })}
-                                    className="border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600 rounded-xl whitespace-nowrap"
+                                    onClick={() =>
+                                        toast({
+                                            title: "Coming Soon",
+                                            description: "Team invitations will be available in the next update",
+                                        })
+                                    }
+                                    className="border-white/10 bg-gray-800/30 text-gray-200 hover:bg-gray-700/50 hover:text-white rounded-xl whitespace-nowrap"
                                 >
                                     <UserPlus className="h-4 w-4 mr-2" />
                                     Invite
@@ -393,37 +399,33 @@ export default function SettingsClient({ business, teamMembers, currentUserRole 
             </Card>
 
             {/* Account Security */}
-            <Card className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
+            <Card className="border border-white/10 bg-gray-800/30 backdrop-blur-xl shadow-lg">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-900">
-                        <div className="h-8 w-8 rounded-lg bg-linear-to-br from-blue-500/10 to-blue-600/10 flex items-center justify-center border border-blue-200/50">
-                            <Shield className="h-4 w-4 text-blue-600" />
+                    <CardTitle className="flex items-center gap-2 text-xl font-semibold text-white">
+                        <div className="h-8 w-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                            <Shield className="h-4 w-4 text-blue-400" />
                         </div>
                         Account Security
                     </CardTitle>
-                    <CardDescription className="text-gray-600">
+                    <CardDescription className="text-gray-300">
                         Manage your account security and preferences
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div className="space-y-4">
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900">Session Management</h3>
-                            <p className="text-sm text-gray-600 mt-1">
-                                Your current session is active
-                            </p>
-                            <div className="mt-4 p-4 bg-linear-to-br from-gray-50 to-white border border-gray-200 rounded-xl">
+                            <h3 className="text-lg font-semibold text-white">Session Management</h3>
+                            <p className="text-sm text-gray-400 mt-1">Your current session is active</p>
+                            <div className="mt-4 p-4 bg-gray-800/50 border border-white/10 rounded-xl">
                                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
                                     <div>
-                                        <p className="font-medium text-gray-900">Current Session</p>
-                                        <p className="text-sm text-gray-500">
-                                            Started {formatDate(new Date())}
-                                        </p>
+                                        <p className="font-medium text-white">Current Session</p>
+                                        <p className="text-sm text-gray-400">Started {formatDate(new Date())}</p>
                                     </div>
                                     <Link href="/api/auth/signout">
                                         <Button
                                             variant="outline"
-                                            className="border-2 border-gray-300 hover:border-red-600 hover:text-red-600 rounded-xl"
+                                            className="border-white/10 bg-gray-800/30 text-gray-200 hover:bg-gray-700/50 hover:text-white rounded-xl"
                                         >
                                             <LogOut className="h-4 w-4 mr-2" />
                                             Logout
@@ -433,32 +435,37 @@ export default function SettingsClient({ business, teamMembers, currentUserRole 
                             </div>
                         </div>
 
-                        <Separator className="bg-gray-200" />
+                        <Separator className="bg-white/10" />
 
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900">Data & Privacy</h3>
-                            <p className="text-sm text-gray-600 mt-1">
+                            <h3 className="text-lg font-semibold text-white">Data & Privacy</h3>
+                            <p className="text-sm text-gray-400 mt-1">
                                 Your data is secured with industry-standard encryption
                             </p>
                             <div className="mt-4 space-y-2">
                                 <Button
                                     variant="outline"
-                                    className="w-full justify-start border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600 rounded-xl"
-                                    onClick={() => toast({
-                                        title: "Coming Soon",
-                                        description: "Export feature will be available in the next update",
-                                    })}
+                                    className="w-full justify-start border-white/10 bg-gray-800/30 text-gray-200 hover:bg-gray-700/50 hover:text-white rounded-xl"
+                                    onClick={() =>
+                                        toast({
+                                            title: "Coming Soon",
+                                            description: "Export feature will be available in the next update",
+                                        })
+                                    }
                                 >
                                     Export Lead Data
                                 </Button>
                                 <Button
                                     variant="outline"
-                                    className="w-full justify-start border-2 border-gray-300 hover:border-red-600 hover:text-red-600 rounded-xl"
-                                    onClick={() => toast({
-                                        title: "Warning",
-                                        description: "This action cannot be undone. Please contact support to delete your account.",
-                                        variant: "destructive",
-                                    })}
+                                    className="w-full justify-start border-white/10 bg-gray-800/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-xl"
+                                    onClick={() =>
+                                        toast({
+                                            title: "Warning",
+                                            description:
+                                                "This action cannot be undone. Please contact support to delete your account.",
+                                            variant: "destructive",
+                                        })
+                                    }
                                 >
                                     Delete Account
                                 </Button>

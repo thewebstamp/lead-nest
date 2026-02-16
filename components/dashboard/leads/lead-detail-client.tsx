@@ -59,17 +59,17 @@ interface LeadDetailClientProps {
 }
 
 const statusColors: Record<string, string> = {
-    new: "bg-blue-100 text-blue-800 border-blue-300",
-    contacted: "bg-amber-100 text-amber-800 border-amber-300",
-    quoted: "bg-purple-100 text-purple-800 border-purple-300",
-    booked: "bg-green-100 text-green-800 border-green-300",
-    lost: "bg-red-100 text-red-800 border-red-300",
+    new: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+    contacted: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+    quoted: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+    booked: "bg-green-500/20 text-green-400 border-green-500/30",
+    lost: "bg-red-500/20 text-red-400 border-red-500/30",
 };
 
 const priorityColors: Record<string, string> = {
-    high: "bg-red-100 text-red-800 border-red-300",
-    medium: "bg-amber-100 text-amber-800 border-amber-300",
-    low: "bg-green-100 text-green-800 border-green-300",
+    high: "bg-red-500/20 text-red-400 border-red-500/30",
+    medium: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+    low: "bg-green-500/20 text-green-400 border-green-500/30",
 };
 
 export default function LeadDetailClient({ lead, notes, businessId }: LeadDetailClientProps) {
@@ -203,19 +203,19 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
                     <Button
                         variant="ghost"
                         onClick={() => router.push("/dashboard/leads")}
-                        className="mb-4 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl"
+                        className="mb-4 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-xl"
                     >
                         <ArrowLeft className="h-4 w-4 mr-2" />
                         Back to Leads
                     </Button>
                     <div className="flex items-start gap-4">
-                        <Avatar className="h-16 w-16 ring-2 ring-white shadow-lg">
+                        <Avatar className="h-16 w-16 ring-2 ring-white/20 shadow-lg">
                             <AvatarFallback className="bg-linear-to-br from-blue-500 to-blue-700 text-white text-xl font-semibold">
                                 {getInitials(lead.name)}
                             </AvatarFallback>
                         </Avatar>
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{lead.name}</h1>
+                            <h1 className="text-2xl font-bold text-white tracking-tight">{lead.name}</h1>
                             <div className="flex flex-wrap items-center gap-3 mt-2">
                                 <Badge className={cn("px-3 py-1.5 rounded-full border", statusColors[lead.status])}>
                                     {lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}
@@ -223,7 +223,7 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
                                 <Badge className={cn("px-3 py-1.5 rounded-full border", priorityColors[lead.priority])}>
                                     {lead.priority.charAt(0).toUpperCase() + lead.priority.slice(1)} Priority
                                 </Badge>
-                                <span className="text-sm text-gray-500 flex items-center gap-1">
+                                <span className="text-sm text-gray-300 flex items-center gap-1">
                                     <Calendar className="h-4 w-4" />
                                     {formatDate(lead.created_at)}
                                 </span>
@@ -233,7 +233,7 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
                 </div>
                 <div className="flex flex-wrap gap-2">
                     <Select value={lead.status} onValueChange={handleStatusUpdate}>
-                        <SelectTrigger className="w-45 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl">
+                        <SelectTrigger className="w-45 border-gray-700 bg-gray-800/50 text-white focus:border-blue-500 focus:ring-blue-500 rounded-xl">
                             <SelectValue placeholder="Update status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -247,14 +247,14 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
                     <Button
                         variant="outline"
                         onClick={() => window.open(`tel:${lead.phone}`)}
-                        className="border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600 rounded-xl"
+                        className="border-white/10 bg-gray-800/30 text-gray-200 hover:bg-gray-700/50 hover:text-white rounded-xl"
                     >
                         <Phone className="h-4 w-4 mr-2" />
                         Call
                     </Button>
                     <Button
                         onClick={() => window.open(`mailto:${lead.email}`)}
-                        className="bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-600/20 rounded-xl"
+                        className="bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:from-blue-600 hover:to-blue-700 hover:shadow-blue-500/25 rounded-xl"
                     >
                         <Mail className="h-4 w-4 mr-2" />
                         Email
@@ -267,27 +267,27 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
                 {/* Left Column - Lead Info */}
                 <div className="lg:col-span-2 space-y-6">
                     {/* Contact Card */}
-                    <Card className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
+                    <Card className="border border-white/10 bg-gray-800/30 backdrop-blur-xl shadow-lg">
                         <CardHeader>
-                            <CardTitle className="text-xl font-semibold text-gray-900">Contact Information</CardTitle>
+                            <CardTitle className="text-xl font-semibold text-white">Contact Information</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="h-8 w-8 rounded-lg bg-linear-to-br from-gray-100 to-gray-50 flex items-center justify-center">
-                                        <User className="h-4 w-4 text-gray-600" />
+                                    <div className="h-8 w-8 rounded-lg bg-gray-700/50 flex items-center justify-center">
+                                        <User className="h-4 w-4 text-gray-300" />
                                     </div>
-                                    <div className="font-medium text-gray-900">{lead.name}</div>
+                                    <div className="font-medium text-white">{lead.name}</div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="h-8 w-8 rounded-lg bg-linear-to-br from-gray-100 to-gray-50 flex items-center justify-center">
-                                        <Mail className="h-4 w-4 text-gray-600" />
+                                    <div className="h-8 w-8 rounded-lg bg-gray-700/50 flex items-center justify-center">
+                                        <Mail className="h-4 w-4 text-gray-300" />
                                     </div>
                                     <div>
-                                        <div className="font-medium text-gray-900">{lead.email}</div>
+                                        <div className="font-medium text-white">{lead.email}</div>
                                         <Button
                                             variant="link"
-                                            className="p-0 h-auto text-blue-600 hover:text-blue-700"
+                                            className="p-0 h-auto text-blue-400 hover:text-blue-300"
                                             onClick={() => window.open(`mailto:${lead.email}`)}
                                         >
                                             Send Email
@@ -295,14 +295,14 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="h-8 w-8 rounded-lg bg-linear-to-br from-gray-100 to-gray-50 flex items-center justify-center">
-                                        <Phone className="h-4 w-4 text-gray-600" />
+                                    <div className="h-8 w-8 rounded-lg bg-gray-700/50 flex items-center justify-center">
+                                        <Phone className="h-4 w-4 text-gray-300" />
                                     </div>
                                     <div>
-                                        <div className="font-medium text-gray-900">{lead.phone}</div>
+                                        <div className="font-medium text-white">{lead.phone}</div>
                                         <Button
                                             variant="link"
-                                            className="p-0 h-auto text-blue-600 hover:text-blue-700"
+                                            className="p-0 h-auto text-blue-400 hover:text-blue-300"
                                             onClick={() => window.open(`tel:${lead.phone}`)}
                                         >
                                             Call Now
@@ -310,37 +310,37 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="h-8 w-8 rounded-lg bg-linear-to-br from-gray-100 to-gray-50 flex items-center justify-center">
-                                        <MapPin className="h-4 w-4 text-gray-600" />
+                                    <div className="h-8 w-8 rounded-lg bg-gray-700/50 flex items-center justify-center">
+                                        <MapPin className="h-4 w-4 text-gray-300" />
                                     </div>
-                                    <div className="font-medium text-gray-900">{lead.location}</div>
+                                    <div className="font-medium text-white">{lead.location}</div>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
                     {/* Service Details */}
-                    <Card className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
+                    <Card className="border border-white/10 bg-gray-800/30 backdrop-blur-xl shadow-lg">
                         <CardHeader>
-                            <CardTitle className="text-xl font-semibold text-gray-900">Service Details</CardTitle>
+                            <CardTitle className="text-xl font-semibold text-white">Service Details</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
                                 <div>
-                                    <h4 className="text-sm font-medium text-gray-700 mb-2">Service Type</h4>
-                                    <Badge variant="secondary" className="px-3 py-1.5 bg-gray-100 text-gray-800 border-gray-200 rounded-full">
+                                    <h4 className="text-sm font-medium text-gray-300 mb-2">Service Type</h4>
+                                    <Badge variant="secondary" className="px-3 py-1.5 bg-gray-700/50 text-gray-200 border-gray-600 rounded-full">
                                         {lead.service_type}
                                     </Badge>
                                 </div>
                                 <div>
-                                    <h4 className="text-sm font-medium text-gray-700 mb-2">Customer Message</h4>
-                                    <div className="p-4 bg-linear-to-br from-gray-50 to-white border border-gray-200 rounded-xl text-gray-700 whitespace-pre-wrap">
+                                    <h4 className="text-sm font-medium text-gray-300 mb-2">Customer Message</h4>
+                                    <div className="p-4 bg-gray-800/50 border border-white/10 rounded-xl text-gray-200 whitespace-pre-wrap">
                                         {lead.message || "No message provided."}
                                     </div>
                                 </div>
                                 <div>
-                                    <h4 className="text-sm font-medium text-gray-700 mb-2">Source</h4>
-                                    <Badge variant="outline" className="px-3 py-1.5 border-gray-300 text-gray-700 rounded-full">
+                                    <h4 className="text-sm font-medium text-gray-300 mb-2">Source</h4>
+                                    <Badge variant="outline" className="px-3 py-1.5 border-gray-600 text-gray-300 rounded-full">
                                         {lead.source || "Form"}
                                     </Badge>
                                 </div>
@@ -349,12 +349,10 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
                     </Card>
 
                     {/* Notes Section */}
-                    <Card className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
+                    <Card className="border border-white/10 bg-gray-800/30 backdrop-blur-xl shadow-lg">
                         <CardHeader>
-                            <CardTitle className="text-xl font-semibold text-gray-900">Notes</CardTitle>
-                            <CardDescription className="text-gray-600">
-                                Add notes and track communications
-                            </CardDescription>
+                            <CardTitle className="text-xl font-semibold text-white">Notes</CardTitle>
+                            <CardDescription className="text-gray-300">Add notes and track communications</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
@@ -365,11 +363,15 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
                                         value={newNote}
                                         onChange={(e) => setNewNote(e.target.value)}
                                         rows={3}
-                                        className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                                        className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                     />
                                     <div className="flex justify-between">
                                         <div className="flex gap-2">
-                                            <Button variant="outline" size="sm" className="border-2 border-gray-300 hover:border-gray-400 rounded-lg">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="border-white/10 bg-gray-800/30 text-gray-200 hover:bg-gray-700/50 hover:text-white rounded-lg"
+                                            >
                                                 <Paperclip className="h-4 w-4 mr-2" />
                                                 Attach
                                             </Button>
@@ -377,7 +379,7 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
                                         <Button
                                             onClick={handleAddNote}
                                             disabled={!newNote.trim() || isSubmittingNote}
-                                            className="bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-600/20 rounded-xl"
+                                            className="bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:from-blue-600 hover:to-blue-700 hover:shadow-blue-500/25 rounded-xl"
                                         >
                                             {isSubmittingNote ? (
                                                 <>
@@ -398,14 +400,17 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
                                 <div className="space-y-4">
                                     {currentNotes.length === 0 ? (
                                         <div className="text-center py-8">
-                                            <div className="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                                            <div className="mx-auto w-16 h-16 rounded-full bg-gray-700 flex items-center justify-center mb-4">
                                                 <MessageSquare className="h-8 w-8 text-gray-400" />
                                             </div>
-                                            <p className="text-gray-600">No notes yet. Add your first note above.</p>
+                                            <p className="text-gray-300">No notes yet. Add your first note above.</p>
                                         </div>
                                     ) : (
                                         currentNotes.map((note) => (
-                                            <div key={note.id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all">
+                                            <div
+                                                key={note.id}
+                                                className="border border-white/10 rounded-xl p-4 hover:bg-gray-700/30 transition-all"
+                                            >
                                                 <div className="flex items-start gap-3">
                                                     <Avatar className="h-8 w-8">
                                                         <AvatarFallback className="bg-linear-to-br from-gray-600 to-gray-700 text-white text-xs">
@@ -414,16 +419,12 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
                                                     </Avatar>
                                                     <div className="flex-1">
                                                         <div className="flex gap-3 items-center justify-between">
-                                                            <span className="font-medium text-gray-900">
+                                                            <span className="font-medium text-white">
                                                                 {note.user_id ? "You" : "System"}
                                                             </span>
-                                                            <span className="text-xs text-gray-500">
-                                                                {formatDate(note.created_at)}
-                                                            </span>
+                                                            <span className="text-xs text-gray-400">{formatDate(note.created_at)}</span>
                                                         </div>
-                                                        <p className="mt-2 text-gray-700 whitespace-pre-wrap">
-                                                            {note.note}
-                                                        </p>
+                                                        <p className="mt-2 text-gray-200 whitespace-pre-wrap">{note.note}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -438,12 +439,10 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
                 {/* Right Column - Sidebar */}
                 <div className="space-y-6">
                     {/* Internal Notes */}
-                    <Card className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
+                    <Card className="border border-white/10 bg-gray-800/30 backdrop-blur-xl shadow-lg">
                         <CardHeader>
-                            <CardTitle className="text-xl font-semibold text-gray-900">Internal Notes</CardTitle>
-                            <CardDescription className="text-gray-600">
-                                Private notes for your team
-                            </CardDescription>
+                            <CardTitle className="text-xl font-semibold text-white">Internal Notes</CardTitle>
+                            <CardDescription className="text-gray-300">Private notes for your team</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-3">
@@ -452,12 +451,12 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
                                     value={internalNotes}
                                     onChange={(e) => setInternalNotes(e.target.value)}
                                     rows={6}
-                                    className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                                    className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                 />
                                 <Button
                                     onClick={handleSaveInternalNotes}
                                     disabled={internalNotes === (lead.internal_notes || "")}
-                                    className="w-full bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-600/20 rounded-xl"
+                                    className="w-full bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:from-blue-600 hover:to-blue-700 hover:shadow-blue-500/25 rounded-xl"
                                 >
                                     Save Notes
                                 </Button>
@@ -466,39 +465,41 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
                     </Card>
 
                     {/* Qualification Details */}
-                    <Card className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
+                    <Card className="border border-white/10 bg-gray-800/30 backdrop-blur-xl shadow-lg">
                         <CardHeader>
-                            <CardTitle className="text-xl font-semibold text-gray-900">Qualification</CardTitle>
-                            <CardDescription className="text-gray-600">
-                                Auto-qualification results
-                            </CardDescription>
+                            <CardTitle className="text-xl font-semibold text-white">Qualification</CardTitle>
+                            <CardDescription className="text-gray-300">Auto-qualification results</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
                                 <div>
-                                    <h4 className="text-sm font-medium text-gray-700 mb-2">Priority Score</h4>
+                                    <h4 className="text-sm font-medium text-gray-300 mb-2">Priority Score</h4>
                                     <Badge className={cn("px-3 py-1.5 rounded-full border", priorityColors[lead.priority])}>
                                         {lead.priority.toUpperCase()} PRIORITY
                                     </Badge>
                                 </div>
                                 <div>
-                                    <h4 className="text-sm font-medium text-gray-700 mb-2">Tags</h4>
+                                    <h4 className="text-sm font-medium text-gray-300 mb-2">Tags</h4>
                                     <div className="flex flex-wrap gap-1">
                                         {lead.tags ? (
-                                            lead.tags.split(',').map((tag, index) => (
-                                                <Badge key={index} variant="outline" className="px-3 py-1 border-gray-300 text-gray-700 rounded-full">
+                                            lead.tags.split(",").map((tag, index) => (
+                                                <Badge
+                                                    key={index}
+                                                    variant="outline"
+                                                    className="px-3 py-1 border-gray-600 text-gray-300 rounded-full"
+                                                >
                                                     {tag.trim()}
                                                 </Badge>
                                             ))
                                         ) : (
-                                            <span className="text-sm text-gray-500">No tags</span>
+                                            <span className="text-sm text-gray-400">No tags</span>
                                         )}
                                     </div>
                                 </div>
                                 {lead.qualification_notes && (
                                     <div>
-                                        <h4 className="text-sm font-medium text-gray-700 mb-2">Qualification Notes</h4>
-                                        <p className="text-sm text-gray-600 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                        <h4 className="text-sm font-medium text-gray-300 mb-2">Qualification Notes</h4>
+                                        <p className="text-sm text-gray-200 p-3 bg-gray-800/50 rounded-lg border border-white/10">
                                             {lead.qualification_notes}
                                         </p>
                                     </div>
@@ -508,40 +509,40 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
                     </Card>
 
                     {/* Quick Actions */}
-                    <Card className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
+                    <Card className="border border-white/10 bg-gray-800/30 backdrop-blur-xl shadow-lg">
                         <CardHeader>
-                            <CardTitle className="text-xl font-semibold text-gray-900">Quick Actions</CardTitle>
+                            <CardTitle className="text-xl font-semibold text-white">Quick Actions</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-2">
                                 <Button
                                     variant="outline"
-                                    className="w-full justify-start border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600 rounded-xl"
-                                    onClick={() => handleStatusUpdate('contacted')}
+                                    className="w-full justify-start border-white/10 bg-gray-800/30 text-gray-200 hover:bg-gray-700/50 hover:text-white rounded-xl"
+                                    onClick={() => handleStatusUpdate("contacted")}
                                 >
                                     <CheckCircle className="h-4 w-4 mr-2" />
                                     Mark as Contacted
                                 </Button>
                                 <Button
                                     variant="outline"
-                                    className="w-full justify-start border-2 border-gray-300 hover:border-purple-600 hover:text-purple-600 rounded-xl"
-                                    onClick={() => handleStatusUpdate('quoted')}
+                                    className="w-full justify-start border-white/10 bg-gray-800/30 text-gray-200 hover:bg-gray-700/50 hover:text-purple-400 rounded-xl"
+                                    onClick={() => handleStatusUpdate("quoted")}
                                 >
                                     <MessageSquare className="h-4 w-4 mr-2" />
                                     Mark as Quoted
                                 </Button>
                                 <Button
                                     variant="outline"
-                                    className="w-full justify-start border-2 border-gray-300 hover:border-green-600 hover:text-green-600 rounded-xl"
-                                    onClick={() => handleStatusUpdate('booked')}
+                                    className="w-full justify-start border-white/10 bg-gray-800/30 text-gray-200 hover:bg-gray-700/50 hover:text-green-400 rounded-xl"
+                                    onClick={() => handleStatusUpdate("booked")}
                                 >
                                     <Calendar className="h-4 w-4 mr-2" />
                                     Mark as Booked
                                 </Button>
                                 <Button
                                     variant="outline"
-                                    className="w-full justify-start border-2 border-gray-300 hover:border-red-600 hover:text-red-600 rounded-xl"
-                                    onClick={() => handleStatusUpdate('lost')}
+                                    className="w-full justify-start border-white/10 bg-gray-800/30 text-gray-200 hover:bg-gray-700/50 hover:text-red-400 rounded-xl"
+                                    onClick={() => handleStatusUpdate("lost")}
                                 >
                                     <XCircle className="h-4 w-4 mr-2" />
                                     Mark as Lost
@@ -551,16 +552,16 @@ export default function LeadDetailClient({ lead, notes, businessId }: LeadDetail
                     </Card>
 
                     {/* Lead Age */}
-                    <Card className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
+                    <Card className="border border-white/10 bg-gray-800/30 backdrop-blur-xl shadow-lg">
                         <CardHeader>
-                            <CardTitle className="text-xl font-semibold text-gray-900">Lead Age</CardTitle>
+                            <CardTitle className="text-xl font-semibold text-white">Lead Age</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="text-center">
-                                <div className="text-3xl font-bold text-blue-600">
+                                <div className="text-3xl font-bold text-blue-400">
                                     {Math.floor((new Date().getTime() - new Date(lead.created_at).getTime()) / (1000 * 60 * 60 * 24))} days
                                 </div>
-                                <p className="text-sm text-gray-500 mt-1">Since creation</p>
+                                <p className="text-sm text-gray-400 mt-1">Since creation</p>
                             </div>
                         </CardContent>
                     </Card>

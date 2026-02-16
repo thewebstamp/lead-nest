@@ -76,26 +76,31 @@ export default function SignupPage() {
 
     return (
         <div className="w-full max-w-md">
-            <div className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-xl p-8 shadow-xl">
+            <div className="rounded-2xl border border-white/10 bg-gray-900/30 backdrop-blur-xl p-8 shadow-2xl">
                 {/* Header */}
                 <div className="mb-8 text-center">
-                    <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+                    <h1 className="text-3xl font-bold tracking-tight text-white">
                         Create your account
                     </h1>
-                    <p className="mt-2 text-sm text-gray-600">
+                    <p className="mt-2 text-sm text-gray-300">
                         Get started with LeadNest in minutes
                     </p>
                 </div>
 
                 {error && (
-                    <Alert variant="destructive" className="mb-6">
+                    <Alert
+                        variant="destructive"
+                        className="mb-6 border-red-500/30 bg-red-500/10 text-red-200"
+                    >
                         <AlertDescription>{error}</AlertDescription>
                     </Alert>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2">
-                        <Label htmlFor="name">Your name</Label>
+                        <Label htmlFor="name" className="text-sm font-semibold text-gray-200">
+                            Your name
+                        </Label>
                         <Input
                             id="name"
                             name="name"
@@ -104,12 +109,14 @@ export default function SignupPage() {
                             onChange={handleChange}
                             required
                             disabled={isLoading}
-                            className="border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                            className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 transition-all hover:border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email" className="text-sm font-semibold text-gray-200">
+                            Email
+                        </Label>
                         <Input
                             id="email"
                             name="email"
@@ -119,12 +126,14 @@ export default function SignupPage() {
                             onChange={handleChange}
                             required
                             disabled={isLoading}
-                            className="border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                            className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 transition-all hover:border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="businessName">Business name</Label>
+                        <Label htmlFor="businessName" className="text-sm font-semibold text-gray-200">
+                            Business name
+                        </Label>
                         <Input
                             id="businessName"
                             name="businessName"
@@ -133,13 +142,15 @@ export default function SignupPage() {
                             onChange={handleChange}
                             required
                             disabled={isLoading}
-                            className="border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                            className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 transition-all hover:border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50"
                         />
-                        <p className="text-xs text-gray-500">You can change this later</p>
+                        <p className="text-xs text-gray-400">You can change this later</p>
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password" className="text-sm font-semibold text-gray-200">
+                            Password
+                        </Label>
                         <Input
                             id="password"
                             name="password"
@@ -149,12 +160,14 @@ export default function SignupPage() {
                             onChange={handleChange}
                             required
                             disabled={isLoading}
-                            className="border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                            className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 transition-all hover:border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="confirmPassword">Confirm password</Label>
+                        <Label htmlFor="confirmPassword" className="text-sm font-semibold text-gray-200">
+                            Confirm password
+                        </Label>
                         <Input
                             id="confirmPassword"
                             name="confirmPassword"
@@ -164,13 +177,13 @@ export default function SignupPage() {
                             onChange={handleChange}
                             required
                             disabled={isLoading}
-                            className="border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                            className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 transition-all hover:border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50"
                         />
                     </div>
 
                     <Button
                         type="submit"
-                        className="cursor-pointer w-full bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg"
+                        className="w-full bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-blue-600 hover:to-blue-700 hover:shadow-blue-500/25"
                         disabled={isLoading}
                     >
                         {isLoading ? (
@@ -181,7 +194,7 @@ export default function SignupPage() {
                         ) : (
                             <>
                                 Create account
-                                <ArrowRight className="ml-2 h-4 w-4" />
+                                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                             </>
                         )}
                     </Button>
@@ -190,18 +203,20 @@ export default function SignupPage() {
                 {/* Divider */}
                 <div className="hidden relative my-6">
                     <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-gray-200" />
+                        <span className="w-full border-t border-gray-700" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-white/80 px-2 text-gray-500">Or continue with</span>
+                        <span className="bg-gray-900/30 px-2 text-gray-400">
+                            Or continue with
+                        </span>
                     </div>
                 </div>
 
-                {/* Google button */}
+                {/* Google button (hidden) */}
                 <Button
                     type="button"
                     variant="outline"
-                    className="hidden w-full border-gray-200 hover:bg-gray-50"
+                    className="hidden w-full border-gray-700 bg-gray-800/50 text-gray-200 hover:bg-gray-700/50"
                     onClick={() => signIn("google", { callbackUrl: "/onboarding" })}
                     disabled={isLoading}
                 >
@@ -226,9 +241,12 @@ export default function SignupPage() {
                     Google
                 </Button>
 
-                <p className="mt-6 text-center text-sm text-gray-600">
+                <p className="mt-6 text-center text-sm text-gray-300">
                     Already have an account?{" "}
-                    <Link href="/auth/signin" className="font-medium text-blue-600 hover:text-blue-700">
+                    <Link
+                        href="/auth/signin"
+                        className="font-medium text-blue-400 transition-colors hover:text-blue-300"
+                    >
                         Sign in
                     </Link>
                 </p>

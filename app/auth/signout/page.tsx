@@ -20,28 +20,28 @@ export default function SignOutPage() {
 
     return (
         <div className="w-full max-w-md">
-            <div className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-xl p-8 shadow-xl">
+            <div className="rounded-2xl border border-white/10 bg-gray-900/30 backdrop-blur-xl p-8 shadow-2xl">
                 {/* Logo */}
                 <div className="mb-6 flex justify-center">
                     <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-linear-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg shadow-blue-600/20">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-500/20">
                             <Zap className="h-5 w-5 text-white" />
                         </div>
-                        <span className="text-xl font-bold text-gray-900">LeadNest</span>
+                        <span className="text-xl font-bold text-white">LeadNest</span>
                     </div>
                 </div>
 
                 {/* Icon */}
-                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
-                    <LogOut className="h-8 w-8 text-red-500" />
+                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10">
+                    <LogOut className="h-8 w-8 text-red-400" />
                 </div>
 
                 {/* Header */}
                 <div className="mb-8 text-center">
-                    <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+                    <h1 className="text-2xl font-bold tracking-tight text-white">
                         Sign out of LeadNest?
                     </h1>
-                    <p className="mt-2 text-sm text-gray-600">
+                    <p className="mt-2 text-sm text-gray-300">
                         You are currently signed in. Are you sure you want to sign out?
                     </p>
                 </div>
@@ -50,7 +50,7 @@ export default function SignOutPage() {
                 <div className="space-y-3">
                     <Button
                         onClick={handleSignOut}
-                        className="cursor-pointer w-full bg-linear-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-lg shadow-red-500/20"
+                        className="w-full bg-linear-to-r from-red-500 to-red-600 text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-red-600 hover:to-red-700 hover:shadow-red-500/25"
                         size="lg"
                     >
                         <LogOut className="mr-2 h-5 w-5" />
@@ -60,7 +60,7 @@ export default function SignOutPage() {
                     <Button
                         onClick={handleCancel}
                         variant="outline"
-                        className="cursor-pointer w-full border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600"
+                        className="w-full border-white/10 bg-gray-800/30 text-gray-200 backdrop-blur-sm transition-all hover:bg-gray-700/50 hover:text-white"
                         size="lg"
                     >
                         <ArrowLeft className="mr-2 h-5 w-5" />
@@ -69,19 +69,19 @@ export default function SignOutPage() {
 
                     <Button
                         variant="ghost"
-                        className="cursor-pointer flex w-full text-gray-500 hover:text-gray-700"
+                        className="flex w-full text-gray-300 transition-colors hover:bg-gray-800/50 hover:text-white"
                         size="sm"
                         asChild
                     >
-                        <Home className="mr-2 h-4 w-4" />
                         <Link href="/">
+                            <Home className="mr-2 h-4 w-4" />
                             Return to home
                         </Link>
                     </Button>
                 </div>
 
                 {/* Footer note */}
-                <p className="mt-6 text-center text-xs text-gray-500">
+                <p className="mt-6 text-center text-xs text-gray-400">
                     You can always sign back in at any time.
                 </p>
             </div>

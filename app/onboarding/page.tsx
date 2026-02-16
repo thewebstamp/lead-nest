@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Loader2, Zap, ArrowRight, ArrowLeft } from "lucide-react";
 import { BackgroundLines } from "@/components/background-lines";
@@ -70,48 +69,39 @@ export default function OnboardingPage() {
 
     if (!session) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-[#0B1120] via-[#0F1A2F] to-[#1A2A3F]">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
             </div>
         );
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-white font-sans antialiased">
-            {/* Background image with overlay */}
-            <div className="absolute inset-0 z-0">
-                <Image
-                    src="/images/autt.jpg"
-                    alt="Onboarding background"
-                    fill
-                    className="object-cover"
-                    priority
-                />
-                <div className="absolute inset-0 bg-linear-to-br from-white/95 via-white/90 to-white/85" />
-            </div>
+        <div className="relative min-h-screen overflow-hidden bg-linear-to-br from-[#0B1120] via-[#0F1A2F] to-[#1A2A3F] font-sans antialiased">
+            {/* Subtle radial glow overlay */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(59,130,246,0.15),transparent_50%)] pointer-events-none" />
 
             {/* Animated background lines */}
-            <BackgroundLines variant="light" />
+            <BackgroundLines variant="dark" />
 
             {/* Navigation */}
-            <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-sm">
+            <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-gray-900/30 backdrop-blur-xl">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between">
                         <Link href="/" className="flex items-center space-x-3">
-                            <div className="cursor-pointer h-9 w-9 rounded-lg bg-linear-to-br from-blue-600 to-blue-800 flex items-center justify-center">
+                            <div className="h-9 w-9 rounded-lg bg-linear-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/20">
                                 <Zap className="h-5 w-5 text-white" />
                             </div>
-                            <span className="text-xl font-bold text-gray-900 tracking-tight">LeadNest</span>
+                            <span className="text-xl font-bold text-white tracking-tight">LeadNest</span>
                         </Link>
 
                         <div className="flex items-center space-x-3">
-                            <span className="text-sm text-gray-600 hidden sm:block">
+                            <span className="text-sm text-gray-300 hidden sm:block">
                                 Step {currentStep} of {TOTAL_STEPS}
                             </span>
                             <Button
                                 variant="ghost"
                                 onClick={() => router.push("/dashboard")}
-                                className="cursor-pointer text-gray-700 hover:text-blue-600"
+                                className="text-gray-300 hover:text-white hover:bg-gray-800/50"
                             >
                                 Skip for now
                             </Button>
@@ -121,11 +111,11 @@ export default function OnboardingPage() {
             </nav>
 
             {/* Progress Bar */}
-            <div className="fixed top-18.25 left-0 right-0 z-40 bg-white/80 backdrop-blur-sm border-b border-gray-100">
+            <div className="fixed top-18.25 left-0 right-0 z-40 bg-gray-900/30 backdrop-blur-sm border-b border-white/10">
                 <div className="max-w-3xl mx-auto px-4 py-3">
-                    <div className="relative h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="relative h-2 bg-gray-700/50 rounded-full overflow-hidden">
                         <div
-                            className="absolute inset-y-0 left-0 bg-linear-to-r from-blue-600 to-blue-700 rounded-full transition-all duration-500 ease-out"
+                            className="absolute inset-y-0 left-0 bg-linear-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500 ease-out"
                             style={{ width: `${progress}%` }}
                         />
                     </div>
@@ -136,15 +126,15 @@ export default function OnboardingPage() {
             <main className="relative pt-32 pb-20 z-10">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Glass card */}
-                    <div className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-xl p-8 md:p-10 shadow-xl">
+                    <div className="rounded-2xl border border-white/10 bg-gray-900/30 backdrop-blur-xl p-8 md:p-10 shadow-2xl">
                         {/* Header */}
                         <div className="text-center mb-8">
-                            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight mb-3">
+                            <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight mb-3">
                                 {currentStep === 1 && "What services do you offer?"}
                                 {currentStep === 2 && "Tell us about your business"}
                                 {currentStep === 3 && "Your lead form is ready!"}
                             </h1>
-                            <p className="text-lg text-gray-600 max-w-xl mx-auto">
+                            <p className="text-lg text-gray-300 max-w-xl mx-auto">
                                 {currentStep === 1 && "Select the services you provide to your customers"}
                                 {currentStep === 2 && "Help us personalize your experience"}
                                 {currentStep === 3 && "Share this link to start capturing leads instantly"}
@@ -174,12 +164,12 @@ export default function OnboardingPage() {
                         </div>
 
                         {/* Footer Actions */}
-                        <div className="flex items-center justify-between pt-6 border-t border-gray-100">
+                        <div className="flex items-center justify-between pt-6 border-t border-white/10">
                             <Button
                                 variant="outline"
                                 onClick={handleBack}
                                 disabled={currentStep === 1 || isLoading}
-                                className="cursor-pointer border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600 rounded-xl px-6 py-5 h-auto"
+                                className="border-white/10 bg-gray-800/30 text-gray-200 backdrop-blur-sm hover:bg-gray-700/50 hover:text-white rounded-xl px-6 py-5 h-auto"
                             >
                                 <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back
@@ -188,7 +178,7 @@ export default function OnboardingPage() {
                             <Button
                                 onClick={handleNext}
                                 disabled={isLoading}
-                                className="cursor-pointer bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg rounded-xl px-6 py-5 h-auto"
+                                className="bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:from-blue-600 hover:to-blue-700 hover:shadow-blue-500/25 rounded-xl px-6 py-5 h-auto"
                             >
                                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 {currentStep === TOTAL_STEPS ? (
@@ -206,10 +196,10 @@ export default function OnboardingPage() {
                             <div
                                 key={index}
                                 className={`h-2.5 w-2.5 rounded-full transition-all ${index + 1 === currentStep
-                                        ? "bg-blue-600 scale-125"
+                                        ? "bg-blue-500 scale-125"
                                         : index + 1 < currentStep
                                             ? "bg-blue-400"
-                                            : "bg-gray-300"
+                                            : "bg-gray-600"
                                     }`}
                             />
                         ))}

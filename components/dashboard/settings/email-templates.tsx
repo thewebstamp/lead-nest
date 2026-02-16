@@ -7,10 +7,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Save, Mail, Clock, Eye } from "lucide-react";
@@ -45,69 +57,69 @@ interface EmailTemplatesProps {
 }
 
 const TEMPLATE_TYPES = [
-    { value: 'confirmation', label: 'Confirmation' },
-    { value: 'notification', label: 'Notification' },
-    { value: 'followup', label: 'Follow-up' },
-    { value: 'reminder', label: 'Reminder' },
+    { value: "confirmation", label: "Confirmation" },
+    { value: "notification", label: "Notification" },
+    { value: "followup", label: "Follow-up" },
+    { value: "reminder", label: "Reminder" },
 ];
 
 const TRIGGER_EVENTS = [
-    { value: 'lead_created', label: 'Lead Created' },
-    { value: 'lead_stale', label: 'Lead Stale' },
-    { value: 'followup_due', label: 'Follow-up Due' },
-    { value: 'lead_converted', label: 'Lead Converted' },
-    { value: 'lead_lost', label: 'Lead Lost' },
+    { value: "lead_created", label: "Lead Created" },
+    { value: "lead_stale", label: "Lead Stale" },
+    { value: "followup_due", label: "Follow-up Due" },
+    { value: "lead_converted", label: "Lead Converted" },
+    { value: "lead_lost", label: "Lead Lost" },
 ];
 
 const VARIABLES = [
-    { key: 'business_name', description: 'Business name' },
-    { key: 'lead_name', description: 'Lead name' },
-    { key: 'lead_email', description: 'Lead email' },
-    { key: 'lead_phone', description: 'Lead phone' },
-    { key: 'service_type', description: 'Service type' },
-    { key: 'lead_location', description: 'Lead location' },
-    { key: 'lead_message', description: 'Lead message' },
-    { key: 'lead_priority', description: 'Lead priority' },
-    { key: 'lead_score', description: 'Lead qualification score' },
-    { key: 'lead_tags', description: 'Lead tags' },
-    { key: 'lead_url', description: 'Link to lead' },
-    { key: 'lead_status', description: 'Lead status' },
-    { key: 'days_stale', description: 'Days since last contact' },
-    { key: 'last_contact_date', description: 'Last contact date' },
+    { key: "business_name", description: "Business name" },
+    { key: "lead_name", description: "Lead name" },
+    { key: "lead_email", description: "Lead email" },
+    { key: "lead_phone", description: "Lead phone" },
+    { key: "service_type", description: "Service type" },
+    { key: "lead_location", description: "Lead location" },
+    { key: "lead_message", description: "Lead message" },
+    { key: "lead_priority", description: "Lead priority" },
+    { key: "lead_score", description: "Lead qualification score" },
+    { key: "lead_tags", description: "Lead tags" },
+    { key: "lead_url", description: "Link to lead" },
+    { key: "lead_status", description: "Lead status" },
+    { key: "days_stale", description: "Days since last contact" },
+    { key: "last_contact_date", description: "Last contact date" },
 ];
 
 export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
     const [templates, setTemplates] = useState<EmailTemplate[]>([]);
     const [schedules, setSchedules] = useState<FollowupSchedule[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState('templates');
+    const [activeTab, setActiveTab] = useState("templates");
 
     // New template form
     const [newTemplate, setNewTemplate] = useState<Partial<EmailTemplate>>({
-        name: '',
-        subject: '',
-        body: '',
-        type: 'confirmation',
-        trigger_event: '',
+        name: "",
+        subject: "",
+        body: "",
+        type: "confirmation",
+        trigger_event: "",
         days_after_trigger: 0,
         is_active: true,
-        variables: []
+        variables: [],
     });
 
     // New schedule form
     const [newSchedule, setNewSchedule] = useState<Partial<FollowupSchedule>>({
-        name: '',
-        description: '',
+        name: "",
+        description: "",
         trigger_condition: {
-            status: ['new', 'contacted'],
-            priority: ['high', 'medium'],
+            status: ["new", "contacted"],
+            priority: ["high", "medium"],
             days_without_contact: 7,
-            exclude_tags: ['do-not-contact', 'spam']
+            exclude_tags: ["do-not-contact", "spam"],
         },
-        actions: [{ type: 'notification' }],
+        actions: [{ type: "notification" }],
         delay_days: 7,
         delay_hours: 0,
-        is_active: true
+        is_active: true,
     });
 
     useEffect(() => {
@@ -143,7 +155,7 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
         if (!newTemplate.variables?.includes(variable)) {
             setNewTemplate({
                 ...newTemplate,
-                variables: [...(newTemplate.variables || []), variable]
+                variables: [...(newTemplate.variables || []), variable],
             });
         }
     };
@@ -151,7 +163,7 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
     const removeVariable = (variable: string) => {
         setNewTemplate({
             ...newTemplate,
-            variables: newTemplate.variables?.filter(v => v !== variable) || []
+            variables: newTemplate.variables?.filter((v) => v !== variable) || [],
         });
     };
 
@@ -182,14 +194,14 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                 });
                 fetchTemplates();
                 setNewTemplate({
-                    name: '',
-                    subject: '',
-                    body: '',
-                    type: 'confirmation',
-                    trigger_event: '',
+                    name: "",
+                    subject: "",
+                    body: "",
+                    type: "confirmation",
+                    trigger_event: "",
                     days_after_trigger: 0,
                     is_active: true,
-                    variables: []
+                    variables: [],
                 });
             } else {
                 throw new Error("Failed to save template");
@@ -232,18 +244,18 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                 });
                 fetchSchedules();
                 setNewSchedule({
-                    name: '',
-                    description: '',
+                    name: "",
+                    description: "",
                     trigger_condition: {
-                        status: ['new', 'contacted'],
-                        priority: ['high', 'medium'],
+                        status: ["new", "contacted"],
+                        priority: ["high", "medium"],
                         days_without_contact: 7,
-                        exclude_tags: ['do-not-contact', 'spam']
+                        exclude_tags: ["do-not-contact", "spam"],
                     },
-                    actions: [{ type: 'notification' }],
+                    actions: [{ type: "notification" }],
                     delay_days: 7,
                     delay_hours: 0,
-                    is_active: true
+                    is_active: true,
                 });
             } else {
                 throw new Error("Failed to save schedule");
@@ -261,18 +273,21 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
 
     const toggleTemplateStatus = async (templateId: string, currentStatus: boolean) => {
         try {
-            const response = await fetch(`/api/businesses/${businessId}/email-templates/${templateId}`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ is_active: !currentStatus }),
-            });
+            const response = await fetch(
+                `/api/businesses/${businessId}/email-templates/${templateId}`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ is_active: !currentStatus }),
+                }
+            );
 
             if (response.ok) {
                 toast({
                     title: "Success",
-                    description: `Template ${!currentStatus ? 'activated' : 'deactivated'}`,
+                    description: `Template ${!currentStatus ? "activated" : "deactivated"}`,
                 });
                 fetchTemplates();
             }
@@ -287,18 +302,21 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
 
     const toggleScheduleStatus = async (scheduleId: string, currentStatus: boolean) => {
         try {
-            const response = await fetch(`/api/businesses/${businessId}/followup-schedules/${scheduleId}`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ is_active: !currentStatus }),
-            });
+            const response = await fetch(
+                `/api/businesses/${businessId}/followup-schedules/${scheduleId}`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ is_active: !currentStatus }),
+                }
+            );
 
             if (response.ok) {
                 toast({
                     title: "Success",
-                    description: `Schedule ${!currentStatus ? 'activated' : 'deactivated'}`,
+                    description: `Schedule ${!currentStatus ? "activated" : "deactivated"}`,
                 });
                 fetchSchedules();
             }
@@ -319,31 +337,31 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
     };
 
     return (
-        <Card className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
+        <Card className="border border-white/10 bg-gray-800/30 backdrop-blur-xl shadow-lg">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-900">
-                    <div className="h-8 w-8 rounded-lg bg-linear-to-br from-blue-500/10 to-blue-600/10 flex items-center justify-center border border-blue-200/50">
-                        <Mail className="h-4 w-4 text-blue-600" />
+                <CardTitle className="flex items-center gap-2 text-xl font-semibold text-white">
+                    <div className="h-8 w-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                        <Mail className="h-4 w-4 text-blue-400" />
                     </div>
                     Email & Automation Settings
                 </CardTitle>
-                <CardDescription className="text-gray-600">
+                <CardDescription className="text-gray-300">
                     Configure email templates and automated follow-ups
                 </CardDescription>
             </CardHeader>
             <CardContent>
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
-                    <TabsList className="grid grid-cols-2 mb-6 p-1 bg-gray-100/80 rounded-xl">
+                    <TabsList className="grid grid-cols-2 mb-6 p-1 bg-gray-700/30 rounded-xl">
                         <TabsTrigger
                             value="templates"
-                            className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg"
+                            className="data-[state=active]:bg-gray-800 data-[state=active]:text-white rounded-lg text-gray-300"
                         >
                             <Mail className="h-4 w-4 mr-2" />
                             Email Templates
                         </TabsTrigger>
                         <TabsTrigger
                             value="schedules"
-                            className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg"
+                            className="data-[state=active]:bg-gray-800 data-[state=active]:text-white rounded-lg text-gray-300"
                         >
                             <Clock className="h-4 w-4 mr-2" />
                             Follow-up Schedules
@@ -353,29 +371,31 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                     {/* Email Templates Tab */}
                     <TabsContent value="templates" className="space-y-6">
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-gray-900">Create New Template</h3>
+                            <h3 className="text-lg font-semibold text-white">Create New Template</h3>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="templateName" className="text-gray-700">Template Name</Label>
+                                    <Label htmlFor="templateName" className="text-gray-200">
+                                        Template Name
+                                    </Label>
                                     <Input
                                         id="templateName"
                                         placeholder="e.g., Lead Confirmation"
                                         value={newTemplate.name}
                                         onChange={(e) => setNewTemplate({ ...newTemplate, name: e.target.value })}
-                                        className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                                        className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="templateType" className="text-gray-700">Type</Label>
+                                    <Label htmlFor="templateType" className="text-gray-200">
+                                        Type
+                                    </Label>
                                     <Select
                                         value={newTemplate.type}
-                                        onValueChange={(value) =>
-                                            setNewTemplate({ ...newTemplate, type: value })
-                                        }
+                                        onValueChange={(value) => setNewTemplate({ ...newTemplate, type: value })}
                                     >
-                                        <SelectTrigger className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl">
+                                        <SelectTrigger className="border-gray-700 bg-gray-800/50 text-white focus:border-blue-500 focus:ring-blue-500 rounded-xl">
                                             <SelectValue placeholder="Select template type" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -389,7 +409,9 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="triggerEvent" className="text-gray-700">Trigger Event (Optional)</Label>
+                                    <Label htmlFor="triggerEvent" className="text-gray-200">
+                                        Trigger Event (Optional)
+                                    </Label>
                                     <Select
                                         value={newTemplate.trigger_event ?? "__none__"}
                                         onValueChange={(value) =>
@@ -399,13 +421,11 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                             })
                                         }
                                     >
-                                        <SelectTrigger className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl">
+                                        <SelectTrigger className="border-gray-700 bg-gray-800/50 text-white focus:border-blue-500 focus:ring-blue-500 rounded-xl">
                                             <SelectValue placeholder="Select trigger event" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="__none__">
-                                                No specific trigger
-                                            </SelectItem>
+                                            <SelectItem value="__none__">No specific trigger</SelectItem>
                                             {TRIGGER_EVENTS.map((event) => (
                                                 <SelectItem key={event.value} value={event.value}>
                                                     {event.label}
@@ -416,53 +436,64 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="daysAfter" className="text-gray-700">Days After Trigger</Label>
+                                    <Label htmlFor="daysAfter" className="text-gray-200">
+                                        Days After Trigger
+                                    </Label>
                                     <Input
                                         id="daysAfter"
                                         type="number"
                                         min="0"
                                         value={newTemplate.days_after_trigger}
-                                        onChange={(e) => setNewTemplate({ ...newTemplate, days_after_trigger: parseInt(e.target.value) || 0 })}
-                                        className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                                        onChange={(e) =>
+                                            setNewTemplate({
+                                                ...newTemplate,
+                                                days_after_trigger: parseInt(e.target.value) || 0,
+                                            })
+                                        }
+                                        className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                     />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="templateSubject" className="text-gray-700">Email Subject</Label>
+                                <Label htmlFor="templateSubject" className="text-gray-200">
+                                    Email Subject
+                                </Label>
                                 <Input
                                     id="templateSubject"
                                     placeholder="Use {{variables}} for dynamic content"
                                     value={newTemplate.subject}
                                     onChange={(e) => setNewTemplate({ ...newTemplate, subject: e.target.value })}
-                                    className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                                    className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="templateBody" className="text-gray-700">Email Body</Label>
+                                <Label htmlFor="templateBody" className="text-gray-200">
+                                    Email Body
+                                </Label>
                                 <Textarea
                                     id="templateBody"
                                     placeholder="Write your email content here. Use {{variables}} for dynamic content."
                                     rows={8}
                                     value={newTemplate.body}
                                     onChange={(e) => setNewTemplate({ ...newTemplate, body: e.target.value })}
-                                    className="font-mono text-sm border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                                    className="font-mono text-sm border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <Label className="text-gray-700">Available Variables</Label>
-                                <div className="flex flex-wrap gap-2 p-3 bg-gray-50/50 border border-gray-200 rounded-xl">
-                                    {VARIABLES.map(variable => (
+                                <Label className="text-gray-200">Available Variables</Label>
+                                <div className="flex flex-wrap gap-2 p-3 bg-gray-800/50 border border-white/10 rounded-xl">
+                                    {VARIABLES.map((variable) => (
                                         <Badge
                                             key={variable.key}
                                             variant={newTemplate.variables?.includes(variable.key) ? "default" : "outline"}
                                             className={cn(
                                                 "cursor-pointer px-3 py-1.5 rounded-full text-xs font-medium transition-all",
                                                 newTemplate.variables?.includes(variable.key)
-                                                    ? "bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200"
-                                                    : "bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:text-blue-600"
+                                                    ? "bg-blue-500/20 text-blue-400 border-blue-500/30 hover:bg-blue-500/30"
+                                                    : "bg-transparent text-gray-300 border-gray-600 hover:border-blue-500 hover:text-blue-400"
                                             )}
                                             onClick={() =>
                                                 newTemplate.variables?.includes(variable.key)
@@ -477,8 +508,9 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                         </Badge>
                                     ))}
                                 </div>
-                                <p className="text-xs text-gray-500">
-                                    Click on variables to add them to your template. They will be replaced with actual data when sent.
+                                <p className="text-xs text-gray-400">
+                                    Click on variables to add them to your template. They will be replaced with
+                                    actual data when sent.
                                 </p>
                             </div>
 
@@ -489,12 +521,12 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                         onCheckedChange={(checked) => setNewTemplate({ ...newTemplate, is_active: checked })}
                                         className="data-[state=checked]:bg-blue-600"
                                     />
-                                    <Label className="text-gray-700">Active</Label>
+                                    <Label className="text-gray-200">Active</Label>
                                 </div>
                                 <Button
                                     onClick={saveTemplate}
                                     disabled={isLoading}
-                                    className="bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-600/20 rounded-xl"
+                                    className="bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:from-blue-600 hover:to-blue-700 hover:shadow-blue-500/25 rounded-xl"
                                 >
                                     <Save className="h-4 w-4 mr-2" />
                                     Save Template
@@ -502,30 +534,33 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                             </div>
                         </div>
 
-                        <Separator className="bg-gray-200" />
+                        <Separator className="bg-white/10" />
 
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-gray-900">
+                            <h3 className="text-lg font-semibold text-white">
                                 Existing Templates ({templates.length})
                             </h3>
 
                             {templates.length === 0 ? (
-                                <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/30">
-                                    <Mail className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                                    <p className="text-gray-600">No email templates created yet</p>
+                                <div className="text-center py-8 border-2 border-dashed border-white/10 rounded-xl bg-gray-800/20">
+                                    <Mail className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                                    <p className="text-gray-300">No email templates created yet</p>
                                 </div>
                             ) : (
                                 <div className="space-y-3">
-                                    {templates.map(template => (
-                                        <div key={template.id} className="p-5 border border-gray-200 rounded-xl hover:shadow-md transition-all">
+                                    {templates.map((template) => (
+                                        <div
+                                            key={template.id}
+                                            className="p-5 border border-white/10 rounded-xl hover:bg-gray-700/30 transition-all"
+                                        >
                                             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                                                 <div className="flex-1">
                                                     <div className="flex flex-wrap items-center gap-2 mb-3">
-                                                        <Badge className="bg-blue-100 text-blue-800 border-blue-200 rounded-full">
+                                                        <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/30 rounded-full">
                                                             {template.type}
                                                         </Badge>
                                                         {template.trigger_event && (
-                                                            <Badge variant="outline" className="border-gray-300 text-gray-700 rounded-full">
+                                                            <Badge variant="outline" className="border-gray-600 text-gray-300 rounded-full">
                                                                 {template.trigger_event}
                                                             </Badge>
                                                         )}
@@ -534,18 +569,21 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                                             className={cn(
                                                                 "rounded-full",
                                                                 template.is_active
-                                                                    ? "bg-green-100 text-green-800 border-green-200"
-                                                                    : "bg-gray-100 text-gray-800 border-gray-200"
+                                                                    ? "bg-green-500/10 text-green-400 border-green-500/30"
+                                                                    : "bg-gray-600/20 text-gray-300 border-gray-600"
                                                             )}
                                                         >
-                                                            {template.is_active ? 'Active' : 'Inactive'}
+                                                            {template.is_active ? "Active" : "Inactive"}
                                                         </Badge>
                                                     </div>
-                                                    <h4 className="font-semibold text-gray-900">{template.name}</h4>
-                                                    <p className="text-sm text-gray-600 mt-1">{template.subject}</p>
+                                                    <h4 className="font-semibold text-white">{template.name}</h4>
+                                                    <p className="text-sm text-gray-300 mt-1">{template.subject}</p>
                                                     <div className="flex flex-wrap gap-1 mt-2">
-                                                        {template.variables.map(variable => (
-                                                            <span key={variable} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                                                        {template.variables.map((variable) => (
+                                                            <span
+                                                                key={variable}
+                                                                className="text-xs bg-gray-700/50 text-gray-300 px-2 py-1 rounded"
+                                                            >
                                                                 {variable}
                                                             </span>
                                                         ))}
@@ -556,7 +594,7 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => testTemplate(template.id)}
-                                                        className="text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                                                        className="text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg"
                                                     >
                                                         <Eye className="h-4 w-4" />
                                                     </Button>
@@ -567,11 +605,11 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                                         className={cn(
                                                             "rounded-lg",
                                                             template.is_active
-                                                                ? "text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-                                                                : "text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                                ? "text-amber-400 hover:text-amber-300 hover:bg-amber-500/10"
+                                                                : "text-green-400 hover:text-green-300 hover:bg-green-500/10"
                                                         )}
                                                     >
-                                                        {template.is_active ? 'Deactivate' : 'Activate'}
+                                                        {template.is_active ? "Deactivate" : "Activate"}
                                                     </Button>
                                                 </div>
                                             </div>
@@ -585,62 +623,74 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                     {/* Follow-up Schedules Tab */}
                     <TabsContent value="schedules" className="space-y-6">
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-gray-900">Create New Follow-up Schedule</h3>
+                            <h3 className="text-lg font-semibold text-white">Create New Follow-up Schedule</h3>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="scheduleName" className="text-gray-700">Schedule Name</Label>
+                                    <Label htmlFor="scheduleName" className="text-gray-200">
+                                        Schedule Name
+                                    </Label>
                                     <Input
                                         id="scheduleName"
                                         placeholder="e.g., 7-Day Follow-up"
                                         value={newSchedule.name}
                                         onChange={(e) => setNewSchedule({ ...newSchedule, name: e.target.value })}
-                                        className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                                        className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="delayDays" className="text-gray-700">Delay (Days)</Label>
+                                    <Label htmlFor="delayDays" className="text-gray-200">
+                                        Delay (Days)
+                                    </Label>
                                     <Input
                                         id="delayDays"
                                         type="number"
                                         min="0"
                                         value={newSchedule.delay_days}
-                                        onChange={(e) => setNewSchedule({ ...newSchedule, delay_days: parseInt(e.target.value) || 0 })}
-                                        className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                                        onChange={(e) =>
+                                            setNewSchedule({ ...newSchedule, delay_days: parseInt(e.target.value) || 0 })
+                                        }
+                                        className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="delayHours" className="text-gray-700">Delay (Hours)</Label>
+                                    <Label htmlFor="delayHours" className="text-gray-200">
+                                        Delay (Hours)
+                                    </Label>
                                     <Input
                                         id="delayHours"
                                         type="number"
                                         min="0"
                                         max="23"
                                         value={newSchedule.delay_hours}
-                                        onChange={(e) => setNewSchedule({ ...newSchedule, delay_hours: parseInt(e.target.value) || 0 })}
-                                        className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                                        onChange={(e) =>
+                                            setNewSchedule({ ...newSchedule, delay_hours: parseInt(e.target.value) || 0 })
+                                        }
+                                        className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label className="text-gray-700">Trigger Conditions</Label>
-                                    <div className="text-sm text-gray-600 p-2 bg-gray-50/50 border border-gray-200 rounded-xl">
+                                    <Label className="text-gray-200">Trigger Conditions</Label>
+                                    <div className="text-sm text-gray-300 p-2 bg-gray-800/50 border border-white/10 rounded-xl">
                                         Will trigger when lead matches status, priority, and days without contact
                                     </div>
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="scheduleDescription" className="text-gray-700">Description</Label>
+                                <Label htmlFor="scheduleDescription" className="text-gray-200">
+                                    Description
+                                </Label>
                                 <Textarea
                                     id="scheduleDescription"
                                     placeholder="Describe when this follow-up should trigger"
                                     rows={3}
                                     value={newSchedule.description}
                                     onChange={(e) => setNewSchedule({ ...newSchedule, description: e.target.value })}
-                                    className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                                    className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                 />
                             </div>
 
@@ -651,12 +701,12 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                         onCheckedChange={(checked) => setNewSchedule({ ...newSchedule, is_active: checked })}
                                         className="data-[state=checked]:bg-blue-600"
                                     />
-                                    <Label className="text-gray-700">Active</Label>
+                                    <Label className="text-gray-200">Active</Label>
                                 </div>
                                 <Button
                                     onClick={saveSchedule}
                                     disabled={isLoading}
-                                    className="bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-600/20 rounded-xl"
+                                    className="bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:from-blue-600 hover:to-blue-700 hover:shadow-blue-500/25 rounded-xl"
                                 >
                                     <Save className="h-4 w-4 mr-2" />
                                     Save Schedule
@@ -664,22 +714,25 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                             </div>
                         </div>
 
-                        <Separator className="bg-gray-200" />
+                        <Separator className="bg-white/10" />
 
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-gray-900">
-                                Active Schedules ({schedules.filter(s => s.is_active).length})
+                            <h3 className="text-lg font-semibold text-white">
+                                Active Schedules ({schedules.filter((s) => s.is_active).length})
                             </h3>
 
                             {schedules.length === 0 ? (
-                                <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/30">
-                                    <Clock className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                                    <p className="text-gray-600">No follow-up schedules created yet</p>
+                                <div className="text-center py-8 border-2 border-dashed border-white/10 rounded-xl bg-gray-800/20">
+                                    <Clock className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                                    <p className="text-gray-300">No follow-up schedules created yet</p>
                                 </div>
                             ) : (
                                 <div className="space-y-3">
-                                    {schedules.map(schedule => (
-                                        <div key={schedule.id} className="p-5 border border-gray-200 rounded-xl hover:shadow-md transition-all">
+                                    {schedules.map((schedule) => (
+                                        <div
+                                            key={schedule.id}
+                                            className="p-5 border border-white/10 rounded-xl hover:bg-gray-700/30 transition-all"
+                                        >
                                             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                                                 <div className="flex-1">
                                                     <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -688,29 +741,33 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                                             className={cn(
                                                                 "rounded-full",
                                                                 schedule.is_active
-                                                                    ? "bg-green-100 text-green-800 border-green-200"
-                                                                    : "bg-gray-100 text-gray-800 border-gray-200"
+                                                                    ? "bg-green-500/10 text-green-400 border-green-500/30"
+                                                                    : "bg-gray-600/20 text-gray-300 border-gray-600"
                                                             )}
                                                         >
-                                                            {schedule.is_active ? 'Active' : 'Inactive'}
+                                                            {schedule.is_active ? "Active" : "Inactive"}
                                                         </Badge>
-                                                        <Badge variant="outline" className="border-gray-300 text-gray-700 rounded-full">
-                                                            After {schedule.delay_days} day{schedule.delay_days !== 1 ? 's' : ''}
-                                                            {schedule.delay_hours > 0 && `, ${schedule.delay_hours} hour${schedule.delay_hours !== 1 ? 's' : ''}`}
+                                                        <Badge variant="outline" className="border-gray-600 text-gray-300 rounded-full">
+                                                            After {schedule.delay_days} day{schedule.delay_days !== 1 ? "s" : ""}
+                                                            {schedule.delay_hours > 0 &&
+                                                                `, ${schedule.delay_hours} hour${schedule.delay_hours !== 1 ? "s" : ""}`}
                                                         </Badge>
                                                     </div>
-                                                    <h4 className="font-semibold text-gray-900">{schedule.name}</h4>
-                                                    <p className="text-sm text-gray-600 mt-1">{schedule.description}</p>
-                                                    <div className="mt-3 text-sm bg-gray-50/50 p-3 border border-gray-200 rounded-xl">
-                                                        <span className="font-medium text-gray-900">Triggers:</span>{' '}
-                                                        <span className="text-gray-700">
-                                                            Status: {Array.isArray(schedule.trigger_condition?.status)
-                                                                ? schedule.trigger_condition.status.join(', ')
-                                                                : 'Any'},
-                                                            Priority: {Array.isArray(schedule.trigger_condition?.priority)
-                                                                ? schedule.trigger_condition.priority.join(', ')
-                                                                : 'Any'},
-                                                            After {schedule.trigger_condition?.days_without_contact || 0} days without contact
+                                                    <h4 className="font-semibold text-white">{schedule.name}</h4>
+                                                    <p className="text-sm text-gray-300 mt-1">{schedule.description}</p>
+                                                    <div className="mt-3 text-sm bg-gray-800/50 p-3 border border-white/10 rounded-xl">
+                                                        <span className="font-medium text-white">Triggers:</span>{" "}
+                                                        <span className="text-gray-300">
+                                                            Status:{" "}
+                                                            {Array.isArray(schedule.trigger_condition?.status)
+                                                                ? schedule.trigger_condition.status.join(", ")
+                                                                : "Any"}
+                                                            , Priority:{" "}
+                                                            {Array.isArray(schedule.trigger_condition?.priority)
+                                                                ? schedule.trigger_condition.priority.join(", ")
+                                                                : "Any"}
+                                                            , After {schedule.trigger_condition?.days_without_contact || 0} days without
+                                                            contact
                                                         </span>
                                                     </div>
                                                 </div>
@@ -722,11 +779,11 @@ export default function EmailTemplates({ businessId }: EmailTemplatesProps) {
                                                         className={cn(
                                                             "rounded-lg",
                                                             schedule.is_active
-                                                                ? "text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-                                                                : "text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                                ? "text-amber-400 hover:text-amber-300 hover:bg-amber-500/10"
+                                                                : "text-green-400 hover:text-green-300 hover:bg-green-500/10"
                                                         )}
                                                     >
-                                                        {schedule.is_active ? 'Deactivate' : 'Activate'}
+                                                        {schedule.is_active ? "Deactivate" : "Activate"}
                                                     </Button>
                                                 </div>
                                             </div>

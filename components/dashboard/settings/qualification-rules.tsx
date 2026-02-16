@@ -39,9 +39,7 @@ export default function QualificationRules({
     initialRules,
     initialThresholds,
 }: QualificationRulesProps) {
-    const safeRules = (initialRules || []).filter(
-        (rule) => rule.field && rule.condition,
-    );
+    const safeRules = (initialRules || []).filter((rule) => rule.field && rule.condition);
 
     const [rules, setRules] = useState<QualificationRule[]>(safeRules);
     const [thresholds, setThresholds] = useState(initialThresholds);
@@ -163,12 +161,10 @@ export default function QualificationRules({
     };
 
     return (
-        <Card className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md">
+        <Card className="border border-white/10 bg-gray-800/30 backdrop-blur-xl shadow-lg">
             <CardHeader>
-                <CardTitle className="text-xl font-semibold text-gray-900">
-                    Lead Qualification Rules
-                </CardTitle>
-                <CardDescription className="text-gray-600">
+                <CardTitle className="text-xl font-semibold text-white">Lead Qualification Rules</CardTitle>
+                <CardDescription className="text-gray-300">
                     Define rules to automatically score and prioritize incoming leads
                 </CardDescription>
             </CardHeader>
@@ -176,11 +172,11 @@ export default function QualificationRules({
             <CardContent className="space-y-6">
                 {/* Priority Thresholds */}
                 <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Priority Thresholds</h3>
+                    <h3 className="text-lg font-semibold text-white">Priority Thresholds</h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-gray-700">High Priority Score</Label>
+                            <Label className="text-gray-200">High Priority Score</Label>
                             <Input
                                 type="number"
                                 value={thresholds.high}
@@ -190,12 +186,12 @@ export default function QualificationRules({
                                         high: parseInt(e.target.value) || 80,
                                     })
                                 }
-                                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                                className="border-gray-700 bg-gray-800/50 text-white focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-gray-700">Medium Priority Score</Label>
+                            <Label className="text-gray-200">Medium Priority Score</Label>
                             <Input
                                 type="number"
                                 value={thresholds.medium}
@@ -205,28 +201,28 @@ export default function QualificationRules({
                                         medium: parseInt(e.target.value) || 60,
                                     })
                                 }
-                                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                                className="border-gray-700 bg-gray-800/50 text-white focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-gray-700">Low Priority</Label>
-                            <div className="h-10 px-3 py-2 border border-gray-200 rounded-xl bg-gray-50/50 text-gray-700 text-sm flex items-center">
+                            <Label className="text-gray-200">Low Priority</Label>
+                            <div className="h-10 px-3 py-2 border border-gray-700 rounded-xl bg-gray-800/50 text-gray-300 text-sm flex items-center">
                                 &lt; {thresholds.medium}
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <Separator className="bg-gray-200" />
+                <Separator className="bg-white/10" />
 
                 {/* Add Rule */}
                 <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Add New Rule</h3>
+                    <h3 className="text-lg font-semibold text-white">Add New Rule</h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                         <div>
-                            <Label className="text-gray-700">Field</Label>
+                            <Label className="text-gray-200">Field</Label>
                             <Select
                                 value={newRule.field}
                                 onValueChange={(value) =>
@@ -236,7 +232,7 @@ export default function QualificationRules({
                                     })
                                 }
                             >
-                                <SelectTrigger className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl">
+                                <SelectTrigger className="border-gray-700 bg-gray-800/50 text-white focus:border-blue-500 focus:ring-blue-500 rounded-xl">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -250,7 +246,7 @@ export default function QualificationRules({
                         </div>
 
                         <div>
-                            <Label className="text-gray-700">Condition</Label>
+                            <Label className="text-gray-200">Condition</Label>
                             <Select
                                 value={newRule.condition}
                                 onValueChange={(value) =>
@@ -260,7 +256,7 @@ export default function QualificationRules({
                                     })
                                 }
                             >
-                                <SelectTrigger className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl">
+                                <SelectTrigger className="border-gray-700 bg-gray-800/50 text-white focus:border-blue-500 focus:ring-blue-500 rounded-xl">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -274,19 +270,17 @@ export default function QualificationRules({
                         </div>
 
                         <div>
-                            <Label className="text-gray-700">Value</Label>
+                            <Label className="text-gray-200">Value</Label>
                             <Input
                                 value={String(newRule.value)}
                                 placeholder={getFieldExample(newRule.field)}
-                                onChange={(e) =>
-                                    setNewRule({ ...newRule, value: e.target.value })
-                                }
-                                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                                onChange={(e) => setNewRule({ ...newRule, value: e.target.value })}
+                                className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                             />
                         </div>
 
                         <div>
-                            <Label className="text-gray-700">Score</Label>
+                            <Label className="text-gray-200">Score</Label>
                             <Input
                                 type="number"
                                 value={newRule.score}
@@ -296,18 +290,16 @@ export default function QualificationRules({
                                         score: parseInt(e.target.value) || 0,
                                     })
                                 }
-                                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                                className="border-gray-700 bg-gray-800/50 text-white focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                             />
                         </div>
 
                         <div>
-                            <Label className="text-gray-700">Tag (Optional)</Label>
+                            <Label className="text-gray-200">Tag (Optional)</Label>
                             <Input
                                 value={newRule.tag || ""}
-                                onChange={(e) =>
-                                    setNewRule({ ...newRule, tag: e.target.value })
-                                }
-                                className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                                onChange={(e) => setNewRule({ ...newRule, tag: e.target.value })}
+                                className="border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                             />
                         </div>
                     </div>
@@ -315,7 +307,7 @@ export default function QualificationRules({
                     <div className="flex justify-end">
                         <Button
                             onClick={addRule}
-                            className="bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-600/20 rounded-xl"
+                            className="bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:from-blue-600 hover:to-blue-700 hover:shadow-blue-500/25 rounded-xl"
                         >
                             <Plus className="mr-2 h-4 w-4" />
                             Add Rule
@@ -323,45 +315,47 @@ export default function QualificationRules({
                     </div>
                 </div>
 
-                <Separator className="bg-gray-200" />
+                <Separator className="bg-white/10" />
 
                 {/* Existing Rules */}
                 <div className="space-y-4">
                     {rules.length === 0 ? (
-                        <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/30">
+                        <div className="text-center py-8 border-2 border-dashed border-white/10 rounded-xl bg-gray-800/20">
                             <AlertCircle className="mx-auto h-8 w-8 text-gray-400" />
-                            <p className="mt-2 text-sm text-gray-600">No rules defined</p>
+                            <p className="mt-2 text-sm text-gray-400">No rules defined</p>
                         </div>
                     ) : (
                         <>
-                            <h3 className="text-lg font-semibold text-gray-900">Existing Rules ({rules.length})</h3>
+                            <h3 className="text-lg font-semibold text-white">Existing Rules ({rules.length})</h3>
                             <div className="space-y-3">
                                 {rules.map((rule) => (
                                     <div
                                         key={rule.id}
-                                        className="flex items-start justify-between p-4 border border-gray-200 rounded-xl hover:shadow-md transition-all"
+                                        className="flex items-start justify-between p-4 border border-white/10 rounded-xl hover:bg-gray-700/30 transition-all"
                                     >
                                         <div className="flex-1">
                                             <div className="flex flex-wrap items-center gap-2 mb-2">
-                                                <Badge className="bg-blue-100 text-blue-800 border-blue-200 rounded-full">
+                                                <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/30 rounded-full">
                                                     {rule.field}
                                                 </Badge>
-                                                <Badge variant="secondary" className="bg-gray-100 text-gray-800 border-gray-200 rounded-full">
+                                                <Badge variant="secondary" className="bg-gray-600/20 text-gray-300 border-gray-600 rounded-full">
                                                     {rule.condition}
                                                 </Badge>
-                                                <span className="text-sm font-medium text-gray-900">{String(rule.value)}</span>
+                                                <span className="text-sm font-medium text-white">{String(rule.value)}</span>
                                             </div>
-                                            <div className="text-sm text-gray-700">
-                                                Score: <span className="font-semibold text-blue-600">{rule.score}</span>
+                                            <div className="text-sm text-gray-300">
+                                                Score: <span className="font-semibold text-blue-400">{rule.score}</span>
                                                 {rule.tag && (
-                                                    <span className="ml-2">• Tag: <span className="font-semibold">{rule.tag}</span></span>
+                                                    <span className="ml-2">
+                                                        • Tag: <span className="font-semibold">{rule.tag}</span>
+                                                    </span>
                                                 )}
                                             </div>
                                         </div>
                                         <Button
                                             variant="ghost"
                                             onClick={() => removeRule(rule.id)}
-                                            className="text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg ml-2"
+                                            className="text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg ml-2"
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
@@ -376,7 +370,7 @@ export default function QualificationRules({
                     <Button
                         onClick={saveRules}
                         disabled={isLoading}
-                        className="bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-600/20 rounded-xl"
+                        className="bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:from-blue-600 hover:to-blue-700 hover:shadow-blue-500/25 rounded-xl"
                     >
                         <Save className="mr-2 h-4 w-4" />
                         Save Rules

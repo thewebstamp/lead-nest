@@ -32,72 +32,66 @@ export default async function AnalyticsPage() {
         [session.user.businessId]
     );
 
-    // Get business info for the dashboard
     const business = await query<{
         name: string;
         service_types: string[];
         created_at: Date;
-    }>(
-        "SELECT name, service_types, created_at FROM businesses WHERE id = $1",
-        [session.user.businessId]
-    );
+    }>("SELECT name, service_types, created_at FROM businesses WHERE id = $1", [
+        session.user.businessId,
+    ]);
 
     return (
         <div className="space-y-6">
             {/* Header */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-                        Analytics Dashboard
-                    </h1>
-                    <p className="text-gray-600">
-                        Track performance and make data-driven decisions
-                    </p>
+                    <h1 className="text-2xl font-bold text-white tracking-tight">Analytics Dashboard</h1>
+                    <p className="text-gray-300">Track performance and make data-driven decisions</p>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-500 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-xl border border-gray-200">
-                    <Calendar className="h-4 w-4 text-blue-600" />
+                <div className="flex items-center gap-2 text-sm text-gray-300 bg-gray-800/30 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/10">
+                    <Calendar className="h-4 w-4 text-blue-400" />
                     <span>Since {new Date(business.rows[0]?.created_at || new Date()).toLocaleDateString()}</span>
                 </div>
             </div>
 
             {/* Initial Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md rounded-xl p-6 hover:shadow-lg transition-all">
+                <div className="border border-white/10 bg-gray-800/30 backdrop-blur-xl shadow-lg rounded-xl p-6 hover:shadow-xl transition-all">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-gray-600">Total Leads (30 days)</p>
-                            <p className="text-3xl font-bold text-gray-900 mt-1">
-                                {initialSummary.rows[0]?.total_leads || '0'}
+                            <p className="text-sm font-medium text-gray-300">Total Leads (30 days)</p>
+                            <p className="text-3xl font-bold text-white mt-1">
+                                {initialSummary.rows[0]?.total_leads || "0"}
                             </p>
                         </div>
-                        <div className="h-12 w-12 rounded-lg bg-linear-to-br from-blue-500/10 to-blue-600/10 flex items-center justify-center border border-blue-200/50">
-                            <Users className="h-6 w-6 text-blue-600" />
+                        <div className="h-12 w-12 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                            <Users className="h-6 w-6 text-blue-400" />
                         </div>
                     </div>
                 </div>
-                <div className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md rounded-xl p-6 hover:shadow-lg transition-all">
+                <div className="border border-white/10 bg-gray-800/30 backdrop-blur-xl shadow-lg rounded-xl p-6 hover:shadow-xl transition-all">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-gray-600">Booked Leads</p>
-                            <p className="text-3xl font-bold text-gray-900 mt-1">
-                                {initialSummary.rows[0]?.booked_leads || '0'}
+                            <p className="text-sm font-medium text-gray-300">Booked Leads</p>
+                            <p className="text-3xl font-bold text-white mt-1">
+                                {initialSummary.rows[0]?.booked_leads || "0"}
                             </p>
                         </div>
-                        <div className="h-12 w-12 rounded-lg bg-linear-to-br from-green-500/10 to-green-600/10 flex items-center justify-center border border-green-200/50">
-                            <Target className="h-6 w-6 text-green-600" />
+                        <div className="h-12 w-12 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+                            <Target className="h-6 w-6 text-green-400" />
                         </div>
                     </div>
                 </div>
-                <div className="border border-gray-200 bg-white/80 backdrop-blur-sm shadow-md rounded-xl p-6 hover:shadow-lg transition-all">
+                <div className="border border-white/10 bg-gray-800/30 backdrop-blur-xl shadow-lg rounded-xl p-6 hover:shadow-xl transition-all">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-gray-600">Conversion Rate</p>
-                            <p className="text-3xl font-bold text-gray-900 mt-1">
-                                {initialSummary.rows[0]?.conversion_rate || '0'}%
+                            <p className="text-sm font-medium text-gray-300">Conversion Rate</p>
+                            <p className="text-3xl font-bold text-white mt-1">
+                                {initialSummary.rows[0]?.conversion_rate || "0"}%
                             </p>
                         </div>
-                        <div className="h-12 w-12 rounded-lg bg-linear-to-br from-purple-500/10 to-purple-600/10 flex items-center justify-center border border-purple-200/50">
-                            <TrendingUp className="h-6 w-6 text-purple-600" />
+                        <div className="h-12 w-12 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+                            <TrendingUp className="h-6 w-6 text-purple-400" />
                         </div>
                     </div>
                 </div>

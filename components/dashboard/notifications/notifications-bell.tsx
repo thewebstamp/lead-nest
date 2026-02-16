@@ -75,9 +75,7 @@ export function NotificationsBell() {
                 }
                 toast({
                     title: "Success",
-                    description: notificationId
-                        ? "Notification marked as read"
-                        : "All notifications cleared",
+                    description: notificationId ? "Notification marked as read" : "All notifications cleared",
                 });
             }
         } catch {
@@ -94,15 +92,15 @@ export function NotificationsBell() {
     const getPriorityColor = (priority: string) => {
         switch (priority) {
             case "urgent":
-                return "bg-red-100 text-red-800 border-red-300";
+                return "bg-red-500/20 text-red-400 border-red-500/30";
             case "high":
-                return "bg-orange-100 text-orange-800 border-orange-300";
+                return "bg-orange-500/20 text-orange-400 border-orange-500/30";
             case "medium":
-                return "bg-blue-100 text-blue-800 border-blue-300";
+                return "bg-blue-500/20 text-blue-400 border-blue-500/30";
             case "low":
-                return "bg-gray-100 text-gray-800 border-gray-300";
+                return "bg-gray-500/20 text-gray-300 border-gray-500/30";
             default:
-                return "bg-gray-100 text-gray-800";
+                return "bg-gray-500/20 text-gray-300";
         }
     };
 
@@ -115,7 +113,7 @@ export function NotificationsBell() {
             case "medium":
                 return "border-l-blue-500";
             default:
-                return "border-l-gray-300";
+                return "border-l-gray-500";
         }
     };
 
@@ -149,28 +147,26 @@ export function NotificationsBell() {
                 <Button
                     variant="ghost"
                     size="sm"
-                    className="relative text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors rounded-xl"
+                    className="relative text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors rounded-xl"
                 >
                     <Bell className="h-5 w-5" />
                     {unreadCount > 0 && (
-                        <Badge className="absolute -top-1 -right-1 h-5 min-w-5 flex items-center justify-center p-0 px-1 text-xs bg-linear-to-r from-blue-600 to-blue-700 text-white border-0 shadow-sm">
+                        <Badge className="absolute -top-1 -right-1 h-5 min-w-5 flex items-center justify-center p-0 px-1 text-xs bg-linear-to-r from-blue-500 to-blue-600 text-white border-0 shadow-sm">
                             {unreadCount > 9 ? "9+" : unreadCount}
                         </Badge>
                     )}
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-96 p-0">
-                <DropdownMenuLabel className="flex items-center justify-between px-4 py-3 bg-linear-to-br from-gray-50 to-white border-b border-gray-200">
-                    <span className="text-sm font-semibold text-gray-900">
-                        Notifications ({unreadCount})
-                    </span>
+            <DropdownMenuContent align="end" className="w-96 p-0 bg-gray-900/90 backdrop-blur-xl border-white/10">
+                <DropdownMenuLabel className="flex items-center justify-between px-4 py-3 bg-gray-800/50 border-b border-white/10">
+                    <span className="text-sm font-semibold text-white">Notifications ({unreadCount})</span>
                     {unreadCount > 0 && (
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => markAsRead()}
                             disabled={isLoading}
-                            className="h-7 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg"
+                            className="h-7 px-2 text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 rounded-lg"
                         >
                             <Check className="h-3.5 w-3.5 mr-1" />
                             Mark all read
@@ -180,47 +176,36 @@ export function NotificationsBell() {
 
                 {notifications.length === 0 ? (
                     <div className="py-12 text-center">
-                        <div className="mx-auto w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+                        <div className="mx-auto w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center mb-3">
                             <Bell className="h-6 w-6 text-gray-400" />
                         </div>
-                        <p className="text-sm text-gray-600 font-medium">No new notifications</p>
-                        <p className="text-xs text-gray-500 mt-1">You&apos;re all caught up!</p>
+                        <p className="text-sm text-gray-200 font-medium">No new notifications</p>
+                        <p className="text-xs text-gray-400 mt-1">You&apos;re all caught up!</p>
                     </div>
                 ) : (
-                    <div className="max-h-96 overflow-y-auto divide-y divide-gray-100">
+                    <div className="max-h-96 overflow-y-auto divide-y divide-white/10">
                         {notifications.map((notification) => (
                             <DropdownMenuItem
                                 key={notification.id}
                                 className={cn(
                                     "flex flex-col items-start p-4 cursor-pointer rounded-none border-l-4",
                                     getPriorityBorder(notification.priority),
-                                    "focus:bg-gray-50 focus:text-gray-900 data-highlighted:bg-gray-50"
+                                    "bg-transparent hover:bg-gray-800/50 focus:bg-gray-800/50 text-white"
                                 )}
                                 onClick={() => handleNotificationClick(notification)}
                             >
                                 <div className="flex items-start w-full">
-                                    <div className="mr-3 text-xl">
-                                        {getNotificationIcon(notification.type)}
-                                    </div>
+                                    <div className="mr-3 text-xl">{getNotificationIcon(notification.type)}</div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-start justify-between gap-2">
-                                            <span className="font-semibold text-sm text-gray-900 truncate">
-                                                {notification.title}
-                                            </span>
-                                            <Badge
-                                                className={cn(
-                                                    "text-xs px-2 py-0.5 rounded-full border shrink-0",
-                                                    getPriorityColor(notification.priority)
-                                                )}
-                                            >
+                                            <span className="font-semibold text-sm text-white truncate">{notification.title}</span>
+                                            <Badge className={cn("text-xs px-2 py-0.5 rounded-full border", getPriorityColor(notification.priority))}>
                                                 {notification.priority}
                                             </Badge>
                                         </div>
-                                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                                            {notification.message}
-                                        </p>
+                                        <p className="text-sm text-gray-300 mt-1 line-clamp-2">{notification.message}</p>
                                         <div className="flex items-center justify-between mt-2">
-                                            <span className="text-xs text-gray-500">
+                                            <span className="text-xs text-gray-400">
                                                 {new Date(notification.created_at).toLocaleTimeString([], {
                                                     hour: "2-digit",
                                                     minute: "2-digit",
@@ -229,7 +214,7 @@ export function NotificationsBell() {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                className="h-6 px-2 text-xs text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                                                className="h-6 px-2 text-xs text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     markAsRead(notification.id);

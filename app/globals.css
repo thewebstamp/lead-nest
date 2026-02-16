@@ -1,6 +1,4 @@
-/* globals.css */
 @import "tailwindcss";
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @theme {
@@ -18,28 +16,43 @@
   --color-accent: hsl(210 40% 96.1%);
   --color-accent-foreground: hsl(222.2 47.4% 11.2%);
   --color-border: hsl(214.3 31.8% 91.4%);
-  
+
+  /* Dark theme colors (overridden in .dark) */
+  --color-background-dark: #0B1120;
+  --color-foreground-dark: #ffffff;
+  --color-card-dark: rgba(17, 25, 40, 0.3);
+  --color-card-foreground-dark: #ffffff;
+  --color-primary-dark: #3b82f6;
+  --color-primary-foreground-dark: #ffffff;
+  --color-secondary-dark: #1f2937;
+  --color-secondary-foreground-dark: #ffffff;
+  --color-muted-dark: #374151;
+  --color-muted-foreground-dark: #9ca3af;
+  --color-accent-dark: #1f2937;
+  --color-accent-foreground-dark: #ffffff;
+  --color-border-dark: rgba(255, 255, 255, 0.1);
+
   /* Border radius */
-  --radius-lg: 0.5rem;
-  --radius-md: 0.375rem;
-  --radius-sm: 0.25rem;
+  --radius-lg: 0.75rem;
+  --radius-md: 0.5rem;
+  --radius-sm: 0.375rem;
 }
 
 .dark {
-  /* Dark theme colors */
-  --color-background: hsl(222.2 84% 4.9%);
-  --color-foreground: hsl(210 40% 98%);
-  --color-card: hsl(222.2 84% 4.9%);
-  --color-card-foreground: hsl(210 40% 98%);
-  --color-primary: hsl(217.2 91.2% 59.8%);
-  --color-primary-foreground: hsl(222.2 47.4% 11.2%);
-  --color-secondary: hsl(217.2 32.6% 17.5%);
-  --color-secondary-foreground: hsl(210 40% 98%);
-  --color-muted: hsl(217.2 32.6% 17.5%);
-  --color-muted-foreground: hsl(215 20.2% 65.1%);
-  --color-accent: hsl(217.2 32.6% 17.5%);
-  --color-accent-foreground: hsl(210 40% 98%);
-  --color-border: hsl(217.2 32.6% 17.5%);
+  /* Dark theme colors - using our premium gradient */
+  --color-background: var(--color-background-dark);
+  --color-foreground: var(--color-foreground-dark);
+  --color-card: var(--color-card-dark);
+  --color-card-foreground: var(--color-card-foreground-dark);
+  --color-primary: var(--color-primary-dark);
+  --color-primary-foreground: var(--color-primary-foreground-dark);
+  --color-secondary: var(--color-secondary-dark);
+  --color-secondary-foreground: var(--color-secondary-foreground-dark);
+  --color-muted: var(--color-muted-dark);
+  --color-muted-foreground: var(--color-muted-foreground-dark);
+  --color-accent: var(--color-accent-dark);
+  --color-accent-foreground: var(--color-accent-foreground-dark);
+  --color-border: var(--color-border-dark);
 }
 
 /* Base styles */
@@ -49,39 +62,76 @@ body {
   color: var(--color-foreground);
 }
 
-/* Custom utilities */
-.bg-gradient-border {
-  border: double 1px transparent;
-  background-image: linear-gradient(var(--color-background), var(--color-background)), 
-                    linear-gradient(to right, var(--color-primary), var(--color-secondary));
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
+/* Premium dark gradient background utility */
+.bg-gradient-premium-dark {
+  background: linear-gradient(135deg, #0B1120 0%, #0F1A2F 50%, #1A2A3F 100%);
 }
 
-/* Scrollbar styling */
+/* Radial glow overlay */
+.bg-radial-glow {
+  background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.15), transparent 70%);
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: rgba(17, 25, 40, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Glassmorphism panel (lighter) */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Scrollbar styling for dark theme */
 ::-webkit-scrollbar {
   width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-background);
+  background: #0B1120;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-muted);
+  background: #1f2937;
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-muted-foreground);
+  background: #374151;
 }
 
 /* Selection styling */
 ::selection {
-  background-color: var(--color-primary);
-  color: var(--color-primary-foreground);
+  background-color: #3b82f6;
+  color: white;
 }
 
+/* Custom animations */
 @keyframes slide-x {
   0% { transform: translateX(-100%); opacity: 0.3; }
   100% { transform: translateX(200%); opacity: 0.5; }
@@ -98,4 +148,42 @@ body {
 
 .animate-slide-y {
   animation: slide-y infinite linear;
+}
+
+/* Additional utilities for glass borders */
+.border-glass {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.border-glass-light {
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.border-glass-hover:hover {
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+/* Focus ring for dark theme */
+.focus-ring-blue {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900;
+}
+
+/* Badge colors for dark theme */
+.badge-blue {
+  @apply bg-blue-500/10 text-blue-400 border border-blue-500/30;
+}
+.badge-green {
+  @apply bg-green-500/10 text-green-400 border border-green-500/30;
+}
+.badge-amber {
+  @apply bg-amber-500/10 text-amber-400 border border-amber-500/30;
+}
+.badge-red {
+  @apply bg-red-500/10 text-red-400 border border-red-500/30;
+}
+.badge-purple {
+  @apply bg-purple-500/10 text-purple-400 border border-purple-500/30;
+}
+.badge-gray {
+  @apply bg-gray-500/10 text-gray-300 border border-gray-500/30;
 }
