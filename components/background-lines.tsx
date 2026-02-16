@@ -9,7 +9,7 @@ interface BackgroundLinesProps {
 
 export const BackgroundLines = ({ variant = "light" }: BackgroundLinesProps) => {
     const lines = Array.from({ length: 8 }, (_, i) => i);
-    const color = variant === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)";
+    const color = variant === "dark" ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.2)";
 
     return (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
